@@ -1,0 +1,62 @@
+title:
+  "Team register"
+
+
+introduction:
+  "This register holds a list of process areas with
+  a brief description for each."
+
+
+register:
+
+  a0_env:
+    desc: "A repository of artifacts needed to
+          create or reproduce a runtime, build
+          or development environment. This
+          consists of an archive of virtual
+          machine disk images as well as any
+          binary dependencies that may be used
+          to create them. Vendored source files,
+          documentation and other environment
+          management resources are also stored
+          here."
+
+  a1_cfg:
+    desc: "A repository of configuration files
+          for individual users and specific
+          devices. This area is intended to help
+          support the ability to reproduce the
+          working environment of individual team
+          members - either to recover from a
+          catastrophic failure or to reproduce
+          and diagnose problems. This area was
+          created because Eclipse configuration
+          can affect the behaviour of the build
+          but is at the same time both user and
+          machine specific, making it unsuitable
+          to store in the main part of the
+          repository."
+
+  a2_dat:
+    desc: "A repository of data files for
+          validation and training. This mainly
+          consists of a systematic structure of
+          symlinks to remote or local files,
+          rather than files checked-in to the
+          version control system."
+
+  a3_src:
+    desc: "A repository of design documents that
+          act as the source of truth for system
+          design configurations and the input to
+          any production process."
+
+  a4_tmp:
+    desc: "A structured temporary storage area
+          that provides a space for files created
+          as a byproduct of an automated process."
+
+  a5_cms:
+    desc: "A structured repository for storing
+          the generated output from our automated
+          processes."

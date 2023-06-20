@@ -1,0 +1,143 @@
+system:
+  id_system: dm001_workflow
+
+
+###############################################################################
+host:
+  localhost:
+    hostname:        'localhost'
+    acct_run:        'wtp'
+    acct_provision:  'wtp'
+    port_range:      '8090-9000'
+    dirpath_log:     ''
+    launch_cmd:      ''
+    environment:     'e002_general_research'
+    log_level:       'TRACE'
+
+
+###############################################################################
+process:
+  proc_main:
+    host: localhost
+
+
+###############################################################################
+node:
+
+  # ---------------------------------------------------------------------------
+  # System clock and state management for the entire system.
+  #
+  system_controller:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.ctrl.sys.ic00_edict
+    state_type:     py_dict
+    config:
+      frequency_hz: 10
+      idx_max:      1200
+
+  # ---------------------------------------------------------------------------
+  # State management for the main process.
+  #
+  main_process_controller:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.ctrl.proc.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # UI.
+  #
+  ui:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.ui.gradio.nlp.simple.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # ACE simplification.
+  #
+  ace:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.rpa.cnl.ace.simplify.ic00_edict
+    state_type:     py_dict
+    config:
+      filepath_env:         Null
+      envvar_key:           OPENAI_API_KEY
+      secs_interval:        0.1
+      is_bit:               False
+      is_async:             True
+      default:
+        id_endpoint:        'chat_completions'
+        model:              'gpt-3.5-turbo'
+        temperature:        1.0
+        n:                  1
+        stream:             False
+        presence_penalty:   0.0
+        frequency_penalty:  0.0
+        user:               ''
+
+
+###############################################################################
+edge:
+
+# -----------------------------------------------------------------------------
+# Fan out from the system controller
+# component to all of the process
+# specific subsidiary controller
+# components.
+#
+
+- owner: system_controller
+  data:  py_dict
+  src:   system_controller.outputs.control_main
+  dst:   main_process_controller.inputs.ctrl
+
+- owner: main_process_controller
+  data:  py_dict
+  src:   main_process_controller.outputs.control_ui
+  dst:   ui.inputs.ctrl
+
+- owner: ui
+  data:  py_dict
+  src:   ui.outputs.text
+  dst:   ace.inputs.text
+
+- owner: ace
+  data:  py_dict
+  src:   ace.outputs.text
+  dst:   ui.inputs.text
+  dirn:  feedback
+
+
+###############################################################################
+data:
+  py_list:  py_list
+  py_dict:  py_dict
+  py_str:   py_str
+
+
+###############################################################################
+req_host_cfg:
+  default_configuration:
+    role:
+      - default_role
+
+
+###############################################################################
+role:
+  default_role:
+    tasks:
+      - name: Update apt-get repo and cache
+        become:        yes
+        become_user:   root
+        become_method: sudo
+        apt:
+          update_cache:     yes
+          force_apt_get:    yes
+          cache_valid_time: 3600

@@ -1,0 +1,25 @@
+title:
+  "Environment register"
+
+
+introduction:
+  "This register holds a list of environments and
+  the role that each is currently assigned to."
+
+
+register:
+
+  e000_design_automation_core:
+    name: "Design automation core"
+    type: "virtualenv"
+    desc: "Core virtualenv for core design automation tools."
+
+  e001_process_assistant:
+    name: "process assistant"
+    type: "virtualenv"
+    desc: "Virtualenv for the process assistant system and tools."
+
+  e002_general_research:
+    name: "general research"
+    type: "virtualenv"
+    desc: "Virtualenv for general purpose research and development work."

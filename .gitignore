@@ -1,0 +1,185 @@
+# This .gitignore is configured such that the
+# file types intended to be placed under revision
+# control must be explicitly specified here.
+#
+# Note: .gitignore configures a rules based
+#       system. The order in which rules are
+#       listed matters, with rules that appear
+#       later in this file overriding rules that
+#       appear earlier.
+#
+
+
+# -----------------------------------------------------------------------------
+# Ignore all files and all directories (unless
+# otherwise specified).
+#
+
+*
+
+
+# -----------------------------------------------------------------------------
+# Override the global ignore rule for directories
+# and subdirectories so that git will search them
+# recursively (unless otherwise specified).
+#
+# If this rule is not present, git will only
+# search the root directory for files to include.
+#
+
+!*/
+
+# Blacklist certain directories.
+#
+/a0_env/*
+/a2_dat/*
+/a4_tmp/*
+/a5_cms/*
+
+
+# -----------------------------------------------------------------------------
+# Override the global ignore rule for some
+# specific files and file types that we intend
+# to be included (unless otherwise specified).
+#
+
+# Stableflow system configuration design documents.
+#
+!*.stableflow.cfg.ini
+!*.stableflow.cfg.json
+!*.stableflow.cfg.toml
+!*.stableflow.cfg.xml
+!*.stableflow.cfg.yaml
+
+# Stableview system configuration design documents.
+#
+!*.stableview.cfg.ini
+!*.stableview.cfg.json
+!*.stableview.cfg.toml
+!*.stableview.cfg.xml
+!*.stableview.cfg.yaml
+
+# Python/Cython/Codon design documents.
+#
+!*.py
+!*.pxd
+!*.pxi
+!*.pyx
+!*.codon
+
+# Kivy UI design documents.
+#
+!*.kv
+
+# C/C++ design documents.
+#
+!*.h
+!*.c
+!*.hpp
+!*.cpp
+
+# Rust design documents.
+#
+!*.rs
+
+# C# design documents.
+#
+!*.cs
+
+# HTML/CSS/Javascript design documents.
+#
+!*.html
+!*.css
+!*.js
+
+# Shellscript design documents.
+#
+!*.sh
+
+# Markdown, ReStructuredText and plain text documents.
+#
+!*.md
+!*.rst
+!*.txt
+
+# Environment specification documents.
+#
+!*.envspec.json
+
+# Controlled item registration documents.
+#
+!*.register.yaml
+
+# Work breakdown structure documents.
+#
+!*.wbs.yaml
+
+# Requirements specification documents.
+#
+!*.req.yaml
+
+# Document schema documents.
+#
+!*.schema.yaml
+
+# The development automation system entrypoint.
+#
+!da
+
+# Tool configuration documents.
+#
+!pytest.ini
+!.gitattributes
+!.gitignore
+
+# URDF (Unified Robotics Description Format) templates.
+#
+!*.urdf.template
+
+# Fonts
+#
+!*.ttf
+!*.woff
+!*.woff2
+
+# Icons
+#
+!*.svg
+!*.png
+
+# -----------------------------------------------------------------------------
+# Explicitly ignore specific directories,
+# files and file types that we intend to be
+# excluded.
+#
+
+# Secrets files for python-dotenv.
+#
+*.env
+
+# Python bytecode files.
+#
+*.pyc
+*__pycache__*
+
+# Python build and test output.
+#
+*.egg-info/
+*.pytest_cache/
+
+# Editor metadata (Atom, Eclipse, EMACS, Gradle,
+# Jetbrains, Visual Studio, VSCode and XCode)
+#
+.atom/
+.metadata/
+.classpath/
+.project/
+.emacs
+.emacs.d/
+.gradle/
+.idea/
+.vs/
+.vscode/
+.xcodeproj/
+.xcworkspace/
+.xcuserstate

@@ -1,0 +1,46 @@
+title:
+  "Protection level register."
+
+
+introduction:
+  "This register holds a list of document
+  protection level identifiers with a brief
+  description for each."
+
+
+register:
+
+  k00_general:
+    desc: "A document may be marked with the
+          k00_general protection level to
+          indicate that the information that
+          it contains is not subject to any
+          specific restrictions on disclosure."
+
+  k01_counterparty_confidential:
+    desc: "A document may be marked with the
+          k01_counterparty_confidential
+          protection level to indicate that
+          the information that it contains
+          is subject to restrictions that limit
+          permitted disclosure to one or more
+          specific named counterparties."
+
+  k02_internal_confidential:
+    desc: "A document may be marked with the
+          k02_internal_confidential protection
+          level to indicate that the information
+          that it contains is subject to
+          restrictions that limit permitted
+          disclosure to internal employees and
+          contractors only."
+
+  k03_project_confidential:
+    desc: "A document may be marked with the
+          k03_project_confidential protection
+          level to indicate that the information
+          that it contains is subject to
+          restrictions that limit permitted
+          disclosure to internal employees and
+          contractors working on the specific
+          project only."

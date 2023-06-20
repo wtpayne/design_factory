@@ -1,0 +1,58 @@
+{
+  "list_item": [
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required by the 'da' command line interface.",
+    "#",
+
+    { "type": "pep508", "spec":    "click==8.1.3"                             },
+    { "type": "pep508", "spec":    "loguru==0.5.3"                            },
+    { "type": "pep508", "spec":    "pudb==2022.1.3"                           },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required by stableflow systems.",
+    "#",
+
+    { "type": "pep508", "spec":    "Cython==0.29.33"                          },
+    { "type": "pep508", "spec":    "dill==0.3.6"                              },
+    { "type": "pep508", "spec":    "jsonschema==4.17.3"                       },
+    { "type": "pep508", "spec":    "numpy==1.24.2"                            },
+    { "type": "pep508", "spec":    "psutil==5.9.4"                            },
+    { "type": "pep508", "spec":    "PyYAML==6.0"                              },
+    { "type": "pep508", "spec":    "pyzmq==25.0.2"                            },
+    { "type": "pep508", "spec":    "setproctitle==1.3.2"                      },
+    { "type": "pep508", "spec":    "watchdog==3.0.0"                          },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required by the 'da service process_assistant start' command.",
+    "#",
+
+    { "type": "pep508", "spec":    "cozo-embedded==0.5.1"                     },
+    { "type": "pep508", "spec":    "discord.py==2.2.2"                        },
+    { "type": "pep508", "spec":    "pycodestyle==2.10.0"                      },
+    { "type": "pep508", "spec":    "pycozo==0.5.1"                            },
+    { "type": "pep508", "spec":    "python-dotenv==1.0.0"                     },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Local workspace directories - editable install.",
+    "#",
+
+    { "type": "local",  "relpath": "a3_src/h10_resource"                      },
+    { "type": "local",  "relpath": "a3_src/h20_functionality"                 },
+    { "type": "local",  "relpath": "a3_src/h30_platform"                      },
+    { "type": "local",  "relpath": "a3_src/h40_component"                     },
+    { "type": "local",  "relpath": "a3_src/h50_subsystem"                     },
+    { "type": "local",  "relpath": "a3_src/h60_system"                        },
+    { "type": "local",  "relpath": "a3_src/h70_bespoke"                       },
+    { "type": "local",  "relpath": "a3_src/h80_research"                      },
+    { "type": "local",  "relpath": "a3_src/h90_internal"                      }
+  ]
+}

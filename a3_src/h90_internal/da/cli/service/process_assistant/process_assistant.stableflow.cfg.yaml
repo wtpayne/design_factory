@@ -1,0 +1,508 @@
+system:
+  id_system: process_assistant
+
+
+###############################################################################
+host:
+  custom_env:
+    hostname:        'localhost'
+    acct_run:        'wtp'
+    acct_provision:  'wtp'
+    port_range:      '8090-9000'
+    dirpath_log:     ''
+    environment:     'e001_process_assistant'
+    log_level:       'TRACE'
+
+
+###############################################################################
+process:
+  proc_main:
+    host: custom_env
+
+
+###############################################################################
+node:
+
+  # ---------------------------------------------------------------------------
+  # System clock and state management for the entire system.
+  #
+  system_controller:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.ctrl.sys.ic00_edict
+    state_type:     py_dict
+    config:
+      frequency_hz: 5
+      idx_max:      1000
+
+  # ---------------------------------------------------------------------------
+  # State management for the main process.
+  #
+  main_process_controller:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.ctrl.proc.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # Watch the local filesystem for changes.
+  #
+  # The root(s) of the filesystem tree(s) to search
+  # are set dynamically at startup.
+  #
+  filesystem_watcher:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.watcher.ic00_edict
+    state_type:     py_dict
+    config:
+      iter_dirpath_root: []
+      iter_pathincl:
+        - !regex '^.*\.ini$'
+        - !regex '^.*\.json$'
+        - !regex '^.*\.toml$'
+        - !regex '^.*\.xml$'
+        - !regex '^.*\.yaml$'
+        - !regex '^.*\.md$'
+        - !regex '^.*\.rst$'
+        - !regex '^.*\.txt$'
+        - !regex '^.*\.py$'
+        - !regex '^.*\.pyx$'
+        - !regex '^.*\.h$'
+        - !regex '^.*\.c$'
+        - !regex '^.*\.hpp$'
+        - !regex '^.*\.cpp$'
+        - !regex '^.*\.rs'
+        - !regex '^.*\.cs'
+        - !regex '^.*\.html$'
+        - !regex '^.*\.css$'
+        - !regex '^.*\.js$'
+      iter_pathexcl: []
+      iter_direxcl:
+        - !regex '^\..*$'
+        - !regex '^.*\.egg-info$'
+        - !regex '^.pytest-cache$'
+        - !regex '^\.cache$'
+        - !regex '^\.git$'
+        - !regex '^\.tox$'
+        - !regex '^\.vagrant$'
+        - !regex '^__pycache__$'
+      iter_read_as_txt:
+        - !regex '^.*\.ini$'
+        - !regex '^.*\.json$'
+        - !regex '^.*\.toml$'
+        - !regex '^.*\.xml$'
+        - !regex '^.*\.yaml$'
+        - !regex '^.*\.md$'
+        - !regex '^.*\.rst$'
+        - !regex '^.*\.txt$'
+        - !regex '^.*\.py$'
+        - !regex '^.*\.pyx$'
+        - !regex '^.*\.h$'
+        - !regex '^.*\.c$'
+        - !regex '^.*\.hpp$'
+        - !regex '^.*\.cpp$'
+        - !regex '^.*\.html$'
+        - !regex '^.*\.css$'
+        - !regex '^.*\.js$'
+      iter_read_as_bin:       []
+      size_batch:             10
+      do_output_all:          True
+      do_repeat_all:          False
+      do_output_modified:     True
+      do_terminate_when_done: False
+
+
+  # ---------------------------------------------------------------------------
+  # Distribute file information to language-specific processing pipelines.
+  #
+  file_type_distributor:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.distributor.ic00_edict
+    state_type:     py_dict
+    config:
+      output:
+        fileinfo_python_parser:
+          - !regex '^.*\.py$'
+        # fileinfo_shell:
+        #   - !regex '^.*\.sh$'
+        # fileinfo_css:
+        #   - !regex '^.*\.css$'
+        # fileinfo_register:
+        #   - !regex '^.*\.register\.yaml$'
+
+  # ---------------------------------------------------------------------------
+  # Parse python files.
+  #
+  python_parser:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.parse.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # Several whitespace related rules are relaxed
+  # to permit the vertical alignment of operators
+  # and operands on consecutive lines. This allows
+  # us to visually group related statements and
+  # to readily identify discrepanices.
+  #
+  check_py_codestyle:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.codestyle.ic00_edict
+    state_type:     py_dict
+    config:
+      list_ignore:
+        - 'E126'  # Allow semantically meaningful indentation.
+        - 'E127'  # Allow semantically meaningful indentation.
+        - 'E128'  # Allow semantically meaningful indentation.
+        - 'E201'  # Allow vertically aligned parameters.
+        - 'E202'  # Allow vertically aligned parameters.
+        - 'E221'  # Allow vertically aligned sequence of assignment statements.
+        - 'E241'  # Allow vertically aligned dictionary values.
+        - 'E251'  # Allow vertically aligned keyword/parameter assignment.
+        - 'E272'  # Allow vertically aligned if x in y statements.
+        - 'W503'  # Allow operators on LHS as per math convention.
+
+  # ---------------------------------------------------------------------------
+  check_py_docstyle:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.docstyle.ic00_edict
+    state_type:     py_dict
+    config:
+      list_ignore:
+        - 'D200'  # Rule D200 (One-line docstring should
+                  # fit on one line) has been disabled so
+                  # a uniform formatting can be applid to
+                  # docstrings irrespective of length.
+                  # (I.e. triple-quoted docstrings with
+                  # quotes on separate lines).
+        - 'D203'  # Rule D203 (1 blank line required before
+                  # class docstring) has been disabled
+                  # because it contradicts with rule D211
+                  # (No blank lines allowed before class
+                  # docstring), and it was felt that a
+                  # uniform format for both class and
+                  # function docstrings was desirable.
+        - 'D212'  # Rule D212 (Multi-line docstring summary
+                  # should start at the first line) has been
+                  # disabled so that we can put a pep263
+                  # encoding marker above the docstring.
+                  # Rule D213 (Multi-line docstring summary
+                  # should start at the second line) has
+                  # been left enabled.
+
+  # ---------------------------------------------------------------------------
+  check_py_complexity:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.complexity.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  check_py_lint:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.lint.ic00_edict
+    state_type:     py_dict
+    config:
+        design:
+          - '--disable=C0326'  # bad-whitespace      - Vertical alignment.
+          - '--disable=C0330'  # bad-continuation    - Vertical alignment.
+          - '--disable=W0311'  # bad-indentation     - Vertical alignment.
+          - '--disable=I0011'  # locally-disabled    - TBD
+          - '--disable=I0012'  # locally-enabled     - TBD
+          - '--disable=I0020'  # suppressed-message  - TBD
+          - '--disable=W0511'  # fixme               - TBD
+          - '--disable=E1129'  # not-context-manager - False alarms?
+          - '--disable=E0401'  # import-error        - False alarms?
+          - '--disable=W0622'  # redefined-builtin   - False alarms?
+
+  # ---------------------------------------------------------------------------
+  check_py_security:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.security.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  check_py_type:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.py.check.type.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  nonconformity_report_aggregator:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.aggregator.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  design_index_etl:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.index.etl.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  design_index_db:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.index.db.ic00_edict
+    state_type:     py_dict
+    config:
+      filepath_db:  Null
+
+  # ---------------------------------------------------------------------------
+  ui_system_tray:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.ui.system_tray.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  ui_web:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.ui.web.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  ui_text_file:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.ui.text_file.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  ui_discord_message_formatter:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.design.ui.discord.formatter.ic00_edict
+    state_type:     py_dict
+    config:
+      id_chan_gen:  1050172081259692085
+
+  # ---------------------------------------------------------------------------
+  ui_discord_client:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.net.discord.bot.ic00_edict
+    state_type:     py_dict
+    config:
+      filepath_env:   Null
+      envvar_token:   TOKEN_DISCORD_BOT_PROCESS_ASSISTANT
+      secs_sleep:     0.5
+
+
+###############################################################################
+edge:
+
+# -----------------------------------------------------------------------------
+# Fan out from the system controller
+# component to all of the process
+# specific subsidiary controller
+# components.
+#
+
+- owner: system_controller
+  data:  py_dict
+  src:   system_controller.outputs.control_main_process_controller
+  dst:   main_process_controller.inputs.ctrl
+
+- owner: main_process_controller
+  data:  py_dict
+  src:   main_process_controller.outputs.control_filesystem_watcher
+  dst:   filesystem_watcher.inputs.ctrl
+
+# -----------------------------------------------------------------------------
+# Local filesystem monitoring, file
+# reading, language specific parsing
+# and metadata reading pipeline.
+#
+
+- owner: filesystem_watcher
+  data:  py_dict
+  src:   filesystem_watcher.outputs.fileinfo
+  dst:   file_type_distributor.inputs.fileinfo
+
+- owner: file_type_distributor
+  data:  py_dict
+  src:   file_type_distributor.outputs.fileinfo_python_parser
+  dst:   python_parser.inputs.fileinfo
+
+# -----------------------------------------------------------------------------
+# Fan out from python language design
+# document parsing component to all of
+# the python language design document
+# checking components.
+#
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_codestyle
+  dst:   check_py_codestyle.inputs.fileinfo
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_docstyle
+  dst:   check_py_docstyle.inputs.fileinfo
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_complexity
+  dst:   check_py_complexity.inputs.fileinfo
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_lint
+  dst:   check_py_lint.inputs.fileinfo
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_security
+  dst:   check_py_security.inputs.fileinfo
+
+- owner: python_parser
+  data:  py_dict
+  src:   python_parser.outputs.fileinfo_check_py_type
+  dst:   check_py_type.inputs.fileinfo
+
+# -----------------------------------------------------------------------------
+# Fan in from all of the design
+# document checking components to
+# the report aggregation component.
+#
+
+- owner: check_py_codestyle
+  data:  py_dict
+  src:   check_py_codestyle.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_codestyle
+
+- owner: check_py_docstyle
+  data:  py_dict
+  src:   check_py_docstyle.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_docstyle
+
+- owner: check_py_complexity
+  data:  py_dict
+  src:   check_py_complexity.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_complexity
+
+- owner: check_py_lint
+  data:  py_dict
+  src:   check_py_lint.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_lint
+
+- owner: check_py_security
+  data:  py_dict
+  src:   check_py_security.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_security
+
+- owner: check_py_type
+  data:  py_dict
+  src:   check_py_type.outputs.fileinfo
+  dst:   nonconformity_report_aggregator.inputs.fileinfo_check_py_type
+
+# -----------------------------------------------------------------------------
+# ETL pipeline for the design index.
+#
+
+- owner: nonconformity_report_aggregator
+  data:  py_dict
+  src:   nonconformity_report_aggregator.outputs.fileinfo_design_index_etl
+  dst:   design_index_etl.inputs.fileinfo
+
+- owner: design_index_etl
+  data:  py_dict
+  src:   design_index_etl.outputs.data
+  dst:   design_index_db.inputs.data
+
+# -----------------------------------------------------------------------------
+# Fan out from the report aggregator
+# to each of the various logging and
+# user interface endpoints.
+#
+
+- owner: nonconformity_report_aggregator
+  data:  py_dict
+  src:   nonconformity_report_aggregator.outputs.fileinfo_ui_system_tray
+  dst:   ui_system_tray.inputs.fileinfo
+
+- owner: nonconformity_report_aggregator
+  data:  py_dict
+  src:   nonconformity_report_aggregator.outputs.fileinfo_ui_web
+  dst:   ui_web.inputs.fileinfo
+
+- owner: nonconformity_report_aggregator
+  data:  py_dict
+  src:   nonconformity_report_aggregator.outputs.fileinfo_ui_text_file
+  dst:   ui_text_file.inputs.fileinfo
+
+- owner: nonconformity_report_aggregator
+  data:  py_dict
+  src:   nonconformity_report_aggregator.outputs.fileinfo_ui_discord
+  dst:   ui_discord_message_formatter.inputs.fileinfo
+
+- owner: ui_discord_message_formatter
+  data:  py_dict
+  src:   ui_discord_message_formatter.outputs.to_discord
+  dst:   ui_discord_client.inputs.to_discord
+
+- owner: ui_discord_client
+  data:  py_dict
+  src:   ui_discord_client.outputs.from_discord
+  dst:   ui_discord_message_formatter.inputs.from_discord
+  dirn:  feedback
+
+
+###############################################################################
+data:
+  py_list:  py_list
+  py_dict:  py_dict
+  py_str:   py_str
+
+
+###############################################################################
+req_host_cfg:
+  default_configuration:
+    role:
+      - default_role
+
+
+###############################################################################
+role:
+  default_role:
+    tasks:
+      - name: Update apt-get repo and cache
+        become:        yes
+        become_user:   root
+        become_method: sudo
+        apt:
+          update_cache:     yes
+          force_apt_get:    yes
+          cache_valid_time: 3600

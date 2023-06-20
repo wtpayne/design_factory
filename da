@@ -1,0 +1,273 @@
+#!/usr/bin/env bash
+# ---
+#
+# title:
+#     "Design automation shell script."
+#
+# description:
+#     "The design automation shell script is
+#     intended to help provide a common entry
+#     point for all the automated processes
+#     in the design factory.
+#
+#     This shell script is responsible for
+#     ensuring that the virtual environment
+#     is appropriately created, configured
+#     and activated. It is also responsible
+#     for invoking the da.cli.command python
+#     module which will handle command line
+#     argument parsing and command invocation."
+#
+# type:
+#     dt000_bash_script
+#
+# validation_level:
+#     v00_minimum
+#
+# protection:
+#     k00_general
+#
+# copyright:
+#     "Copyright 2015-2022 William Payne"
+#
+# license:
+#     "Licensed under the Apache License, Version
+#     2.0 (the License); you may not use this file
+#     except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed
+#     to in writing, software distributed under
+#     the License is distributed on an AS IS BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+#     either express or implied. See the License
+#     for the specific language governing
+#     permissions and limitations under the
+#     License."
+#
+# ...
+
+
+# -----------------------------------------------------------------------------
+# Set shell options.
+#
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+
+# -----------------------------------------------------------------------------
+# Check to ensure required commands exist.
+#
+# This section uses 'command' to check that the
+# 'python3', 'pip3' and 'git' commands exist in
+# the current execution environment, and halt the
+# bash script with an error code and an error
+# message on stderr if any of them are missing.
+#
+has_command_python3=0;
+has_command_pip3=0;
+has_command_git=0;
+if command -v "python3"  > "/dev/null"; then has_command_python3=1;     fi
+if command -v "pip3"     > "/dev/null"; then has_command_pip3=1;        fi
+if command -v "git"      > "/dev/null"; then has_command_git=1;         fi
+if [ ${has_command_python3} -eq 0 ]; then
+    printf "The 'python3' command was not found.\n"                     1>&2;
+    printf "Try installing python3 with:\n"                             1>&2;
+    printf "   sudo apt-get update\n"                                   1>&2;
+    printf "   sudo apt-get install python3\n"                          1>&2;
+    exit 1;
+fi
+if [ ${has_command_pip3} -eq 0 ]; then
+    printf "The 'pip3' command was not found.\n"                        1>&2;
+    printf "Try installing python3-pip with:\n"                         1>&2;
+    printf "   sudo apt-get update\n"                                   1>&2;
+    printf "   sudo apt-get install python3-pip\n"                      1>&2;
+    exit 1;
+fi
+if [ ${has_command_git} -eq 0 ]; then
+    printf "The 'git' command was not found.\n"                         1>&2;
+    printf "Try installing git with:\n"                                 1>&2;
+    printf "   sudo apt-get update\n"                                   1>&2;
+    printf "   sudo apt-get install git\n"                              1>&2;
+    exit 1;
+fi
+
+
+# -----------------------------------------------------------------------------
+# Determine the path to the current workspace.
+#
+# This section uses the pushd and popd commands
+# to change the current directory to the location
+# of the script and then back to the original
+# directory. It also resolves any symbolic links
+# in the path. The resulting path is then stored
+# in the WORKSPACE variable and exported so that
+# it can be accessed by any child processes.
+#
+WORKSPACE=$(
+    pushd . > "/dev/null";
+    temp="${BASH_SOURCE[0]}";
+    if ([ -h "${temp}" ]); then
+        while ([ -h "${temp}" ]); do
+            cd "$(dirname "$temp")";
+            temp=$(readlink "${temp}");
+        done
+    fi
+    cd "$(dirname ${temp})" > "/dev/null";
+    pwd;
+    popd > "/dev/null";
+);
+export WORKSPACE;
+
+
+# -----------------------------------------------------------------------------
+# Check for problems with the e000_design_automation_core virtual environment.
+#
+# We have sometimes run into problems that result
+# in the venv directory being created but not
+# populated. We detect this by looking to see if
+# the directory exists but without the usual
+# "/bin/activate" script inside it. If this is
+# the case, then we simply wipe the directory
+# and start again from scratch.
+#
+id_env="e000_design_automation_core"
+dirpath_venv="${WORKSPACE}/a0_env/venv/${id_env}"
+filepath_activate="${dirpath_venv}/bin/activate"
+if [ -d "${dirpath_venv}" ] && [ ! -f "${filepath_activate}" ]; then
+    printf "The venv appears to be broken.\n" 1>&2;
+    printf "The venv will be recreated.\n"    1>&2;
+    rm -r "${dirpath_venv}"
+fi
+
+
+# -----------------------------------------------------------------------------
+# Ensure the e000_design_automation_core virtual environment exists.
+#
+# This section checks if the virtual environment
+# is present and creates it if not. If a new
+# virtual environemnt is created, it is marked
+# as stale so that required packages will be
+# installed.
+#
+is_stale_venv=0;
+if [ ! -d "${dirpath_venv}" ]; then
+    if python3 -m venv "${dirpath_venv}"; then
+        is_stale_venv=1;
+    else
+        printf "Try installing python3-venv with:\n"     1>&2;
+        printf "   sudo apt-get update\n"                1>&2;
+        printf "   sudo apt-get install python3-venv\n"  1>&2;
+        exit 1
+    fi
+fi
+
+
+# -----------------------------------------------------------------------------
+# Check to see if e000_design_automation_core virtual environment is stale.
+#
+# This section checks if the virtual environment
+# is stale, i.e., if the list of requirements in
+# the environment register has changed since the
+# virtual environment was created or last updated.
+#
+# This section checks the modification times of
+# the environment.register.yaml file and the
+# site-packages and python-wheels directories
+# in the virtual environment, and if the
+# environment register file is newer than either
+# of these directories, the virtual environment
+# is considered stale.
+#
+dirpath_envspec="${WORKSPACE}/a3_src/h10_resource/envspec"
+filepath_envspec="${dirpath_envspec}/${id_env}.envspec.json"
+dirname_py3="python$(python3 --version | cut -d " " -f2 | cut -d "." -f1,2)"
+dirpath_pkg="${dirpath_venv}/lib/${dirname_py3}/site-packages";
+if [[ ${filepath_envspec} -nt ${dirpath_pkg}       ]]; then
+    is_stale_pkg=1;
+else
+    is_stale_pkg=0;
+fi
+
+has_dirpath_whl=0;
+dirpath_whl="${dirpath_venv}/share/python-wheels";
+if [ -d "${dirpath_whl}" ]; then
+    if [[ ${filepath_envspec} -nt ${dirpath_whl}       ]]; then
+        is_stale_whl=1;
+    else
+        is_stale_whl=0;
+    fi
+    if [[ ${is_stale_pkg} == 1 && ${is_stale_whl} == 1 ]]; then
+        is_stale_venv=1;
+    fi
+else
+    if [[ ${is_stale_pkg} == 1 ]]; then
+        is_stale_venv=1;
+    fi
+fi
+
+
+# -----------------------------------------------------------------------------
+# Ensure that the e000_design_automation_core virtual environment is active.
+#
+# This section ensures that the e000_design_automation_core
+# virtual environment is active, deactivating the
+# old environment if necessary and activating the
+# new one.
+#
+is_active_none=0;
+is_active_old=0;
+is_active_new=0;
+
+if   [[ "${VIRTUAL_ENV-none}" == "none"       ]]; then is_active_none=1;
+elif [[ "${VIRTUAL_ENV}" != "${dirpath_venv}" ]]; then is_active_old=1;
+elif [[ "${VIRTUAL_ENV}" == "${dirpath_venv}" ]]; then is_active_new=1;
+else
+    printf "Logic implementation error.\n";
+    exit 1;
+fi
+
+if   [[ ${is_active_none} == 1 ]]; then do_deactivate_old=0 do_source_new=1
+elif [[ ${is_active_old}  == 1 ]]; then do_deactivate_old=1 do_source_new=1
+elif [[ ${is_active_new}  == 1 ]]; then do_deactivate_old=0 do_source_new=0
+else
+    printf "Logic implementation error.\n";
+    exit 1;
+fi
+
+if [[ ${do_deactivate_old} == 1 ]]; then deactivate; fi
+if [[ ${do_source_new}     == 1 ]]; then source "${dirpath_venv}/bin/activate"; fi
+
+
+# -----------------------------------------------------------------------------
+# Update the e000_design_automation_core virtual environment if it is stale.
+#
+# If the virtual environment is stale, this
+# section updates it by installing all of the
+# packages listed in the file
+# e000_design_automation_core.envspec.json.
+#
+if [[ ${is_stale_venv} == 1 ]]; then
+
+    pip3 install -e "${WORKSPACE}/a3_src/h90_internal"
+    python3 -m da.env.update "${WORKSPACE}" "${id_env}"
+    # TODO: ENSURE da.env.update RETURNS ERROR CODE AND HALT IF A PROBLEM
+
+fi
+
+
+# -----------------------------------------------------------------------------
+# Run the design automation command line interface
+# command module with all supplied command line
+# arguments.
+#
+# We prepend the name of the app to the arguments
+# list so that it can be extracted in command.py
+# and then passed to the click library to use as
+# the name of the command in the help string.
+#
+NAME_APP=$(basename "$0")
+python3 -m da.cli.command "${NAME_APP}" "${@}"

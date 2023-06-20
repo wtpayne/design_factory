@@ -1,0 +1,26 @@
+title:
+  "Component framework register"
+
+
+introduction:
+  "This register holds a list of component
+  framework identifiers along with a short
+  description of each."
+
+
+register:
+
+  cf00_stableflow:
+    name:      "Stableflow."
+    desc:      "The Stableflow component framework
+               is an implementation of a Lee and
+               Parks style dataflow process
+               network with cyclostatic scheduling
+               and large-grain components.
+
+               It is intended to enable component
+               based software development in a
+               framework which is amenable to
+               the introduction of highly
+               automated design and analysis
+               techniques."

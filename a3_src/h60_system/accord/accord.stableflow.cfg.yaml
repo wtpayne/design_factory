@@ -1,0 +1,284 @@
+system:
+  id_system: accord
+
+
+###############################################################################
+host:
+  localhost:
+    hostname:        'localhost'
+    acct_run:        'wtp'
+    acct_provision:  'wtp'
+    port_range:      '8090-9000'
+    dirpath_log:     ''
+    launch_cmd:      ''
+    environment:     'e002_general_research'
+    log_level:       'TRACE'
+
+
+###############################################################################
+process:
+  proc_main:
+    host: localhost
+
+
+###############################################################################
+node:
+
+  # ---------------------------------------------------------------------------
+  # System clock and state management for the entire system.
+  #
+  ctrl_sys:
+    process:          proc_main
+    req_host_cfg:     default_configuration
+    functionality:
+      py_module:      cl.ctrl.sys.ic00_edict
+    state_type:       py_dict
+    config:
+      frequency_hz:   2
+
+  # ---------------------------------------------------------------------------
+  # State management for the main process.
+  #
+  ctrl_main:
+    process:          proc_main
+    req_host_cfg:     default_configuration
+    functionality:
+      py_module:      cl.ctrl.proc.ic00_edict
+    state_type:       py_dict
+
+  # ---------------------------------------------------------------------------
+  # Discord bot integration.
+  #
+  msgmux:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.util.noop.ic00_edict
+    state_type:     py_dict
+    config:
+      channel:
+        chair:      1115744080907997204
+        room_01:    1115744295845118032
+        room_02:    1115744329131106325
+        room_03:    1115744378623893675
+        room_04:    1115744396005097592
+        room_05:    1115744413751185570
+      message:
+      - id_msg:     ["question", "summary"]
+        channel:
+        - chair
+        - room_01
+        - room_02
+        - room_03
+        - room_04
+        - room_05
+
+  discord:
+    process:          proc_main
+    req_host_cfg:     default_configuration
+    functionality:
+      py_module:      cl.net.discord.bot.ic00_edict
+    state_type:       py_dict
+    config:
+      filepath_env:   Null
+      envvar_key:     TOKEN_DISCORD_BOT_ACCORD
+      secs_sleep:     0.5
+
+  command:
+    process:          proc_main
+    req_host_cfg:     default_configuration
+    functionality:
+      py_module:      cl.net.discord.cmd.ic00_edict
+    state_type:       py_dict
+    config:
+      cmd:
+        question:     Ask a question.
+        summary:      Summarise the responses so far.
+
+  # ---------------------------------------------------------------------------
+  # Command handling logic.
+  #
+  question:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    accord.question.ic00_edict
+    state_type:     py_dict
+
+  summary:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    accord.summary.ic00_edict
+    state_type:     py_dict
+
+  openai:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.util.noop.ic00_edict
+    state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # Logging.
+  #
+  log:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.util.noop.ic00_edict
+    state_type:     py_dict
+
+
+###############################################################################
+edge:
+
+# -----------------------------------------------------------------------------
+# Fan out from the system controller
+# component to all of the process
+# specific subsidiary controller
+# components.
+#
+
+- owner: ctrl_sys
+  data:  py_dict
+  src:   ctrl_sys.outputs.ctrl_main
+  dst:   ctrl_main.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_discord
+  dst:   discord.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_command
+  dst:   command.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_question
+  dst:   question.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_summary
+  dst:   summary.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_msgmux
+  dst:   msgmux.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_log
+  dst:   log.inputs.ctrl
+
+#  Functional chain for discord bot configuration and mux/demux.
+
+- owner: msgmux
+  data:  py_dict
+  src:   msgmux.outputs.msg
+  dst:   discord.inputs.msg
+
+- owner: discord
+  data:  py_dict
+  src:   discord.outputs.cmd
+  dst:   command.inputs.cmd
+
+- owner: command
+  data:  py_dict
+  src:   command.outputs.cmd
+  dst:   discord.inputs.cmd
+  dirn:  feedback
+
+# Functional chain for question distribution.
+
+- owner: command
+  data:  py_dict
+  src:   command.outputs.question
+  dst:   question.inputs.cmd
+
+- owner: question
+  data:  py_dict
+  src:   question.outputs.msg
+  dst:   msgmux.inputs.question
+  dirn:  feedback
+
+# Functional chain for the discussion summarisation.
+
+- owner: discord
+  data:  py_dict
+  src:   discord.outputs.msg
+  dst:   summary.inputs.msg
+
+- owner: command
+  data:  py_dict
+  src:   command.outputs.summary
+  dst:   summary.inputs.cmd
+
+- owner: summary
+  data:  py_dict
+  src:   summary.outputs.prompt
+  dst:   openai.inputs.prompt
+
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.response
+  dst:   summary.inputs.response
+  dirn:  feedback
+
+- owner: summary
+  data:  py_dict
+  src:   summary.outputs.summary
+  dst:   msgmux.inputs.summary
+  dirn:  feedback
+
+
+
+# Logging
+
+- owner: discord
+  data:  py_dict
+  src:   discord.outputs.log
+  dst:   log.inputs.discord
+
+- owner: question
+  data:  py_dict
+  src:   question.outputs.log
+  dst:   log.inputs.question
+
+- owner: summary
+  data:  py_dict
+  src:   summary.outputs.log
+  dst:   log.inputs.summary
+
+
+
+###############################################################################
+data:
+  py_list:  py_list
+  py_dict:  py_dict
+  py_str:   py_str
+
+
+###############################################################################
+req_host_cfg:
+  default_configuration:
+    role:
+      - default_role
+
+
+###############################################################################
+role:
+  default_role:
+    tasks:
+      - name: Update apt-get repo and cache
+        become:        yes
+        become_user:   root
+        become_method: sudo
+        apt:
+          update_cache:     yes
+          force_apt_get:    yes
+          cache_valid_time: 3600

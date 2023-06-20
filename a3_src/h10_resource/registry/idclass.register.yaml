@@ -1,0 +1,321 @@
+title:
+  "Identifier class register"
+
+
+introduction:
+  "Various classes of identifier string are
+  registered in this document. Identifier strings
+  enable the identities and relationships between
+  entities to be recorded or inferred via string
+  matching. This simple implementation technique
+  provides a flexible capability upon which
+  numerous automated engineering processes may be
+  built."
+
+
+register:
+
+  process_area:
+    regs: "process_area.register.yaml"
+    desc: "Design process area identifier."
+    pfix: "a"
+    dgts: 1
+    note: "Different areas of the workspace are
+          given over to different stages or
+          activities of the design process.
+          This makes it easier to check that
+          the process is being followed correctly,
+          e.g. by setting appropriate read/write
+          flags."
+
+  branch_group:
+    regs: Null
+    desc: "Branch group identifier."
+    pfix: "b"
+    dgts: 1
+    note: "The flow of development bifuricates
+          into branches for many reasons, each
+          with different life cycle. For example,
+          feature branches will be short lived,
+          rapidly integrating back into mainline
+          development, whereas post-release
+          maintenance branches may never be
+          reintegrated. We group branches into
+          broad categories so that our scripts
+          can identify and manage the lifecycle
+          in an appropriate manner."
+
+  capability:
+    regs: Null
+    desc: "Capability identifier."
+    pfix: "c"
+    dgts: 3
+    note: "Capability."
+
+  component_framework:
+    regs: component_framework.register.yaml
+    desc: "Component framework identifier."
+    pfix: "cf"
+    dgts: 2
+    note: "This identifier is used to uniquely
+          identify different component, modelling
+          and software runtime frameworks.
+          (Stableflow, Simulink, LabView etc...)"
+
+  counterparty:
+    regs: Null
+    desc: "Counterparty identifier."
+    pfix: "co"
+    dgts: 3
+    note: "Obfuscated unique identifier for
+          clients, suppliers and project partners,
+          enabling us to refer to clients from
+          within source documents without breaching
+          expectations of confidentiality."
+
+  discipline:
+    regs: Null
+    desc: "Discipline identifier."
+    pfix: "d"
+    dgts: 5
+    note: "Systems development involves the
+          coordination of work from multiple
+          distinct disciplines."
+
+  demo:
+    regs: Null
+    desc: "Demo identifier."
+    pfix: "dm"
+    dgts: 3
+    note: "Demonstration codename."
+
+  document_type:
+    regs: "document_type.register.yaml"
+    desc: "Document type identifier."
+    pfix: "dt"
+    dgts: 3
+    note: "This identifier is used to uniquely
+          identify different types of design
+          document."
+
+  environment:
+    regs: "environment.register.yaml"
+    desc: "Runtime, build or development environment identifier."
+    pfix: "e"
+    dgts: 3
+    note: "This identifier is used to uniquely
+          identify different runtime environment
+          configurations for build host and build
+          target. This can be used to identify
+          virtualenv instances, docker images,
+          virtual machine disk images and so on."
+
+  recording:
+    regs: Null
+    desc: "Recording serial identifier."
+    pfix: "g"
+    dgts: 2
+    expr: "g[0-9]{3}_[0-9]{4}"
+    note: "This identifier is used to identify
+          individual recordings within a recording
+          session."
+
+  ref_ctrl:
+    regs: "ref_ctrl.register.yaml"
+    desc: "Reference control hierarchy tier identifier."
+    pfix: "h"
+    dgts: 2
+    note: "We use an explicit hierarchy to reduce
+           the formation of cyclic dependencies
+           and to encourage product line oriented
+           organisation."
+
+  item:
+    regs: Null
+    desc: "Item identifier."
+    pfix: "i"
+    dgts: 6
+    note: "Items are generic identifiers that can
+          be used for any thing that needs to be
+          tracked. These are currently most heavily
+          used for requirements items."
+
+  interface_convention:
+    regs: "interface_convention.register.yaml"
+    desc: "interface convention identifier."
+    pfix: "ic"
+    dgts: 2
+    note: "Interface convention identifiers help
+          us to identify components that have
+          been designed to conform to specific
+          interface standartds or conventions."
+
+  job:
+    regs: Null
+    desc: "Job or task identifier."
+    pfix: "j"
+    dgts: 7
+    note: "We use the term 'job' rather than 'ticket'
+          because the letter t is already used as
+          the team member id prefix."
+
+  protection_level:
+    regs: Null
+    desc: "Protection level identifier."
+    pfix: "k"
+    dgts: 2
+    note: "The letter k is short for klassification."
+
+  lifecycle_product_class:
+    regs: Null
+    desc: "Lifecycle product class identifier."
+    pfix: "l"
+    dgts: 2
+    note: "Engineering lifecycle products are
+          grouped into a small number of classes.
+          This facilitates the systematic and
+          universal application of class specific
+          registration, validation and tracking
+          processes."
+
+  platform:
+    regs: Null
+    desc: "Platform identifier."
+    pfix: "m"
+    dgts: 2
+    note: "Identifier for all test and data
+          recording platforms."
+
+  stream:
+    regs: Null
+    desc: "Stream identifier."
+    pfix: "n"
+    dgts: 2
+    note: "Identifier for data streams on a
+          particular platform."
+
+  nonconformity:
+    regs: Null
+    desc: "Nonconformity type identifier."
+    pfix: "nc"
+    dgts: 4
+    note: "Identifier for nonconformity types."
+
+  project:
+    regs: Null
+    desc: "Project identifier."
+    pfix: "p"
+    dgts: 4
+    note: "Projects are numbered and named in a
+          global namespace."
+
+  process:
+    regs: Null
+    desc: "Process identifier."
+    pfix: "q"
+    dgts: 5
+    note: "Process identifiers begin with a q for
+          quality."
+
+  lifecycle_product:
+    regs: Null
+    desc: "Lifecycle product identifier."
+    pfix: "r"
+    dgts: 3
+    note: "Engineering lifecycle products are
+          registered here."
+
+  process_class:
+    regs: Null
+    desc: "Process class identifier."
+    pfix: "s"
+    dgts: 2
+    note: "Process identifiers begin with an s for
+          no reason other than the word process
+          has two of them."
+
+  team_member:
+    regs: "team_member.register.yaml"
+    desc: "Team member identifier."
+    pfix: "t"
+    dgts: 3
+    note: "I prefer calling people team members
+          rather than users."
+
+  timebox:
+    regs: Null
+    desc: "Time box identifier."
+    pfix: "u"
+    dgts: 2
+    expr: "u?[0-9]{4}[A-B]"
+    note: "The time box is the fundamental
+          time unit for project planning,
+          integration planning, and build &
+          release planning. Each time box is
+          two or three weeks in length, and
+          the sequence of time boxes follows
+          a rigid calendar/schedule. It is
+          roughly equivalent to the concept
+          of a sprint from the Scrum methodology.
+          Uniquely amongst identifiers, the
+          prefix can be omitted."
+
+  validation_level:
+    regs: Null
+    desc: "Document data validation level identifier."
+    pfix: "v"
+    dgts: 2
+    note: "Documents can declare the stringency of
+          their own validation."
+
+  recording_system:
+    regs: Null
+    desc: "Recording system identifier."
+    pfix: "w"
+    dgts: 3
+    note: "Recording system. There may be more
+          than one on a platform."
+
+  workspace:
+    regs: Null
+    desc: "Workspace identifier."
+    pfix: "ws"
+    dgts: 2
+    note: "We sometimes need to have more than
+          one copy of the design document set
+          available at the same time on our local
+          workstation. For example, this may be
+          to make it easier switch between
+          projects, or to carry out comparisons
+          between different versions of a design.
+          This identifier gives us a way of
+          systematically identifying and handling
+          such local working copies."
+
+  coordinate_system:
+    regs: Null
+    desc: "Coordinate system type identifier."
+    pfix: "x"
+    dgts: 2
+    note: "We define several abstract coordinate
+          systems which exist independently of any
+          particular sensor or platform. Projects
+          may then use these abstract coordinate
+          systems as the basis for their own
+          concrete coordinate systems; defined
+          w.r.t specific platforms and sensors.
+          The prefix x is supposed to be
+          reminiscent of x-axis or aXis."
+
+  device:
+    regs: "device.register.yaml"
+    desc: "Device identifier."
+    pfix: "z"
+    dgts: 4
+    note: "The device identifier allows us to
+          identify and manage specific devices.
+          This is particularly useful for managing
+          high performance computing nodes and
+          devices controlling bench/integration
+          test equipment. The prefix z is short
+          for zoo."

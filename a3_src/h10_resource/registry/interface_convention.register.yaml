@@ -1,0 +1,24 @@
+title:
+  "interface convention register"
+
+
+introduction:
+  "This register holds a list of interface
+  convention identifiers along with a short
+  description of each."
+
+
+register:
+
+  ic00_edict:
+    framework: "cf00_stableflow"
+    name:      "Edict interface convention."
+    desc:      "The Edict interface convention
+               for stableflow components expects
+               top level 'packets' to consist of
+               a python dict with a top level
+               'ena' enable flag, a top level
+               'ts' timestamp dict, and a list
+               containing all of the messages
+               contained within the packet."
+

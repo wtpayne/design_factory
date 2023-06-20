@@ -1,0 +1,22 @@
+title:
+  "Device register"
+
+
+introduction:
+  "This register holds a list of devices and the
+  role that each is currently assigned to."
+
+
+register:
+
+  z0001_atlas:
+    name: "atlas"
+    desc: "Midi tower workstation with NVIDIA RTX2080Ti GPU."
+
+  z0002_golem:
+    name: "golem"
+    desc: "ASUS ROG G703GX laptop with NVIDIA RTX2080 GPU."
+
+  z0003_tictac:
+    name: "tictac"
+    desc: "London Linode - 1 shared CPU, 2GB RAM, Ubuntu 22.04."
