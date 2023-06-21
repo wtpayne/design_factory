@@ -66,7 +66,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     (request_handler,
      template_handler,
-     workflow_handler) = cl.net.openai.client.ic00_edict.init_handlers(
+     workflow_handler) = cl.net.openai.client.ic00_edict.init_openai_client(
                 filepath_env  = cfg['filepath_env'],
                 envvar_key    = cfg.get('envvar_key',    'OPENAI_API_KEY'),
                 is_bit        = cfg.get('is_bit',        True),  # Builtin test

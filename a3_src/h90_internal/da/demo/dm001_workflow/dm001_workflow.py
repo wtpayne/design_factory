@@ -203,7 +203,8 @@ def start():
 
     """
     tup_overrides = ('host.localhost.dirpath_log',   _dirpath_log(),
-                     'node.ace.config.filepath_env', _filepath_dotenv())
+                     'node.ace.config.filepath_env', _filepath_dotenv(),
+                     'host.localhost.acct_run',      _username())
 
     import da.env.run
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
@@ -261,3 +262,12 @@ def _filepath_cfg():
                        control_tier = 'h90_internal',
                        relpath      = relpath_cfg)
 
+
+# -----------------------------------------------------------------------------
+def _username():
+    """
+    Return the current username.
+
+    """
+
+    return os.getenv('USERNAME', default = 'USERNAME_NOT_FOUND')
