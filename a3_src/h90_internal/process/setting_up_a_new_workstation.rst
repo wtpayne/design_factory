@@ -84,7 +84,23 @@ on.
 #. > ssh-copy-id <USERNAME>@localhost
 
 
-5. Clone the source design document repository
+5. Copy the workstation public SSH key to github
+------------------------------------------------
+
+Open your github SSH keys settings page at:-
+
+    https://github.com/settings/keys
+
+Create a new entry for the SSH key. The title
+can be anything you like (<USERNAME>@<HOSTNAME>
+is a common convention). The key type should be
+"authentication key". Take the key value from
+the public key that we have just created:-
+
+#. > cat ~/.ssh/id_rsa.pub
+
+
+6. Clone the source design document repository
 ----------------------------------------------
 
 Instructions and documentation will assume that
@@ -96,7 +112,7 @@ the source repository has been checked out to
 #. > git clone https://github.com/wtpayne/design_factory.git df
 
 
-6. Get development API keys
+7. Get development API keys
 ---------------------------
 
 Obtain the development API keys from the team
@@ -115,7 +131,7 @@ directory.
 #. mv default.env ~/dev/df/a3_src/h10_resource/key
 
 
-7. Run the system
+8. Run the system
 -----------------
 
 Now that everything is set up, you should be able
@@ -131,7 +147,7 @@ dependencies for you.
 #. > ./da demo dm006 stop
 
 
-8. Troubleshooting
+9. Troubleshooting
 ------------------
 
 If you run into problems with the automatic
