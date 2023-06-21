@@ -85,7 +85,7 @@
     "#",
 
     { "type": "pep508", "spec":    "pyte==0.8.1"                              },
-    { "type": "github", "remote":  "git@github.com:julio641742/ptterm.git",
+    { "type": "github", "remote":  "git@github.com:wtpayne/ptterm.git",
                         "tag":     "v0.1" },
 
     "",
