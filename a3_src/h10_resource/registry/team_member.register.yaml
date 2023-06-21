@@ -11,18 +11,23 @@ register:
 
   t000_wtp:
     name:
-      William Payne
-    email:
-      wtpayne@gmail.com
+      William Thomas Payne
     alias:
       - wtp
       - williampayne
-    project:
 
   t001_ir:
     name:
       Yiannis Ravanis
-    email:
-      Yiannis.rav@gmail.com
-    alias:
-    project:
+
+  t002_lfgd:
+    name:
+      Laurence Felix Grosvenor-Duffy
+
+  t003_cp:
+    name:
+      Connor Pancoast
+
+  t004_az:
+    name:
+      Artem Zhiganov
