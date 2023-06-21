@@ -62,6 +62,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if inputs['cmd']['ena']:
             for cmd in inputs['cmd']['list']:
 
-                print('Handle question command:')
+                print('-' * 80)
+                print('Question:')
+                print('=========')
                 import pprint
                 pprint.pprint(cmd)

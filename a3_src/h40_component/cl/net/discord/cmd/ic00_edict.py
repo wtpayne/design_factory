@@ -110,16 +110,17 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         #
         if inputs['cmd']['ena']:
             for map_cmd in inputs['cmd']['list']:
-                id_cmd = map_cmd['name_command']
 
-                if id_cmd not in set_id_cmd:
+                id_cmd = map_cmd['name_command']
+                if id_cmd not in map_output:
                     raise RuntimeError(
                             'Did not recognize command: {id_cmd}'.format(
                                                             id_cmd = id_cmd))
 
-                outputs[id_cmd]['ena'] = True
-                outputs[id_cmd]['ts']  = timestamp
-                outputs[id_cmd]['list'].append(map_cmd)
+                for id_out in map_output[id_cmd]:
+                    outputs[id_out]['ena'] = True
+                    outputs[id_out]['ts']  = timestamp
+                    outputs[id_out]['list'].append(map_cmd)
 
         # Process command configuration.
         #

@@ -533,3 +533,6 @@ def _discord_bot(cfg_bot,
             reconnect   = False,
             log_level   = logging.INFO,
             log_handler = loghandler)
+    # bot.run(token       = cfg_bot['str_token'],
+    #         reconnect   = False,
+    #         log_level   = logging.INFO)

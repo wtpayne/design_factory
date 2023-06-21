@@ -66,6 +66,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if inputs['msg']['ena']:
             list_transcript.extend(inputs['msg']['list'])
 
+            print('Transcript:-')
+            print('============')
+
+            import pprint
+            pprint.pprint(list_transcript)
+
         if inputs['cmd']['ena']:
             for cmd in inputs['cmd']['list']:
 

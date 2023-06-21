@@ -97,7 +97,7 @@ node:
         output:
         - facilitation
         - minute_keeping
-      - id_cmd:       facilitation
+      - id_cmd:       summarize
         desc:         Summarise the responses so far.
         output:
         - minute_keeping
