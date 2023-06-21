@@ -154,5 +154,3 @@ get back to a clean slate is to delete the
 relevant virtual environment directory:
 
 ~/dev/df/a0_env/venv/<ENVIRONMENT_ID>
-
-
