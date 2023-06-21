@@ -99,9 +99,21 @@ def _configure_recent_files_list(ctx):
     if 'recent_files' not in ctx.store:
         ctx.store.recent_files = []
 
-    # _add_to_recent_files(ctx, '/media/wtp/Data1/dev/df/ws00_pri/a3_src/h90_internal/da/cli/service/process_assistant/process_assistant.stableflow.cfg.yaml')
-    _add_to_recent_files(ctx, '/media/wtp/Data1/dev/df/ws00_pri/a3_src/h60_system/accord/accord.stableflow.cfg.yaml')
-    # _add_to_recent_files(ctx, '/media/wtp/Data1/dev/df/ws00_pri/a3_src/h60_system/routine/routine.stableflow.cfg.yaml')
+    import da.env
+    _add_to_recent_files(
+            ctx,
+            da.env.path(control_tier = 'h60_system',
+                        relpath      = 'accord/accord.stableflow.cfg.yaml'))
+
+    # _add_to_recent_files(
+    #         ctx,
+    #         da.env.path(control_tier = 'h60_system',
+    #                     relpath      = 'routine/routine.stableflow.cfg.yaml'))
+
+    # _add_to_recent_files(
+    #         ctx,
+    #         da.env.path(control_tier = 'h90_internal',
+    #                     relpath      = 'da/cli/service/process_assistant/process_assistant.stableflow.cfg.yaml'))
 
 
 # -----------------------------------------------------------------------------
