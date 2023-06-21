@@ -1,13 +1,14 @@
-=========================
-Setting up a new computer
-=========================
+=================================
+Setting up a new server or device
+=================================
 
 
 Overview
 ========
 
 This procedure describes how to set up a new
-computer for deployment.
+server or device. I.e. a machine that will be
+used for deploying a system in production.
 
 
 Instructions
