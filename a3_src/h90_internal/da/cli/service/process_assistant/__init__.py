@@ -70,7 +70,8 @@ def start():
     tup_overrides = (
         'node.filesystem_watcher.config.iter_dirpath_root', [_dirpath_src(),],
         'node.ui_discord_client.config.filepath_env',        _filepath_dotenv(),
-        'node.design_index_db.config.filepath_db',           _filepath_db())
+        'node.design_index_db.config.filepath_db',           _filepath_db(),
+        'host.localhost.acct_run',                           _username())
 
     da.env.run.stableflow_start(
         path_cfg      = _filepath_system_cfg(),
@@ -163,3 +164,13 @@ def _dirpath_self():
 
     """
     return os.path.dirname(os.path.realpath(__file__))
+
+
+# -----------------------------------------------------------------------------
+def _username():
+    """
+    Return the current username.
+
+    """
+
+    return os.getenv('USERNAME', default = 'USERNAME_NOT_FOUND')

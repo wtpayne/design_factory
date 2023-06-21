@@ -6,8 +6,8 @@ system:
 host:
   custom_env:
     hostname:        'localhost'
-    acct_run:        'wtp'
-    acct_provision:  'wtp'
+    acct_run:        ''
+    acct_provision:  ''
     port_range:      '8090-9000'
     dirpath_log:     ''
     environment:     'e001_process_assistant'
