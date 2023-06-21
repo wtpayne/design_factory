@@ -50,6 +50,7 @@ license:
 # -----------------------------------------------------------------------------
 def validate(inputs         = None,
              outputs        = None,
+             cfg            = None,
              cannot_contain = None,
              must_contain   = None,
              must_equal     = None):
@@ -57,44 +58,48 @@ def validate(inputs         = None,
     Validate inputs or outputs.
 
     """
-    if (inputs is not None) and (outputs is None):
-        str_io = 'inputs'
-        set_id = set(inputs.keys())
-    elif (inputs is None) and (outputs is not None):
-        str_io = 'outputs'
-        set_id = set(outputs.keys())
+    if ((inputs is not None) and (outputs is None) and (cfg is None)):
+        str_arg = 'inputs'
+        set_key = set(inputs.keys())
+    elif ((inputs is None) and (outputs is not None) and (cfg is None)):
+        str_arg = 'outputs'
+        set_key = set(outputs.keys())
+    elif ((inputs is None) and (outputs is None) and (cfg is not None)):
+        str_arg = 'cfg'
+        set_key = set(cfg.keys())
     else:
         raise RuntimeError('Must provide either inputs only or outputs only.')
 
-
     if cannot_contain is not None:
-        if set(cannot_contain).issubset(set_id):
+        if set(cannot_contain).issubset(set_key):
             raise RuntimeError(
-                    'Invalid {io}. Contains invalid id.'.format(io = str_io))
+                        'Invalid {arg}. Contains invalid id.'.format(
+                                                                arg = str_arg))
 
     if must_contain is not None:
-        if not set(must_contain).issubset(set_id):
+        if not set(must_contain).issubset(set_key):
             raise RuntimeError(
-                    'Invalid {io}. Required id not found.'.format(io = str_io))
+                        'Invalid {arg}. Required id not found.'.format(
+                                                                arg = str_arg))
 
     if must_equal is not None:
         set_required = set(must_equal)
-        if set_id != set_required:
+        if set_key != set_required:
 
             str_missing = ''
-            set_missing = set_required - set_id
+            set_missing = set_required - set_key
             if set_missing:
                 str_missing = 'Missing: {tup}. '.format(
                                                     tup = tuple(set_missing))
 
             str_extra = ''
-            set_extra = set_id - set_required
+            set_extra = set_key - set_required
             if set_extra:
                 str_extra = 'Extra: {tup}. '.format(tup = tuple(set_extra))
 
             raise RuntimeError(
-                    'Invalid {str_io}. {missing}{extra}'.format(
-                                                        str_io  = str_io,
+                    'Invalid {arg}. {missing}{extra}'.format(
+                                                        arg     = str_arg,
                                                         missing = str_missing,
                                                         extra   = str_extra))
 

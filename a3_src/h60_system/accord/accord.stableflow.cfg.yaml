@@ -92,24 +92,31 @@ node:
     state_type:       py_dict
     config:
       cmd:
-        question:     Ask a question.
-        summary:      Summarise the responses so far.
+      - id_cmd:       ask
+        desc:         Ask a question.
+        output:
+        - facilitation
+        - minute_keeping
+      - id_cmd:       facilitation
+        desc:         Summarise the responses so far.
+        output:
+        - minute_keeping
 
   # ---------------------------------------------------------------------------
-  # Command handling logic.
+  # Meeting tasks
   #
-  question:
+  facilitation:
     process:        proc_main
     req_host_cfg:   default_configuration
     functionality:
-      py_module:    accord.question.ic00_edict
+      py_module:    accord.facilitation.ic00_edict
     state_type:     py_dict
 
-  summary:
+  minute_keeping:
     process:        proc_main
     req_host_cfg:   default_configuration
     functionality:
-      py_module:    accord.summary.ic00_edict
+      py_module:    accord.minute_keeping.ic00_edict
     state_type:     py_dict
 
   openai:
@@ -158,12 +165,12 @@ edge:
 - owner: ctrl_main
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_question
-  dst:   question.inputs.ctrl
+  dst:   facilitation.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_summary
-  dst:   summary.inputs.ctrl
+  dst:   minute_keeping.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -193,49 +200,47 @@ edge:
   dst:   discord.inputs.cmd
   dirn:  feedback
 
-# Functional chain for question distribution.
+# Functional chain for facilitation.
 
 - owner: command
   data:  py_dict
-  src:   command.outputs.question
-  dst:   question.inputs.cmd
+  src:   command.outputs.facilitation
+  dst:   facilitation.inputs.cmd
 
-- owner: question
+- owner: facilitation
   data:  py_dict
-  src:   question.outputs.msg
-  dst:   msgmux.inputs.question
+  src:   facilitation.outputs.msg
+  dst:   msgmux.inputs.facilitation
   dirn:  feedback
 
-# Functional chain for the discussion summarisation.
+# Functional chain for minute keeping.
 
 - owner: discord
   data:  py_dict
   src:   discord.outputs.msg
-  dst:   summary.inputs.msg
+  dst:   minute_keeping.inputs.msg
 
 - owner: command
   data:  py_dict
-  src:   command.outputs.summary
-  dst:   summary.inputs.cmd
+  src:   command.outputs.minute_keeping
+  dst:   minute_keeping.inputs.cmd
 
-- owner: summary
+- owner: minute_keeping
   data:  py_dict
-  src:   summary.outputs.prompt
+  src:   minute_keeping.outputs.prompt
   dst:   openai.inputs.prompt
 
 - owner: openai
   data:  py_dict
   src:   openai.outputs.response
-  dst:   summary.inputs.response
+  dst:   minute_keeping.inputs.response
   dirn:  feedback
 
-- owner: summary
+- owner: minute_keeping
   data:  py_dict
-  src:   summary.outputs.summary
-  dst:   msgmux.inputs.summary
+  src:   minute_keeping.outputs.msg
+  dst:   msgmux.inputs.minute_keeping
   dirn:  feedback
-
-
 
 # Logging
 
@@ -244,15 +249,15 @@ edge:
   src:   discord.outputs.log
   dst:   log.inputs.discord
 
-- owner: question
+- owner: facilitation
   data:  py_dict
-  src:   question.outputs.log
-  dst:   log.inputs.question
+  src:   facilitation.outputs.log
+  dst:   log.inputs.facilitation
 
-- owner: summary
+- owner: minute_keeping
   data:  py_dict
-  src:   summary.outputs.log
-  dst:   log.inputs.summary
+  src:   minute_keeping.outputs.log
+  dst:   log.inputs.minute_keeping
 
 
 

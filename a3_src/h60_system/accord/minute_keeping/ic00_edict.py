@@ -3,7 +3,7 @@
 ---
 
 title:
-    "Accprd app command handler for the summary command."
+    "Accprd app minute taking task component."
 
 description:
     "Handle invocations of the summary command."

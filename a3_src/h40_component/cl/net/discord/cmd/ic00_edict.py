@@ -46,6 +46,8 @@ license:
 """
 
 
+import collections
+
 import fl.util.edict
 
 
@@ -56,21 +58,41 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    signal     = None
-    tup_id_cmd = tuple(cfg['cmd'].keys())
-    set_id_cmd = set(tup_id_cmd)
-    tup_id_in  = ('cmd', 'ctrl')
-    tup_id_out = tup_id_cmd + ('cmd',)
-    fl.util.edict.validate(inputs  = inputs,  must_equal = tup_id_in)
-    fl.util.edict.validate(outputs = outputs, must_equal = tup_id_out)
-    fl.util.edict.init(outputs)
+    # Validate configuration.
+    #
+    fl.util.edict.validate(cfg        = cfg,
+                           must_equal = ('cmd',))
+    list_output = list()
+    for cfg_cmd in cfg['cmd']:
+        for key in ('id_cmd', 'desc', 'output'):
+            if key not in cfg_cmd:
+                raise RuntimeError(
+                        'Missing command configuration key: {key}'.format(
+                                                                    key = key))
+        for id_out in cfg_cmd['output']:
+            list_output.append(id_out)
+
+    # Validate inputs and outputs.
+    #
+    fl.util.edict.validate(inputs       = inputs,
+                           must_equal   = ('cmd', 'ctrl'))
+    fl.util.edict.validate(outputs      = outputs,
+                           must_contain = tuple(list_output) + ('cmd',))
 
     # Configure commands from configuration.
     #
     list_cfg_cmd = list()
-    for id_cmd in tup_id_cmd:
+    map_output   = collections.defaultdict(list)
+    for cfg_cmd in cfg['cmd']:
+        id_cmd          = cfg_cmd['id_cmd']
+        str_description = cfg_cmd['desc']
         list_cfg_cmd.append(dict(name        = id_cmd,
-                                 description = cfg['cmd'][id_cmd]))
+                                 description = str_description))
+        for id_out in cfg_cmd['output']:
+            map_output[id_cmd].append(id_out)
+
+    fl.util.edict.init(outputs)
+    signal = None
 
     while True:
 
@@ -102,10 +124,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # Process command configuration.
         #
         if list_cfg_cmd:
-
-            import pprint
-            pprint.pprint(list_cfg_cmd)
-
             outputs['cmd']['ena']     = True
             outputs['cmd']['ts']      = timestamp
             outputs['cmd']['list'][:] = list_cfg_cmd
