@@ -37,8 +37,6 @@ an Ubuntu 22.04 image.
 #. > wsl --set-default-version 2
 #. reboot
 #. > wsl.exe --install Ubuntu-22.04
-#. reboot
-
 
 2. Launch ubuntu 22.04 using WSL
 --------------------------------
@@ -156,3 +154,5 @@ get back to a clean slate is to delete the
 relevant virtual environment directory:
 
 ~/dev/df/a0_env/venv/<ENVIRONMENT_ID>
+
+
