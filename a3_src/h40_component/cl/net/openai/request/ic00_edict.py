@@ -10,7 +10,7 @@ description:
     the OpenAI HTTP API."
 
 id:
-    "8d2b1939-cea9-4af0-9528-7cc5e44d0a5c"
+    "ea1d2286-0a0f-4cbf-b621-5f5ae205ab98"
 
 type:
     dt004_python_stableflow_edict_component
@@ -46,6 +46,7 @@ license:
 
 
 import fl.net.openai.client
+import fl.util
 import key
 
 
@@ -58,9 +59,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     default_args = dict(id_endpoint = 'chat_completions',
                         model       = 'gpt-3.5-turbo')
 
-    (request_handler,
-     template_handler,
-     workflow_handler) = init_openai_client(
+    (request_handler, _, _) = init_openai_client(
                 filepath_env  = cfg.get('filepath_env',  None),
                 envvar_key    = cfg.get('envvar_key',    'OPENAI_API_KEY'),
                 api_key       = cfg.get('api_key',       None),
@@ -69,75 +68,45 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 secs_interval = cfg.get('secs_interval', 2),
                 default       = cfg.get('default',       default_args))
 
-    # Initialize outputs.
-    #
+    timestamp    = dict()
+    list_request = list()
+    list_result  = list()
+    list_error   = list()
+
     signal = None
-    for id_out in outputs.keys():
-        outputs[id_out]['ena']  = False
-        outputs[id_out]['ts']   = dict()
-        outputs[id_out]['list'] = list()
-
+    fl.util.edict.init(outputs)
     while True:
-
         inputs = yield (outputs, signal)
+        fl.util.edict.reset(outputs)
 
-        # Reset outputs.
-        #
-        for id_out in outputs.keys():
-            outputs[id_out]['ena'] = False
-            outputs[id_out]['ts'].clear()
-            outputs[id_out]['list'].clear()
+        timestamp.clear()
+        list_request.clear()
+        list_result.clear()
+        list_error.clear()
 
-        map_ts = dict()
+        if inputs['request']['ena']:
+            timestamp.update(inputs['request']['ts'])
+            list_request.extend(inputs['request']['list'])
 
-        # Grab any new request inputs.
-        #
-        list_request = list()
-        if 'request' in inputs and inputs['request']['ena']:
-            map_ts       = inputs['request']['ts']
-            list_request = inputs['request']['list']
+            print('OPENAI REQUEST: ' + repr(list_request))
 
-        # Grab any new template inputs.
-        #
-        list_template = list()
-        if 'template' in inputs and inputs['template']['ena']:
-            map_ts        = inputs['template']['ts']
-            list_template = inputs['template']['list']
 
-        # Grab any new workflow inputs.
-        #
-        list_workflow = list()
-        if 'workflow' in inputs and inputs['workflow']['ena']:
-            map_ts        = inputs['workflow']['ts']
-            list_workflow = inputs['workflow']['list']
+        (list_result, list_error) = request_handler.send(list_request)
 
-        # Grab any new param inputs.
-        #
-        map_ts     = dict()
-        list_param = list()
-        if 'param' in inputs and inputs['param']['ena']:
-            map_ts     = inputs['param']['ts']
-            list_param = inputs['param']['list']
+        if list_result:
 
-        # Send the templates and parameters to
-        # the OpenAI API client.
-        #
-        (list_result,
-         list_error) = workflow_handler.send((list_workflow,
-                                              list_param))
+            print('OPENAI RESULT: ' + repr(list_result))
 
-        # Update result outputs.
-        #
-        if ('result' in outputs) and list_result:
             outputs['result']['ena'] = True
-            outputs['result']['ts'].update(map_ts)
+            outputs['result']['ts'].update(timestamp)
             outputs['result']['list'][:] = list_result
 
-        # Update error-reporting outputs.
-        #
-        if ('error' in outputs) and list_error:
+        if list_error:
+
+            print('OPENAI ERROR: ' + repr(list_error))
+
             outputs['error']['ena'] = True
-            outputs['error']['ts'].update(map_ts)
+            outputs['error']['ts'].update(timestamp)
             outputs['error']['list'][:] = list_error
 
 

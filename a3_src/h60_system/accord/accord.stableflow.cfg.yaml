@@ -79,16 +79,15 @@ node:
         desc:         Ask a question.
         output:
         - facilitation
-        - minute_keeping
       - id_cmd:       summarize
         desc:         Summarise the responses so far.
         output:
-        - minute_keeping
+        - facilitation
+        - aggregation
       - id_cmd:       debug
         desc:         Print debug information.
         output:
         - facilitation
-        - minute_keeping
 
   # ---------------------------------------------------------------------------
   # Meeting tasks
@@ -100,11 +99,18 @@ node:
       py_module:    accord.facilitation.ic00_edict
     state_type:     py_dict
 
-  minute_keeping:
+  aggregation:
     process:        proc_main
     req_host_cfg:   default_configuration
     functionality:
-      py_module:    accord.minute_keeping.ic00_edict
+      py_module:    accord.aggregation.ic00_edict
+    state_type:     py_dict
+
+  openai:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.net.openai.request.ic00_edict
     state_type:     py_dict
     config:
       filepath_env:         Null
@@ -121,6 +127,13 @@ node:
         presence_penalty:   0.0
         frequency_penalty:  0.0
         user:               ''
+
+  distribution:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    accord.distribution.ic00_edict
+    state_type:     py_dict
 
   # ---------------------------------------------------------------------------
   # Logging.
@@ -166,7 +179,7 @@ edge:
 - owner: ctrl_main
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_summary
-  dst:   minute_keeping.inputs.ctrl
+  dst:   aggregation.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -209,22 +222,37 @@ edge:
   dst:   msgmux.inputs.facilitation
   dirn:  feedback
 
-# Functional chain for minute keeping.
+# Functional chain for summary generation.
 
 - owner: discord
   data:  py_dict
   src:   discord.outputs.msg
-  dst:   minute_keeping.inputs.msg
+  dst:   aggregation.inputs.msg
 
 - owner: command
   data:  py_dict
-  src:   command.outputs.minute_keeping
-  dst:   minute_keeping.inputs.cmd
+  src:   command.outputs.aggregation
+  dst:   aggregation.inputs.cmd
 
-- owner: minute_keeping
+- owner: aggregation
   data:  py_dict
-  src:   minute_keeping.outputs.msg
-  dst:   msgmux.inputs.minute_keeping
+  src:   aggregation.outputs.request
+  dst:   openai.inputs.request
+
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.result
+  dst:   distribution.inputs.result
+
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.error
+  dst:   log.inputs.error
+
+- owner: distribution
+  data:  py_dict
+  src:   distribution.outputs.msg
+  dst:   msgmux.inputs.summary
   dirn:  feedback
 
 # Logging
@@ -239,10 +267,10 @@ edge:
   src:   facilitation.outputs.log
   dst:   log.inputs.facilitation
 
-- owner: minute_keeping
+- owner: aggregation
   data:  py_dict
-  src:   minute_keeping.outputs.log
-  dst:   log.inputs.minute_keeping
+  src:   aggregation.outputs.log
+  dst:   log.inputs.aggregation
 
 
 
