@@ -50,28 +50,11 @@ node:
   # Discord bot integration.
   #
   msgmux:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:          proc_main
+    req_host_cfg:     default_configuration
     functionality:
-      py_module:    cl.util.noop.ic00_edict
-    state_type:     py_dict
-    config:
-      channel:
-        chair:      1115744080907997204
-        room_01:    1115744295845118032
-        room_02:    1115744329131106325
-        room_03:    1115744378623893675
-        room_04:    1115744396005097592
-        room_05:    1115744413751185570
-      message:
-      - id_msg:     ["question", "summary"]
-        channel:
-        - chair
-        - room_01
-        - room_02
-        - room_03
-        - room_04
-        - room_05
+      py_module:      cl.net.discord.mux.ic00_edict
+    state_type:       py_dict
 
   discord:
     process:          proc_main
@@ -101,6 +84,11 @@ node:
         desc:         Summarise the responses so far.
         output:
         - minute_keeping
+      - id_cmd:       debug
+        desc:         Print debug information.
+        output:
+        - facilitation
+        - minute_keeping
 
   # ---------------------------------------------------------------------------
   # Meeting tasks
@@ -118,13 +106,21 @@ node:
     functionality:
       py_module:    accord.minute_keeping.ic00_edict
     state_type:     py_dict
-
-  openai:
-    process:        proc_main
-    req_host_cfg:   default_configuration
-    functionality:
-      py_module:    cl.util.noop.ic00_edict
-    state_type:     py_dict
+    config:
+      filepath_env:         Null
+      envvar_key:           OPENAI_API_KEY
+      secs_interval:        0.1
+      is_bit:               False
+      is_async:             True
+      default:
+        id_endpoint:        'chat_completions'
+        model:              'gpt-3.5-turbo'
+        temperature:        1.0
+        n:                  1
+        stream:             False
+        presence_penalty:   0.0
+        frequency_penalty:  0.0
+        user:               ''
 
   # ---------------------------------------------------------------------------
   # Logging.
@@ -224,17 +220,6 @@ edge:
   data:  py_dict
   src:   command.outputs.minute_keeping
   dst:   minute_keeping.inputs.cmd
-
-- owner: minute_keeping
-  data:  py_dict
-  src:   minute_keeping.outputs.prompt
-  dst:   openai.inputs.prompt
-
-- owner: openai
-  data:  py_dict
-  src:   openai.outputs.response
-  dst:   minute_keeping.inputs.response
-  dirn:  feedback
 
 - owner: minute_keeping
   data:  py_dict

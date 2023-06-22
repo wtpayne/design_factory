@@ -53,6 +53,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Noop component coroutine.
 
     """
+
     signal = None
     fl.util.edict.init(outputs)
     while True:
@@ -61,9 +62,15 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
         if inputs['cmd']['ena']:
             for cmd in inputs['cmd']['list']:
+                id_cmd = cmd['name_command']
 
-                print('-' * 80)
-                print('Question:')
-                print('=========')
-                import pprint
-                pprint.pprint(cmd)
+                if id_cmd == 'ask':
+                    question                  = ' '.join(cmd['args'])
+                    outputs['msg']['ena']     = True
+                    outputs['msg']['list'][:] = [
+                                        (1115744295845118032, question),
+                                        (1115744329131106325, question),
+                                        (1115744378623893675, question),
+                                        (1115744396005097592, question),
+                                        (1115744413751185570, question)]
+
