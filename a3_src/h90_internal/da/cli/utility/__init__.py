@@ -51,6 +51,7 @@ def uuid():
     Generate a UUID and copy it to the clipboard.
 
     """
+
     import uuid
     import pyclip
 

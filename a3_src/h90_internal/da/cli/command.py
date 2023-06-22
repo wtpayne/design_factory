@@ -83,6 +83,7 @@ def grp_main():
     design automation commands.
 
     """
+
     pass
 
 
@@ -94,6 +95,7 @@ def grp_env():
     Environment management.
 
     """
+
     pass
 
 
@@ -105,6 +107,7 @@ def grp_service():
     Background services.
 
     """
+
     pass
 
 
@@ -116,6 +119,7 @@ def grp_process_assistant():
     Process assistant service.
 
     """
+
     pass
 
 
@@ -126,6 +130,7 @@ def start():
     Start the process assistant service.
 
     """
+
     import da.cli.service.process_assistant
     sys.exit(da.cli.service.process_assistant.start())
 
@@ -137,6 +142,7 @@ def stop():
     Stop the process assistant service.
 
     """
+
     import da.cli.service.process_assistant
     sys.exit(da.cli.service.process_assistant.stop())
 
@@ -149,6 +155,7 @@ def grp_utility():
     Utility commands.
 
     """
+
     pass
 
 
@@ -159,6 +166,7 @@ def uuid():
     Generate a UUID4.
 
     """
+
     import da.cli.utility
     sys.exit(da.cli.utility.uuid())
 
@@ -171,6 +179,7 @@ def grp_test():
     Testing tools and commands.
 
     """
+
     pass
 
 
@@ -181,6 +190,7 @@ def all():
     Run all tests.
 
     """
+
     import da.test
     sys.exit(da.test.all())
 
@@ -193,6 +203,7 @@ def grp_demo():
     Demonstrations.
 
     """
+
     pass
 
 
@@ -250,6 +261,7 @@ def _dirpath_src():
     hierarchy.
 
     """
+
     dirpath_self = os.path.dirname(os.path.realpath(__file__))
     return os.path.normpath(os.path.join(dirpath_self, '../../..'))
 

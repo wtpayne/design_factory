@@ -56,6 +56,7 @@ def test():
     Run all dm005 tests.
 
     """
+
     import da.env
     import da.test
 
@@ -89,6 +90,7 @@ def start():
     Start dm006 system.
 
     """
+
     tup_overrides = ('host.localhost.dirpath_log',          _dirpath_log(),
                      'node.discord.config.filepath_dotenv', _filepath_dotenv(),
                      'host.localhost.acct_run',             _username())
@@ -104,6 +106,7 @@ def stop():
     Stop dm006 system.
 
     """
+
     import da.env.run
     sys.exit(da.env.run.stableflow_stop(path_cfg = _filepath_cfg()))
 
@@ -114,6 +117,7 @@ def _dirpath_log():
     Return the directory path to the logging directory for this system.
 
     """
+
     import da.env
     return da.env.path(process_area = 'a4_tmp',
                        control_tier = 'h80_research',
@@ -126,6 +130,7 @@ def _filepath_dotenv():
     Return the filepath to the dotenv .env file containing the API key.
 
     """
+
     import da.env
     return da.env.path(
                 process_area = 'a3_src',

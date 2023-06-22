@@ -63,6 +63,7 @@ def start():
     runtime configuration.
 
     """
+
     filepath_db = _filepath_db()
     dirpath_db  = os.path.dirname(filepath_db)
     if not os.path.exists(dirpath_db):
@@ -85,6 +86,7 @@ def stop():
     Stop the process assistant service.
 
     """
+
     da.env.run.stableflow_stop(path_cfg = _filepath_system_cfg())
 
 
@@ -94,6 +96,7 @@ def _filepath_db():
     Return the file path of the design index database file.
 
     """
+
     return os.path.join(_dirpath_tmp(), 'main/design_index.db')
 
 
@@ -103,6 +106,7 @@ def _dirpath_tmp():
     Return the path of the root directory of the temporary document filesystem.
 
     """
+
     return os.path.join(_dirpath_root(), 'a4_tmp')
 
 
@@ -121,6 +125,7 @@ def _dirpath_src():
     hierarchy.
 
     """
+
     return os.path.join(_dirpath_root(), 'a3_src')
 
 
@@ -130,6 +135,7 @@ def _dirpath_root():
     Return the path of the root directory of the design factory filesystem.
 
     """
+
     return os.path.normpath(os.path.join(_dirpath_self(), '../../../../../..'))
 
 
@@ -143,6 +149,7 @@ def _filepath_dotenv():
     and passwords for different integrations.
 
     """
+
     return os.path.join(_dirpath_self(), '.env')
 
 
@@ -152,6 +159,7 @@ def _filepath_system_cfg():
     Return the file path of the configuration data.
 
     """
+
     dirpath_self = _dirpath_self()
     filename_cfg = '{name_system}.stableflow.cfg.yaml'.format(
                                 name_system = os.path.basename(dirpath_self))
@@ -164,6 +172,7 @@ def _dirpath_self():
     Return the directory path to the current module.
 
     """
+
     return os.path.dirname(os.path.realpath(__file__))
 
 

@@ -79,6 +79,7 @@ class Ordered(click.Group):
         Return an OrderedGroup instance.
 
         """
+
         super().__init__(name, commands, **attrs)
 
         # From Python 3.5 dict() is order preserving, so
@@ -93,4 +94,5 @@ class Ordered(click.Group):
         Return an ordered list of the commands in the group.
 
         """
+
         return self.commands
