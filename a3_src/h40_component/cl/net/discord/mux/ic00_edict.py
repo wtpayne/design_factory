@@ -3,7 +3,7 @@
 ---
 
 title:
-    "Discord message multiplexer stableflow-edict component."
+    "Multiplexer stableflow-edict component."
 
 description:
     "."
@@ -43,88 +43,39 @@ license:
 ...
 """
 
+
+import fl.util
+
+
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Discord client component coroutine.
+    Enabled dictionary multiplexer component coroutine.
 
     """
 
-    list_cfg_cmd = list()
-    for cfg_cmd in cfg['command']:
-        name =
+    map_ts   = dict()
+    list_msg = list()
 
-    # set_id_out = set(outputs.keys())
-    # set_id_in  = set(outputs.keys())
-
-    # if 'cmd' not in set_id_in:
-    #     raise RuntimeError('cmd must be in input')
-
-    # if 'cmd' not in set_id_out:
-    #     raise RuntimeError('cmd must be in output')
-
-    # list_cfg_cmd = list()
-    # set_id_cmd   = set_id_out - {'cmd'}
-    # for id_cmd in set_id_cmd:
-    #     list_cfg_cmd.append(dict(name        = id_cmd,
-    #                              description = cfg[id_cmd]['description'])
-
-
-    # Initialize outputs.
-    #
     signal = None
-    for id_out in set_id_out:
-        outputs[id_out]['ena']  = False
-        outputs[id_out]['ts']   = dict()
-        outputs[id_out]['list'] = list()
-
-    # Loop forever, sending messages
-    # to and from the discord client
-    # via the two message queues.
-    #
+    fl.util.edict.init(outputs)
     while True:
-
         inputs = yield (outputs, signal)
+        fl.util.edict.reset(outputs)
 
-        # Reset outputs.
-        #
-        for id_out in tup_id_out:
-            if id_out in outputs:
-                outputs[id_out]['ena'] = False
-                outputs[id_out]['ts'].clear()
-                outputs[id_out]['list'].clear()
+        map_ts.clear()
+        list_msg.clear()
 
-        # Pass messages and command
-        # configuration to the discord
-        # bot.
-        #
-        map_ts          = dict()
-        list_msg_to_bot = list()
-        list_cmd_to_bot = list()
-        for (id_in, list_in) in (('msg', list_msg_to_bot),
-                                 ('cmd', list_cmd_to_bot)):
-
-            if id_in in inputs:
-                pkt_in = inputs[id_in]
+        for (id_in, pkt_in) in inputs.items():
+            if not pkt_in['ena']:
+                continue
+            if id_in == 'ctrl':
                 map_ts = pkt_in['ts']
-                list_in.extend(pkt_in['list'])
+                continue
+            list_msg.extend(pkt_in['list'])
 
-        (list_msg_from_bot,
-         list_cmd_from_bot,
-         list_log_from_bot) = bot.send((list_msg_to_bot,
-                                       list_cmd_to_bot))
-
-        # Recieve messages, command
-        # invocations and log items
-        # from the doscord bot and
-        # pass them on to the rest
-        # of the system.
-        #
-        for (id_out, list_out) in (('msg', list_msg_from_bot),
-                                   ('cmd', list_cmd_from_bot),
-                                   ('log', list_log_from_bot)):
-
-            if id_out in outputs and list_out:
-                outputs[id_out]['ena'] = True
-                outputs[id_out]['ts'].update(map_ts)
-                outputs[id_out]['list'][:] = list_out
+        if list_msg:
+            for (id_out, pkt_out) in outputs.items():
+                pkt_out['ena'] = True
+                pkt_out['ts'].update(map_ts)
+                pkt_out['list'][:] = list_msg
