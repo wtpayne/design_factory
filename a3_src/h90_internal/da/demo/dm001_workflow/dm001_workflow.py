@@ -45,8 +45,10 @@ license:
 """
 
 
+import getpass
 import os
 import sys
+
 
 # -----------------------------------------------------------------------------
 def test():
@@ -270,4 +272,9 @@ def _username():
 
     """
 
-    return os.getenv('USERNAME', default = 'USERNAME_NOT_FOUND')
+    try:
+        username = getpass.getuser()
+    except Exception:
+        raise RuntimeError('Could not find username.')
+    else:
+        return username
