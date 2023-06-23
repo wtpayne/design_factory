@@ -74,7 +74,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                     str_token    = cfg.get('str_token',     None),
                     secs_sleep   = cfg.get('secs_sleep',    0.5))
 
-    signal = None
+    timestamp = dict()
+    signal    = None
     fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
@@ -84,13 +85,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # configuration to the discord
         # bot.
         #
-        map_ts          = dict()
         list_msg_to_bot = list()
         list_cmd_to_bot = list()
         for (id_in, list_in) in (('msg', list_msg_to_bot),
                                  ('cmd', list_cmd_to_bot)):
 
-            map_ts = inputs[id_in]['ts']
+            timestamp.update(inputs[id_in]['ts'])
             list_in.extend(inputs[id_in]['list'])
 
         (list_msg_from_bot,
@@ -110,7 +110,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
             if id_out in outputs and list_out:
                 outputs[id_out]['ena'] = True
-                outputs[id_out]['ts'].update(map_ts)
+                outputs[id_out]['ts'].update(timestamp)
                 outputs[id_out]['list'][:] = list_out
 
 

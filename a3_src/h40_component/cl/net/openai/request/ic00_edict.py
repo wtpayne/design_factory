@@ -90,7 +90,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
             print('OPENAI REQUEST: ' + repr(list_request))
 
-
         (list_result, list_error) = request_handler.send(list_request)
 
         if list_result:

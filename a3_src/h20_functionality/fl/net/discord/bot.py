@@ -451,6 +451,7 @@ def _discord_bot(cfg_bot,
 
         raise RuntimeError('Command error: {err}.'.format(err = error))
 
+
     # -------------------------------------------------------------------------
     @bot.event
     async def on_message(message):
@@ -471,21 +472,26 @@ def _discord_bot(cfg_bot,
 
         await bot.process_commands(message)
 
-        if not message.author.bot:
+        if message.author.bot:
+            return
 
-            if message.content.startswith(BOT_COMMAND_PREFIX):
-                return
+        if message.content.startswith(BOT_COMMAND_PREFIX):
+            return
 
-            msg = dict(msg_type   = 'message',
-                       id_prev    = None,
-                       id_msg     = message.id,
-                       id_author  = message.author.id,
-                       id_channel = message.channel.id,
-                       content    = message.content)
-            try:
-                queue_msg_from_bot.put(msg, block = False)
-            except queue.Full:
-                log.error('Message dropped. queue_msg_from_bot is full.')
+        msg = dict(msg_type     = 'message',
+                   id_prev      = None,
+                   id_msg       = message.id,
+                   id_author    = message.author.id,
+                   name_author  = message.author.name,
+                   nick_author  = message.author.nick,
+                   id_channel   = message.channel.id,
+                   name_channel = message.channel.name,
+                   content      = message.content)
+
+        try:
+            queue_msg_from_bot.put(msg, block = False)
+        except queue.Full:
+            log.error('Message dropped. queue_msg_from_bot is full.')
 
     # -------------------------------------------------------------------------
     @bot.event
@@ -515,24 +521,33 @@ def _discord_bot(cfg_bot,
 
         """
 
-        if not msg_after.author.bot:
-            try:
-                msg = dict(msg_type   = 'message',
-                           id_prev    = msg_before.id,
-                           id_msg     = msg_after.id,
-                           id_author  = msg_after.author.id,
-                           id_channel = msg_after.channel.id,
-                           content    = msg_after.content)
-                queue_msg_from_bot.put(msg, block = False)
-            except queue.Full:
-                log.error('Message dropped. queue_msg_from_bot is full.')
+        if msg_after.author.bot:
+            return
+
+        if msg_after.content.startswith(BOT_COMMAND_PREFIX):
+            return
+
+        msg = dict(msg_type     = 'message',
+                   id_prev      = msg_before.id,
+                   id_msg       = msg_after.id,
+                   id_author    = msg_after.author.id,
+                   name_author  = msg_after.author.name,
+                   nick_author  = msg_after.author.nick,
+                   id_channel   = msg_after.channel.id,
+                   name_channel = msg_after.channel.name,
+                   content      = msg_after.content)
+
+        try:
+            queue_msg_from_bot.put(msg, block = False)
+        except queue.Full:
+            log.error('Message dropped. queue_msg_from_bot is full.')
 
     # Run the client.
     #
-    bot.run(token       = cfg_bot['str_token'],
-            reconnect   = False,
-            log_level   = logging.INFO,
-            log_handler = loghandler)
     # bot.run(token       = cfg_bot['str_token'],
     #         reconnect   = False,
-    #         log_level   = logging.INFO)
+    #         log_level   = logging.INFO,
+    #         log_handler = loghandler)
+    bot.run(token       = cfg_bot['str_token'],
+            reconnect   = False,
+            log_level   = logging.INFO)
