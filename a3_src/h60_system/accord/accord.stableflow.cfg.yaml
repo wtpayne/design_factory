@@ -34,7 +34,7 @@ node:
       py_module:      cl.ctrl.sys.ic00_edict
     state_type:       py_dict
     config:
-      frequency_hz:   2
+      frequency_hz:   5
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
@@ -65,7 +65,7 @@ node:
     config:
       filepath_env:   Null
       envvar_key:     TOKEN_DISCORD_BOT_ACCORD
-      secs_sleep:     0.5
+      secs_sleep:     0.2
 
   command:
     process:          proc_main
@@ -75,35 +75,23 @@ node:
     state_type:       py_dict
     config:
       cmd:
-      - id_cmd:       ask
-        desc:         Ask a question.
-        output:
-        - facilitation
+      - id_cmd:       create
+        desc:         Create a deliberation session.
+      - id_cmd:       question
+        desc:         Ask a question in the current session.
       - id_cmd:       summarize
         desc:         Summarise the responses so far.
-        output:
-        - facilitation
-        - aggregation
       - id_cmd:       debug
         desc:         Print debug information.
-        output:
-        - facilitation
 
   # ---------------------------------------------------------------------------
   # Meeting tasks
   #
-  facilitation:
+  deliberation:
     process:        proc_main
     req_host_cfg:   default_configuration
     functionality:
-      py_module:    accord.facilitation.ic00_edict
-    state_type:     py_dict
-
-  aggregation:
-    process:        proc_main
-    req_host_cfg:   default_configuration
-    functionality:
-      py_module:    accord.aggregation.ic00_edict
+      py_module:    accord.deliberation.ic00_edict
     state_type:     py_dict
 
   openai:
@@ -173,13 +161,8 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
-  src:   ctrl_main.outputs.ctrl_question
-  dst:   facilitation.inputs.ctrl
-
-- owner: ctrl_main
-  data:  py_dict
-  src:   ctrl_main.outputs.ctrl_summary
-  dst:   aggregation.inputs.ctrl
+  src:   ctrl_main.outputs.ctrl_deliberation
+  dst:   deliberation.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -205,21 +188,8 @@ edge:
 
 - owner: command
   data:  py_dict
-  src:   command.outputs.cmd
-  dst:   discord.inputs.cmd
-  dirn:  feedback
-
-# Functional chain for facilitation.
-
-- owner: command
-  data:  py_dict
-  src:   command.outputs.facilitation
-  dst:   facilitation.inputs.cmd
-
-- owner: facilitation
-  data:  py_dict
-  src:   facilitation.outputs.msg
-  dst:   msgmux.inputs.facilitation
+  src:   command.outputs.cfg_cmd
+  dst:   discord.inputs.cfg_cmd
   dirn:  feedback
 
 # Functional chain for summary generation.
@@ -227,16 +197,22 @@ edge:
 - owner: discord
   data:  py_dict
   src:   discord.outputs.msg
-  dst:   aggregation.inputs.msg
+  dst:   deliberation.inputs.msg
 
 - owner: command
   data:  py_dict
-  src:   command.outputs.aggregation
-  dst:   aggregation.inputs.cmd
+  src:   command.outputs.cmd
+  dst:   deliberation.inputs.cmd
 
-- owner: aggregation
+- owner: deliberation
   data:  py_dict
-  src:   aggregation.outputs.request
+  src:   deliberation.outputs.msg
+  dst:   msgmux.inputs.msg
+  dirn:  feedback
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.request
   dst:   openai.inputs.request
 
 - owner: openai
@@ -262,15 +238,10 @@ edge:
   src:   discord.outputs.log
   dst:   log.inputs.discord
 
-- owner: facilitation
+- owner: deliberation
   data:  py_dict
-  src:   facilitation.outputs.log
-  dst:   log.inputs.facilitation
-
-- owner: aggregation
-  data:  py_dict
-  src:   aggregation.outputs.log
-  dst:   log.inputs.aggregation
+  src:   deliberation.outputs.log
+  dst:   log.inputs.deliberation
 
 
 

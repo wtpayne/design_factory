@@ -63,7 +63,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    tup_id_in  = ('ctrl', 'cmd', 'msg')
+    tup_id_in  = ('ctrl', 'cfg_cmd', 'msg')
     tup_id_out = ('cmd', 'msg', 'log')
     fl.util.edict.validate(inputs  = inputs,  must_equal = tup_id_in)
     fl.util.edict.validate(outputs = outputs, must_equal = tup_id_out)
@@ -87,8 +87,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         #
         list_msg_to_bot = list()
         list_cmd_to_bot = list()
-        for (id_in, list_in) in (('msg', list_msg_to_bot),
-                                 ('cmd', list_cmd_to_bot)):
+        for (id_in, list_in) in (('msg',     list_msg_to_bot),
+                                 ('cfg_cmd', list_cmd_to_bot)):
 
             timestamp.update(inputs[id_in]['ts'])
             list_in.extend(inputs[id_in]['list'])
