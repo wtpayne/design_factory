@@ -360,7 +360,9 @@ def _discord_bot(cfg_bot,
             """
             map_cmd = dict(type    = 'interaction',
                            id_btn  = interaction.data['custom_id'],
-                           id_user = interaction.user.id)
+                           id_user = interaction.user.id,
+                           id_name = interaction.user.name,
+                           id_channel = interaction.channel.id)
             try:
                 queue_cmd_from_bot.put(map_cmd, block = False)
             except queue.Full:
@@ -563,15 +565,25 @@ def _discord_bot(cfg_bot,
 
         if message.content.startswith(BOT_COMMAND_PREFIX):
             return
-
-        msg = dict(msg_type     = 'message',
-                   id_prev      = None,
-                   id_msg       = message.id,
-                   id_author    = message.author.id,
-                   name_author  = message.author.name,
-                   id_channel   = message.channel.id,
-                   name_channel = message.channel.name,
-                   content      = message.content)
+        
+        if isinstance(message.channel, discord.DMChannel):
+            msg = dict(msg_type     = 'dm',
+                    id_prev      = None,
+                    id_msg       = message.id,
+                    id_author    = message.author.id,
+                    name_author  = message.author.name,
+                    id_channel   = message.channel.id,
+                    name_channel = None,
+                    content      = message.content)
+        else:
+            msg = dict(msg_type     = 'message',
+                    id_prev      = None,
+                    id_msg       = message.id,
+                    id_author    = message.author.id,
+                    name_author  = message.author.name,
+                    id_channel   = message.channel.id,
+                    name_channel = message.channel.name,
+                    content      = message.content)
 
         try:
             queue_msg_from_bot.put(msg, block = False)
@@ -611,16 +623,26 @@ def _discord_bot(cfg_bot,
 
         if msg_after.content.startswith(BOT_COMMAND_PREFIX):
             return
-
-        msg = dict(msg_type     = 'message',
-                   id_prev      = msg_before.id,
-                   id_msg       = msg_after.id,
-                   id_author    = msg_after.author.id,
-                   name_author  = msg_after.author.name,
-                   nick_author  = msg_after.author.nick,
-                   id_channel   = msg_after.channel.id,
-                   name_channel = msg_after.channel.name,
-                   content      = msg_after.content)
+        
+        if isinstance(msg_before.channel, discord.DMChannel):
+            msg = dict(msg_type  = 'dm',
+                    id_prev      = msg_before.id,
+                    id_msg       = msg_after.id,
+                    id_author    = msg_after.author.id,
+                    name_author  = msg_after.author.name,
+                    id_channel   = msg_after.channel.id,
+                    name_channel = None,
+                    content      = msg_after.content)
+        else:
+            msg = dict(msg_type     = 'message',
+                    id_prev      = msg_before.id,
+                    id_msg       = msg_after.id,
+                    id_author    = msg_after.author.id,
+                    name_author  = msg_after.author.name,
+                    nick_author  = msg_after.author.nick,
+                    id_channel   = msg_after.channel.id,
+                    name_channel = msg_after.channel.name,
+                    content      = msg_after.content)
 
         try:
             queue_msg_from_bot.put(msg, block = False)

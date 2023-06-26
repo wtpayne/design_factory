@@ -51,7 +51,7 @@ import fl.util
 import key
 
 import fl.net.discord.bot
-
+users_joined_array = []
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
@@ -59,7 +59,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Transcript aggregation coroutine.
 
     """
-
+    global users_joined_array
     transcript = collections.defaultdict(list)
     map_user   = collections.defaultdict(list)
 
@@ -89,7 +89,9 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                     id_btn = cmd['id_btn']
 
                     if id_btn.startswith('btn_join_'):
-                        list_msg.append(_create_join_message(cmd, map_user))
+                        join_messages = _create_join_message(cmd, map_user)
+                        for msg in join_messages:
+                            list_msg.append(msg)
 
                 elif type_cmd == 'command':
                     id_cmd = cmd['name_command']
@@ -106,10 +108,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                     if id_cmd == 'summarize':
                         list_request.append(_create_summary_request(
                                                             cmd, transcript))
+
                 else:
                     raise RuntimeError(
                             'Command type not recognized: {type}'.format(
                                                             type = type_cmd))
+                
 
         if list_msg:
             outputs['msg']['ena'] = True
@@ -121,21 +125,43 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             outputs['request']['ts'].update(timestamp)
             outputs['request']['list'][:] = list_request
 
-
 # -----------------------------------------------------------------------------
-users_joined_array = []
+
 
 def _create_join_message(cmd, map_user):
     """
     """
     global users_joined_array
+
+    join_messages_array = []
+
     id_user = cmd['id_user']
+    user_name = cmd['id_name']
+    channel_id = cmd['id_channel']
+    
+    if id_user in users_joined_array:
+        return
+    
     users_joined_array.append(id_user)
 
-    return dict(
+    join_messages_array.append(dict(
         type    = 'dm',
         id_user = id_user,
-        content = 'You have joined the deliberation.')
+        content = 'You have joined the deliberation.')) 
+            
+    join_messages_array.append(dict(
+        type       = 'msg',
+        id_channel = channel_id,
+        content    = '{user_name_} has joined the deliberation.'.format(user_name_ = user_name)))
+            
+    for user in users_joined_array:
+        if user != id_user:
+            join_messages_array.append(dict(
+                type    = 'dm',
+                id_user = user,
+                content = 'User {user_name_} has joined the deliberation.'.format(user_name_ = user_name)))
+
+    return join_messages_array
 
 
 # -----------------------------------------------------------------------------
@@ -144,7 +170,6 @@ def _create_join_button(cmd):
     Return a message that contains a join button.
 
     """
-
     str_uid = uuid.uuid4().hex[:16]
     id_btn  = 'btn_join_{uid}'.format(uid = str_uid)
 
@@ -176,7 +201,6 @@ def _create_question_messages(delib_question):
             content    = delib_question))
         
     return send_questions_dict_array
-
 
 # -----------------------------------------------------------------------------
 def _create_summary_request(cmd, transcript):
