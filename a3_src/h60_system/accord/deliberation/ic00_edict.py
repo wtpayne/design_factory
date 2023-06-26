@@ -98,7 +98,10 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                         list_msg.append(_create_join_button(cmd))
 
                     if id_cmd == 'question':
-                        list_msg.extend(_create_question_messages(cmd))
+                        question = ' '.join(cmd['args'])
+                        send_list = (_create_question_messages(question))
+                        for recipient in send_list:
+                            list_msg.append(recipient)
 
                     if id_cmd == 'summarize':
                         list_request.append(_create_summary_request(
@@ -120,13 +123,18 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
 
 # -----------------------------------------------------------------------------
+users_joined_array = []
+
 def _create_join_message(cmd, map_user):
     """
     """
+    global users_joined_array
+    id_user = cmd['id_user']
+    users_joined_array.append(id_user)
 
     return dict(
         type    = 'dm',
-        id_user = cmd['id_user'],
+        id_user = id_user,
         content = 'You have joined the deliberation.')
 
 
@@ -149,10 +157,25 @@ def _create_join_button(cmd):
 
 
 # -----------------------------------------------------------------------------
-def _create_question_messages(cmd):
+def _create_question_messages(delib_question):
     """
+    Return a list of messages that contain the question to each user that has joined the deliberation.
     """
-    return []
+
+    send_questions_dict_array = list()
+    if delib_question is None:
+        raise Exception("Delib question is not provided")
+
+    if len(users_joined_array) == 0:
+        raise Exception("Users joined array is empty")
+
+    for user_id in users_joined_array:
+        send_questions_dict_array.append(dict(
+            type       = 'dm',
+            id_user    = user_id,
+            content    = delib_question))
+        
+    return send_questions_dict_array
 
 
 # -----------------------------------------------------------------------------
