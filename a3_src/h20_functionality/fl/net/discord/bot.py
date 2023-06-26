@@ -455,7 +455,7 @@ def _discord_bot(cfg_bot,
         if 'button' in map_msg and isinstance(map_msg['button'], ButtonData):
             button_data     = map_msg.pop('button')
             map_msg['view'] = ButtonView(
-                                    style    = discord.ButtonStyle.gray,
+                                    style    = discord.ButtonStyle.green,
                                     label    = button_data.label,
                                     id_btn   = button_data.id_btn,
                                     callback = on_button_press_generic)
@@ -626,6 +626,37 @@ def _discord_bot(cfg_bot,
             queue_msg_from_bot.put(msg, block = False)
         except queue.Full:
             log.error('Message dropped. queue_msg_from_bot is full.')
+
+    # -------------------------------------------------------------------------
+    # Requires Manage Messages bot permission.
+
+    @bot.command(name="nukebot")
+    async def delete_bot_messages(ctx):
+        bot_id = bot.user.id
+        counter = 0
+
+        async for message in ctx.channel.history(limit=100):
+            if message.author.id == bot_id:
+                counter += 1
+                await message.delete()
+                await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
+                    
+        # Inform the admin
+        await ctx.author.send(f"Deleted {counter} message(s) sent by the bot.")
+
+    @bot.command(name="nukeme")
+    async def delete_my_messages(ctx):
+        author_id = ctx.author.id
+        counter = 0
+        async for message in ctx.channel.history(limit=100):
+            if message.author.id == author_id:
+                counter += 1
+                await message.delete()
+                await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
+                        
+            # Inform the admin
+        await ctx.author.send(f"Deleted {counter} message(s) from you.")
+
 
     # Run the client.
     #
