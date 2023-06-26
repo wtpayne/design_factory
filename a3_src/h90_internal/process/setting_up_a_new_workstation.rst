@@ -186,6 +186,30 @@ on.
 > sudo systemsetup -setremotelogin on
 > ssh-copy-id $USER@localhost
 
+You might get the error message when running the
+third command:
+
+> setremotelogin: Turning Remote Login on or off
+requires Full Disk Access privileges.
+
+Here are steps to resolve this:
+
+1. Open **System Preferences** on your Mac.
+2. Go to **Security & Privacy**.
+3. Switch to the **Privacy** tab.
+4. Scroll down the list on the left and select
+   **Full Disk Access**.
+5. Click on the lock icon in the bottom-left
+   corner to make changes. You will need to
+   enter your password.
+6. Click on the **+** button to add an application
+   to the list.
+7. Navigate to **Applications** > **Utilities** and
+   select **Terminal**, then click **Open**.
+8. Terminal now has Full Disk Access. You will need 
+   to close Terminal and open it again for the 
+   changes to take effect.
+
 2. Copy the workstation public SSH key to github
 ------------------------------------------------
 
