@@ -10,21 +10,25 @@ This procedure describes how to set up a new
 workstation. I.e. a machine that will be
 used for design and development.
 
+Mac instructions are below those for Windows.
+Development is possible on a Mac workstation,
+though there may be hidden compatibility issues
+which will make themselves known later. Windows
+users should emulate Ubuntu 22.04.
+
+If you would like to use Docker on Mac to emulate
+Ubuntu, 
+
 
 Instructions for a Windows workstation
 ======================================
 
 We use the Ubuntu 22.04 LTS release as the primary
-OS against which we develop, so until such time as
-we put some effort into ensuring cross platform
-compatibility, we rely on virtualization tools to
-support development on workstations that use Apple
-Mac OS X or Microsoft Windows.
+OS against which we develop.
 
 For Microsoft Windows, the Windows Subsystem for
 Linux (WSL) can be used to provide an Ubuntu 22.04
-environment, and for Mac OS X, Docker can be used
-in a similar way.
+environment.
 
 
 1. Install Ubuntu 22.04 using WSL
@@ -146,6 +150,106 @@ dependencies for you.
 
 
 9. Troubleshooting
+------------------
+
+If you run into problems with the automatic
+dependency installation process, one way to
+get back to a clean slate is to delete the
+relevant virtual environment directory:
+
+~/dev/df/a0_env/venv/<ENVIRONMENT_ID>
+
+
+Instructions for a Mac workstation
+======================================
+
+
+This is mostly the same as the windows instructions,
+except the commands to make the SSH keypair are
+different and you are not running an instance of
+Ubuntu (though you are free to do so— if you do,
+swap step 1 here for step 4 in the Windows 
+instructions).
+
+
+1. Configure SSH for passwordless SSH to localhost
+--------------------------------------------------
+
+The stableflow framework uses ssh to deploy
+and run systems. This includes localhost for
+local development, so we need passwordless ssh
+to every machine that we wish to deploy or run
+on.
+
+> ssh-keygen -t rsa
+> sudo systemsetup -getremotelogin
+> sudo systemsetup -setremotelogin on
+> ssh-copy-id $USER@localhost
+
+2. Copy the workstation public SSH key to github
+------------------------------------------------
+
+Open your github SSH keys settings page at:-
+
+    https://github.com/settings/keys
+
+Create a new entry for the SSH key. The title
+can be anything you like (<USERNAME>@<HOSTNAME>
+is a common convention). The key type should be
+"authentication key". Take the key value from
+the public key that we have just created:-
+
+> cat ~/.ssh/id_rsa.pub
+
+
+3. Clone the source design document repository
+----------------------------------------------
+
+Instructions and documentation will assume that
+the source repository has been checked out to
+~/dev/df, but this is not required.
+
+> mkdir dev
+> cd dev
+> git clone https://github.com/wtpayne/design_factory.git df
+
+
+4. Get development API keys
+---------------------------
+
+Obtain the development API keys from the team
+member responsible (currently t000_wtp).
+
+This file contains the development API key so
+keep it secret and do not commit it, or share
+it with others in any way.
+
+These will be provided as a default.env file,
+compressed as a .tar.gz. Download this file,
+decompress it, and move it to the resource/key
+directory.
+
+> tar -xzf ./default.env.tar.gz
+> mv default.env ~/dev/df/a3_src/h10_resource/key
+
+
+5. Run the system
+-----------------
+
+Now that everything is set up, you should be able
+to run the system. The first time that you run
+a command, it should install any missing python
+dependencies for you.
+
+> cd ~/dev/df
+> ./da
+> ./da demo
+> ./da demo dm006
+> ./da demo dm006 start
+> ./da demo dm006 stop
+
+
+6. Troubleshooting
 ------------------
 
 If you run into problems with the automatic
