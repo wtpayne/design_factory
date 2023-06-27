@@ -6,26 +6,27 @@ This guide will walk you through creating a new
 instance of the Accord discord bot.
 
 
-Creating a Discord Bot Account
+Creating a discord bot account
 ==============================
 
 Before writing code for the bot, you need to
 create a bot account from the Discord developer
 portal.
 
-* Go to the Discord Developer Portal
+# Go to the Discord Developer Portal
   (https://discord.com/developers/applications)
-* Click on the "New Application" button.
-* Give a name to the application and click on
+# Click on the "New Application" button.
+# Give a name to the application and click on
   "Create".
-* Click on the "Bot" tab and then click "Add Bot".
+# Click on the "Bot" tab and then click "Add Bot".
   Confirm the popup.
-* Copy the token under the "Bot" tab and keep it
+# Copy the token under the "Bot" tab and keep it
   somewhere safe. If you lose it you can generate
   a new one by clicking on ``Reset Token``
 
-Configuring Bot
-===============
+
+Configuring the discord bot
+===========================
 
 In the "Bot" tab, make sure the following are
 selected by clicking the grey button on the right
@@ -38,32 +39,49 @@ selected by clicking the grey button on the right
 
 Now save the changes made to the Bot tab.
 
-Inviting Your Bot to a Server
-=============================
 
-To interact with your bot, it needs to be added to a server.
+Inviting the bot to a server
+============================
 
-* Open the 'OAuth2' tab, then click on the 'URL Generator'
-* Under ``SCOPES`` click 'bot'
-* Under 'Bot Permissions', enable each of the
+To interact with your bot, it needs to be added
+to a server.
+
+# Open the 'OAuth2' tab, then click on the
+  'URL Generator'
+# Under ``SCOPES`` click 'bot'
+# Under 'Bot Permissions', enable each of the
   following permissions:
 
-   ``Create Instant Invite, Change Nickname,
-   Create Expressions, Read Messages/View Channels,
-   Create Events, Send Messages, Create Public Threads,
-   Send Messages In Threads, Embed Links,
-   Attach Files, Read Message History,
-   Use External Emojis, Use External Stickers,
-   Add Reactions, Use Slash Commands, Connect,
-   Speak, Video, Use Voice Activity,
-   Request To Speak, Use Embedded Activities,
-   Use Soundboard, Use External Sounds``
+    ``Create Instant Invite
+    Change Nickname
+    Create Expressions
+    Read Messages/View Channels
+    Create Events
+    Send Messages
+    Create Public Threads
+    Send Messages In Threads
+    Embed Links
+    Attach Files
+    Read Message History
+    Use External Emojis
+    Use External Stickers
+    Add Reactions
+    Use Slash Commands
+    Connect
+    Speak
+    Video
+    Use Voice Activity
+    Request To Speak
+    Use Embedded Activities
+    Use Soundboard
+    Use External Sounds``
 
-* Copy the generated URL and open it in your
+# Copy the generated URL and open it in your
   web browser to add your bot to a server.
 
-Running your bot in dm006
-=========================
+
+Running your bot
+================
 
 To run your version of the accord bot, make the
 following changes to the df files:
