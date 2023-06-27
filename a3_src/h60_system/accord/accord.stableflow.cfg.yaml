@@ -11,7 +11,7 @@ host:
     port_range:      '8090-9000'
     dirpath_log:     ''
     launch_cmd:      ''
-    environment:     'e002_general_research'
+    environment:     'e003_accord'
     log_level:       'TRACE'
 
 
