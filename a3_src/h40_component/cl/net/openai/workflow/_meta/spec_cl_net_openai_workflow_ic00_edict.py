@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Functional specification for cl.net.openai.client.ic00_edict
+Functional specification for cl.net.openai.workflow.ic00_edict
 
 """
 
@@ -35,7 +35,7 @@ def coro(cfg):
 # =============================================================================
 class SpecifyClNetOpenAiClientIc00_edict:
     """
-    Spec for the cl.net.openai.client.ic00_edict component.
+    Spec for the cl.net.openai.workflow.ic00_edict component.
 
     """
 
@@ -43,20 +43,20 @@ class SpecifyClNetOpenAiClientIc00_edict:
     @pytest.mark.e002_general_research
     def it_supports_import_of_cl_net_openai_client_e00_edict(self):
         """
-        cl.net.openai.client.ic00_edict can be imported.
+        cl.net.openai.workflow.ic00_edict can be imported.
 
         """
-        import cl.net.openai.client.ic00_edict
+        import cl.net.openai.workflow.ic00_edict
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
     def it_supports_creation_of_the_main_coroutine(self):
         """
-        cl.net.openai.client.ic00_edict:coro() can be created.
+        cl.net.openai.workflow.ic00_edict:coro() can be created.
 
         """
-        import cl.net.openai.client.ic00_edict
-        component = cl.net.openai.client.ic00_edict.coro(
+        import cl.net.openai.workflow.ic00_edict
+        component = cl.net.openai.workflow.ic00_edict.coro(
                                     runtime = None,
                                     cfg     = {},
                                     inputs  = dict(),
@@ -68,7 +68,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
     @pytest.mark.e002_general_research
     def it_runs(self):
         """
-        cl.net.openai.client.ic00_edict:coro() rybs.
+        cl.net.openai.workflow.ic00_edict:coro() rybs.
 
         """
         id_endpoint    = 'chat_completions'
@@ -164,7 +164,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
                                    list = list())
 
         cfg_sys = fl.test.component.functional_test_cfg(
-                  module = 'cl.net.openai.client.ic00_edict',
+                  module = 'cl.net.openai.workflow.ic00_edict',
                   config = cfg_client,
                   script = [{'in':  { 'workflow': edict_workflow_ena,
                                       'param':    edict_param_ena       },

@@ -77,12 +77,10 @@ def test():
                              _path(control_tier = 'h40_component',
                                    relpath      = 'cl/net/openai',
                                    id_env       = ID_ENV),
-                             _path(control_tier = 'h40_component',
-                                   relpath      = 'cl/util/persistence',
-                                   id_env       = ID_ENV),
                              _path(control_tier = 'h60_system',
                                    relpath      = 'accord',
                                    id_env       = ID_ENV)))
+
 
 # -----------------------------------------------------------------------------
 def start():

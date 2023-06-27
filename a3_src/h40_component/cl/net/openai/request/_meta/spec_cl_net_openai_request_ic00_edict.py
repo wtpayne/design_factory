@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Functional specification for cl.net.openai.client.ic00_edict
+Functional specification for cl.net.openai.request.ic00_edict
 
 """
 
@@ -35,7 +35,7 @@ def coro(cfg):
 # =============================================================================
 class SpecifyClNetOpenAiClientIc00_edict:
     """
-    Spec for the cl.net.openai.client.ic00_edict component.
+    Spec for the cl.net.openai.request.ic00_edict component.
 
     """
 
@@ -43,20 +43,20 @@ class SpecifyClNetOpenAiClientIc00_edict:
     @pytest.mark.e002_general_research
     def it_supports_import_of_cl_net_openai_client_e00_edict(self):
         """
-        cl.net.openai.client.ic00_edict can be imported.
+        cl.net.openai.request.ic00_edict can be imported.
 
         """
-        import cl.net.openai.client.ic00_edict
+        import cl.net.openai.request.ic00_edict
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
     def it_supports_creation_of_the_main_coroutine(self):
         """
-        cl.net.openai.client.ic00_edict:coro() can be created.
+        cl.net.openai.request.ic00_edict:coro() can be created.
 
         """
-        import cl.net.openai.client.ic00_edict
-        component = cl.net.openai.client.ic00_edict.coro(
+        import cl.net.openai.request.ic00_edict
+        component = cl.net.openai.request.ic00_edict.coro(
                                     runtime = None,
                                     cfg     = {},
                                     inputs  = dict(),
@@ -68,7 +68,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
     @pytest.mark.e002_general_research
     def it_runs(self):
         """
-        cl.net.openai.client.ic00_edict:coro() rybs.
+        cl.net.openai.request.ic00_edict:coro() rybs.
 
         """
         id_endpoint    = 'chat_completions'
@@ -90,32 +90,8 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               is_async      = False, # Asynchronous.
                               default       = dict(id_endpoint = id_endpoint,
                                                    model       = id_model))
-        type_template  = dict(id            = 'prompt_template',
-                              ver           = '1.0')
-        template_valid = dict(id_endpoint   = id_endpoint,
-                              type          = type_template,
-                              uid_variant   = uid_variant,  # Improvement.
-                              uid_template  = uid_template, # Process step.
-                              uid_workflow  = uid_workflow, # Process id.
-                              kwargs_req    = {'model': id_model},
-                              messages      = messages_test )
-        type_param     = dict(id            = 'prompt_params',
-                              ver           = '1.0')
-        param_valid    = dict(type          = type_param,
-                              uid_params    = uid_params,
-                              uid_template  = uid_template,
-                              uid_workflow  = uid_workflow,
-                              kwargs_tmpl   = dict(), # <-- Args for template.
-                              kwargs_req    = dict(), # <-- Args for request.
-                              state         = dict()) # <-- Process state.
-        type_workflow  = dict(id            = 'prompt_workflow',
-                              ver           = '1.0')
-        workflow_valid = dict(type          = type_workflow,
-                              uid_workflow  = uid_workflow,
-                              spec          = WORKFLOW_LOGIC.format(
-                                                    template = template_valid,
-                                                    param    = param_valid),
-                              coroutine     = None)
+        request_valid  = dict(model         = id_model,
+                              messages      = messages_test)
         message_valid  = dict(role          = 'assistant',
                               content       = '\n\nTest')
         choices_valid  = dict(finish_reason = 'stop',
@@ -135,45 +111,36 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               response      =  response_valid,
                               state         = {})
 
-        edict_workflow_ena  = dict(ena  = True,
-                                   ts   = dict(),
-                                   list = [workflow_valid])
-        edict_workflow_none = dict(ena  = False,
-                                   ts   = dict(),
-                                   list = list())
+        edict_request_ena  = dict(ena  = True,
+                                  ts   = dict(),
+                                  list = [request_valid])
+        edict_request_none = dict(ena  = False,
+                                  ts   = dict(),
+                                  list = list())
 
-        edict_param_ena     = dict(ena  = True,
-                                   ts   = dict(),
-                                   list = [param_valid])
-        edict_param_none    = dict(ena  = False,
-                                   ts   = dict(),
-                                   list = list())
+        edict_result_ena   = dict(ena  = True,
+                                  ts   = dict(),
+                                  list = [result_valid])
+        edict_result_none  = dict(ena  = False,
+                                  ts   = dict(),
+                                  list = list())
 
-        edict_result_ena    = dict(ena  = True,
-                                   ts   = dict(),
-                                   list = [result_valid])
-        edict_result_none   = dict(ena  = False,
-                                   ts   = dict(),
-                                   list = list())
-
-        edict_error_ena     = dict(ena  = True,
-                                   ts   = dict(),
-                                   list = list())
-        edict_error_none    = dict(ena  = False,
-                                   ts   = dict(),
-                                   list = list())
+        edict_error_ena    = dict(ena  = True,
+                                  ts   = dict(),
+                                  list = list())
+        edict_error_none   = dict(ena  = False,
+                                  ts   = dict(),
+                                  list = list())
 
         cfg_sys = fl.test.component.functional_test_cfg(
-                  module = 'cl.net.openai.client.ic00_edict',
+                  module = 'cl.net.openai.request.ic00_edict',
                   config = cfg_client,
-                  script = [{'in':  { 'workflow': edict_workflow_ena,
-                                      'param':    edict_param_ena       },
-                             'out': { 'result':   edict_result_ena,
-                                      'error':    edict_error_none      }},
-                            {'in':  { 'workflow': edict_workflow_none,
-                                      'param':    edict_param_none      },
-                             'out': { 'result':   edict_result_ena,
-                                      'error':    edict_error_none      }}])
+                  script = [{'in':  { 'request': edict_request_ena     },
+                             'out': { 'result':  edict_result_ena,
+                                      'error':   edict_error_none      }},
+                            {'in':  { 'request': edict_request_none    },
+                             'out': { 'result':  edict_result_none,
+                                      'error':   edict_error_none      }}])
 
         exit_code = pl.stableflow.sys.prep_and_start(map_cfg  = cfg_sys,
                                                      is_local = True)

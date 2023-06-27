@@ -46,6 +46,7 @@ license:
 
 
 import fl.net.openai.client
+import fl.util.edict
 import key
 
 
@@ -90,7 +91,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             list_template.extend(inputs['template']['list'])
 
         if inputs['param']['ena']:
-            timestamp.update(inputs['template']['ts'])
+            timestamp.update(inputs['param']['ts'])
             list_param.extend(inputs['param']['list'])
 
         (list_result,

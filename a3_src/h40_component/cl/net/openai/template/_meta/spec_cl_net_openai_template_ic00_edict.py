@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Functional specification for cl.net.openai.client.ic00_edict
+Functional specification for cl.net.openai.template.ic00_edict
 
 """
 
@@ -35,28 +35,30 @@ def coro(cfg):
 # =============================================================================
 class SpecifyClNetOpenAiClientIc00_edict:
     """
-    Spec for the cl.net.openai.client.ic00_edict component.
+    Spec for the cl.net.openai.template.ic00_edict component.
 
     """
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
+    @pytest.mark.e003_accord
     def it_supports_import_of_cl_net_openai_client_e00_edict(self):
         """
-        cl.net.openai.client.ic00_edict can be imported.
+        cl.net.openai.template.ic00_edict can be imported.
 
         """
-        import cl.net.openai.client.ic00_edict
+        import cl.net.openai.template.ic00_edict
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
+    @pytest.mark.e003_accord
     def it_supports_creation_of_the_main_coroutine(self):
         """
-        cl.net.openai.client.ic00_edict:coro() can be created.
+        cl.net.openai.template.ic00_edict:coro() can be created.
 
         """
-        import cl.net.openai.client.ic00_edict
-        component = cl.net.openai.client.ic00_edict.coro(
+        import cl.net.openai.template.ic00_edict
+        component = cl.net.openai.template.ic00_edict.coro(
                                     runtime = None,
                                     cfg     = {},
                                     inputs  = dict(),
@@ -66,9 +68,10 @@ class SpecifyClNetOpenAiClientIc00_edict:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
+    @pytest.mark.e003_accord
     def it_runs(self):
         """
-        cl.net.openai.client.ic00_edict:coro() rybs.
+        cl.net.openai.template.ic00_edict:coro() rybs.
 
         """
         id_endpoint    = 'chat_completions'
@@ -108,14 +111,6 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               kwargs_tmpl   = dict(), # <-- Args for template.
                               kwargs_req    = dict(), # <-- Args for request.
                               state         = dict()) # <-- Process state.
-        type_workflow  = dict(id            = 'prompt_workflow',
-                              ver           = '1.0')
-        workflow_valid = dict(type          = type_workflow,
-                              uid_workflow  = uid_workflow,
-                              spec          = WORKFLOW_LOGIC.format(
-                                                    template = template_valid,
-                                                    param    = param_valid),
-                              coroutine     = None)
         message_valid  = dict(role          = 'assistant',
                               content       = '\n\nTest')
         choices_valid  = dict(finish_reason = 'stop',
@@ -135,10 +130,10 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               response      =  response_valid,
                               state         = {})
 
-        edict_workflow_ena  = dict(ena  = True,
+        edict_template_ena  = dict(ena  = True,
                                    ts   = dict(),
-                                   list = [workflow_valid])
-        edict_workflow_none = dict(ena  = False,
+                                   list = [template_valid])
+        edict_template_none = dict(ena  = False,
                                    ts   = dict(),
                                    list = list())
 
@@ -164,15 +159,15 @@ class SpecifyClNetOpenAiClientIc00_edict:
                                    list = list())
 
         cfg_sys = fl.test.component.functional_test_cfg(
-                  module = 'cl.net.openai.client.ic00_edict',
+                  module = 'cl.net.openai.template.ic00_edict',
                   config = cfg_client,
-                  script = [{'in':  { 'workflow': edict_workflow_ena,
+                  script = [{'in':  { 'template': edict_template_ena,
                                       'param':    edict_param_ena       },
                              'out': { 'result':   edict_result_ena,
                                       'error':    edict_error_none      }},
-                            {'in':  { 'workflow': edict_workflow_none,
+                            {'in':  { 'template': edict_template_none,
                                       'param':    edict_param_none      },
-                             'out': { 'result':   edict_result_ena,
+                             'out': { 'result':   edict_result_none,
                                       'error':    edict_error_none      }}])
 
         exit_code = pl.stableflow.sys.prep_and_start(map_cfg  = cfg_sys,

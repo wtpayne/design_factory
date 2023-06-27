@@ -46,7 +46,7 @@ license:
 
 
 import fl.net.openai.client
-import fl.util
+import fl.util.edict
 import key
 
 
@@ -88,21 +88,15 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             timestamp.update(inputs['request']['ts'])
             list_request.extend(inputs['request']['list'])
 
-            print('OPENAI REQUEST: ' + repr(list_request))
-
         (list_result, list_error) = request_handler.send(list_request)
 
         if list_result:
-
-            print('OPENAI RESULT: ' + repr(list_result))
 
             outputs['result']['ena'] = True
             outputs['result']['ts'].update(timestamp)
             outputs['result']['list'][:] = list_result
 
         if list_error:
-
-            print('OPENAI ERROR: ' + repr(list_error))
 
             outputs['error']['ena'] = True
             outputs['error']['ts'].update(timestamp)

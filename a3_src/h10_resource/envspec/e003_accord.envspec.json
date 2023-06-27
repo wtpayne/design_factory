@@ -51,6 +51,7 @@
     "#",
 
     { "type": "pep508", "spec":    "appdirs==1.4.4"                           },
+    { "type": "pep508", "spec":    "python-dotenv==1.0.0"                     },
     { "type": "pep508", "spec":    "discord.py==2.2.3"                        },
     { "type": "pep508", "spec":    "openai==0.27.4"                           },
 
