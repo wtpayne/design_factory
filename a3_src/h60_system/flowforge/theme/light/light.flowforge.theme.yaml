@@ -1,0 +1,321 @@
+id_theme:                         light
+
+font:
+  default:
+    relpath:                      tecnico/fino.ttf
+
+icon:
+
+  play:
+    id_family:                    solid
+    color_fill:                   "#c0c0c0ff"
+    width_tgt:                    Null
+    height_tgt:                   16
+
+  pause:
+    id_family:                    solid
+    color_fill:                   "#c0c0c0ff"
+    width_tgt:                    Null
+    height_tgt:                   16
+
+  stop:
+    id_family:                    solid
+    color_fill:                   "#c0c0c0ff"
+    width_tgt:                    Null
+    height_tgt:                   16
+
+color:
+
+  # Core colors
+  #
+
+  text:                            _spec::flowforge.theme.brand.dark_grey_mid
+  text_disabled:                   _spec::flowforge.theme.brand.light_grey_shade_5
+  text_selected_bg:                _spec::flowforge.theme.brand.light_grey_mid
+
+  window_bg:                       _spec::flowforge.theme.brand.light_grey_tint_3
+  child_bg:                        _spec::flowforge.theme.brand.light_grey_tint_3
+  popup_bg:                        _spec::flowforge.theme.brand.light_grey_tint_3
+  modal_window_dim_bg:             _spec::flowforge.theme.brand.light_grey_tint_3
+
+  nav_highlight:                   _spec::flowforge.theme.brand.light_grey_tint_4
+  nav_windowing_dim_bg:            _spec::flowforge.theme.brand.light_grey_tint_4
+  nav_windowing_highlight:         _spec::flowforge.theme.brand.light_grey_tint_4
+
+  docking_empty_bg:                _spec::flowforge.theme.brand.light_grey_tint_4
+  docking_preview:                 _spec::flowforge.theme.brand.light_grey_tint_4
+
+  drag_drop_target:                _spec::flowforge.theme.brand.light_grey_tint_4
+
+  title_bg:                        _spec::flowforge.theme.brand.dark_grey_mid
+  title_bg_active:                 _spec::flowforge.theme.brand.dark_grey_mid
+  title_bg_collapsed:              _spec::flowforge.theme.brand.dark_grey_mid
+
+  menu_bar_bg:                     _spec::flowforge.theme.brand.light_grey_tint_3
+
+  frame_bg:                        _spec::flowforge.theme.brand.light_grey_tint_4
+  frame_bg_active:                 _spec::flowforge.theme.brand.light_grey_tint_5
+  frame_bg_hovered:                _spec::flowforge.theme.brand.accent_a
+
+  border:                          _spec::flowforge.theme.brand.light_grey_tint_2
+  border_shadow:                   _spec::flowforge.theme.brand.light_grey_tint_1
+
+  scrollbar_bg:                    _spec::flowforge.theme.brand.light_grey_tint_3
+  scrollbar_grab:                  _spec::flowforge.theme.brand.light_grey_tint_2
+  scrollbar_grab_active:           _spec::flowforge.theme.brand.light_grey_tint_5
+  scrollbar_grab_hovered:          _spec::flowforge.theme.brand.accent_a
+
+  resize_grip:                     _spec::flowforge.theme.brand.light_grey_tint_2
+  resize_grip_active:              _spec::flowforge.theme.brand.light_grey_tint_5
+  resize_grip_hovered:             _spec::flowforge.theme.brand.accent_a
+
+  header:                          _spec::flowforge.theme.brand.light_grey_tint_3
+  header_active:                   _spec::flowforge.theme.brand.light_grey_tint_5
+  header_hovered:                  _spec::flowforge.theme.brand.accent_a
+
+  check_mark:                      _spec::flowforge.theme.brand.light_grey_tint_4
+
+  button:                          _spec::flowforge.theme.brand.light_grey_tint_3
+  button_active:                   _spec::flowforge.theme.brand.light_grey_tint_5
+  button_hovered:                  _spec::flowforge.theme.brand.accent_a
+
+  separator:                       _spec::flowforge.theme.brand.light_grey_tint_3
+  separator_active:                _spec::flowforge.theme.brand.light_grey_tint_5
+  separator_hovered:               _spec::flowforge.theme.brand.accent_a
+
+  slider_grab:                     _spec::flowforge.theme.brand.light_grey_tint_1
+  slider_grab_active:              _spec::flowforge.theme.brand.light_grey_tint_1
+
+  tab:                             _spec::flowforge.theme.brand.light_grey_tint_3
+  tab_active:                      _spec::flowforge.theme.brand.light_grey_tint_5
+  tab_hovered:                     _spec::flowforge.theme.brand.accent_a
+  tab_unfocused:                   _spec::flowforge.theme.brand.light_grey_tint_3
+  tab_unfocused_active:            _spec::flowforge.theme.brand.light_grey_tint_3
+
+  table_border_light:              _spec::flowforge.theme.brand.light_grey_tint_4
+  table_border_strong:             _spec::flowforge.theme.brand.light_grey_tint_4
+  table_header_bg:                 _spec::flowforge.theme.brand.light_grey_tint_4
+  table_row_bg:                    _spec::flowforge.theme.brand.light_grey_tint_4
+  table_row_bg_alt:                _spec::flowforge.theme.brand.light_grey_tint_4
+
+  plot_histogram:                  _spec::flowforge.theme.brand.light_grey_tint_4
+  plot_histogram_hovered:          _spec::flowforge.theme.brand.accent_a
+  plot_lines:                      _spec::flowforge.theme.brand.accent_a
+  plot_lines_hovered:              _spec::flowforge.theme.brand.accent_a
+
+
+  # Node colors
+  #
+
+  grid_background:                 _spec::flowforge.theme.brand.background_white
+  grid_line:                       _spec::flowforge.theme.brand.light_grey_tint_4
+
+  node_outline:                    _spec::flowforge.theme.brand.light_grey_mid
+  node_background:                 _spec::flowforge.theme.brand.light_grey_tint_4
+  node_background_hovered:         _spec::flowforge.theme.brand.light_grey_tint_3
+  node_background_selected:        _spec::flowforge.theme.brand.light_grey_tint_3
+
+  title_bar:                       _spec::flowforge.theme.brand.light_grey_tint_3
+  title_bar_hovered:               _spec::flowforge.theme.brand.accent_a
+  title_bar_selected:              _spec::flowforge.theme.brand.accent_a
+
+  pin:                             _spec::flowforge.theme.brand.light_grey_mid
+  pin_hovered:                     _spec::flowforge.theme.brand.accent_a
+
+  link:                            _spec::flowforge.theme.brand.light_grey_tint_1
+  link_hovered:                    _spec::flowforge.theme.brand.accent_a
+  link_selected:                   _spec::flowforge.theme.brand.accent_a
+
+  box_selector:                    _spec::flowforge.theme.brand.accent_a
+  box_selector_outline:            _spec::flowforge.theme.brand.accent_a
+
+
+  # Plot colors
+  #
+
+  line:                            _spec::flowforge.theme.brand.background_white
+  fill:                            _spec::flowforge.theme.brand.background_white
+  markeroutline:                   _spec::flowforge.theme.brand.background_white
+  markerfill:                      _spec::flowforge.theme.brand.background_white
+  errorbar:                        _spec::flowforge.theme.brand.background_white
+
+  framebg:                         _spec::flowforge.theme.brand.background_white
+  plotbg:                          _spec::flowforge.theme.brand.background_white
+  plotborder:                      _spec::flowforge.theme.brand.background_white
+
+  legendbg:                        _spec::flowforge.theme.brand.background_white
+  legendborder:                    _spec::flowforge.theme.brand.background_white
+  legendtext:                      _spec::flowforge.theme.brand.background_white
+
+  titletext:                       _spec::flowforge.theme.brand.background_white
+  inlaytext:                       _spec::flowforge.theme.brand.background_white
+
+  xaxis:                           _spec::flowforge.theme.brand.background_white
+  xaxisgrid:                       _spec::flowforge.theme.brand.background_white
+
+  yaxis:                           _spec::flowforge.theme.brand.background_white
+  yaxisgrid:                       _spec::flowforge.theme.brand.background_white
+  yaxis2:                          _spec::flowforge.theme.brand.background_white
+  yaxisgrid2:                      _spec::flowforge.theme.brand.background_white
+  yaxis3:                          _spec::flowforge.theme.brand.background_white
+  yaxisgrid3:                      _spec::flowforge.theme.brand.background_white
+
+  selection:                       _spec::flowforge.theme.brand.background_white
+  query:                           _spec::flowforge.theme.brand.background_white
+  crosshairs:                      _spec::flowforge.theme.brand.background_white
+
+style:
+
+  alpha_x:                         1.0
+  alpha_y:                         1.0
+
+  window_padding_x:                Null
+  window_padding_y:                Null
+  window_rounding_x:               10
+  window_rounding_y:               10
+  window_border_size_x:            1
+  window_border_size_y:            1
+  window_min_size_x:               1
+  window_min_size_y:               1
+  window_title_align_x:            _spec::dearpygui.dearpygui.mvDir_Left
+  window_title_align_y:            _spec::dearpygui.dearpygui.mvDir_Left
+
+  child_rounding_x:                1
+  child_rounding_y:                1
+  child_border_size_x:             1
+  child_border_size_y:             1
+
+  popup_rounding_x:                10
+  popup_rounding_y:                10
+  popup_border_size_x:             1
+  popup_border_size_y:             1
+
+  frame_padding_x:                 0
+  frame_padding_y:                 0
+  frame_rounding_x:                10
+  frame_rounding_y:                10
+  frame_border_size_x:             0
+  frame_border_size_y:             0
+
+  item_spacing_x:                  2
+  item_spacing_y:                  2
+  item_inner_spacing_x:            0
+  item_inner_spacing_y:            0
+
+  indent_spacing_x:                1
+  indent_spacing_y:                1
+  cell_padding_x:                  1
+  cell_padding_y:                  1
+  scrollbar_size_x:                10
+  scrollbar_size_y:                10
+  scrollbar_rounding_x:            3
+  scrollbar_rounding_y:            3
+  grab_min_size_x:                 1
+  grab_min_size_y:                 1
+  grab_rounding_x:                 3
+  grab_rounding_y:                 3
+  tab_rounding_x:                  3
+  tab_rounding_y:                  3
+
+  button_text_align_x:             _spec::dearpygui.dearpygui.mvDir_Left
+  button_text_align_y:             _spec::dearpygui.dearpygui.mvDir_Left
+  selectable_text_align_x:         _spec::dearpygui.dearpygui.mvDir_Left
+  selectable_text_align_y:         _spec::dearpygui.dearpygui.mvDir_Left
+
+  # Node style
+  #
+  grid_spacing_x:                  8
+  grid_spacing_y:                  8
+
+  node_corner_rounding_x:          10
+  node_corner_rounding_y:          10
+  node_padding_horizontal_x:       5
+  node_padding_horizontal_y:       5
+  node_padding_vertical_x:         5
+  node_padding_vertical_y:         5
+  node_border_thickness_x:         1
+  node_border_thickness_y:         1
+
+  link_thickness_x:                1
+  link_thickness_y:                1
+  link_line_segments_per_length_x: 1
+  link_line_segments_per_length_y: 1
+  link_hover_distance_x:           10
+  link_hover_distance_y:           10
+
+  pin_circle_radius_x:             3
+  pin_circle_radius_y:             3
+  pin_quad_side_length_x:          3
+  pin_quad_side_length_y:          3
+  pin_triangle_side_length_x:      3
+  pin_triangle_side_length_y:      3
+  pin_line_thickness_x:            1
+  pin_line_thickness_y:            1
+  pin_hover_radius_x:              10
+  pin_hover_radius_y:              10
+  pin_offset_x:                    0
+  pin_offset_y:                    0
+
+  # Plot style
+  #
+  line_weight_x:                   1
+  line_weight_y:                   1
+  marker_x:                        1
+  marker_y:                        1
+  marker_size_x:                   1
+  marker_size_y:                   1
+  marker_weight_x:                 1
+  marker_weight_y:                 1
+  fill_alpha_x:                    1
+  fill_alpha_y:                    1
+  error_bar_size_x:                1
+  error_bar_size_y:                1
+  error_bar_weight_x:              1
+  error_bar_weight_y:              1
+  digital_bit_height_x:            1
+  digital_bit_height_y:            1
+  digital_bit_gap_x:               1
+  digital_bit_gap_y:               1
+  plot_border_size_x:              1
+  plot_border_size_y:              1
+  minor_alpha_x:                   1
+  minor_alpha_y:                   1
+  major_tick_len_x:                1
+  major_tick_len_y:                1
+  minor_tick_len_x:                1
+  minor_tick_len_y:                1
+  major_tick_size_x:               1
+  major_tick_size_y:               1
+  minor_tick_size_x:               1
+  minor_tick_size_y:               1
+  major_grid_size_x:               1
+  major_grid_size_y:               1
+  minor_grid_size_x:               1
+  minor_grid_size_y:               1
+  plot_padding_x:                  1
+  plot_padding_y:                  1
+  label_padding_x:                 1
+  label_padding_y:                 1
+  legend_padding_x:                1
+  legend_padding_y:                1
+  legend_inner_padding_x:          1
+  legend_inner_padding_y:          1
+  legend_spacing_x:                1
+  legend_spacing_y:                1
+  mouse_pos_padding_x:             1
+  mouse_pos_padding_y:             1
+  annotation_padding_x:            1
+  annotation_padding_y:            1
+  fit_padding_x:                   1
+  fit_padding_y:                   1
+  plot_default_size_x:             1
+  plot_default_size_y:             1
+  plot_min_size_x:                 1
+  plot_min_size_y:                 1
+
+form:
+
+  sidebar_width:                   250
+  sidebar_widget_width:            100
+  indent:                          7
+  node_widget_width:               80

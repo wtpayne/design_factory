@@ -122,6 +122,14 @@
 #
 !*.schema.yaml
 
+# Stableview theme configuration.
+#
+!*.theme.ini
+!*.theme.json
+!*.theme.toml
+!*.theme.xml
+!*.theme.yaml
+
 # The development automation system entrypoint.
 #
 !da
