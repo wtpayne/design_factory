@@ -2,6 +2,12 @@
 Setting up a new server or device
 =================================
 
+This process provides guidance on how to set up
+a new production server or edge device.
+
+.. contents:: Table of Contents
+   :local:
+
 
 Overview
 ========
@@ -18,7 +24,7 @@ Instructions
 1. Device registration
 ----------------------
 
-Select a codeword from the codeword register.
+Select a codeword from the codeword register::
     
     /h10_resource/registry/codeword.register.yaml
     
@@ -27,7 +33,7 @@ device register to find the next available
 serial number, and combine the codeword and 
 the serial number together to obtain the device
 id. Use this to update both the device register
-and the codeword register.
+and the codeword register::
 
     /h10_resource/registry/device.register.yaml
 
@@ -44,7 +50,7 @@ the device id that you have just registered.
 ---------------------------------------------
 
 Update the default.env secrets file with a record
-of the root password.
+of the root password::
 
     /h10_resource/key/default.env
 
@@ -52,7 +58,7 @@ The environment variable name should be written
 in underscore delimited all caps. It should begin
 with the prefix "PWD" followed by the device id
 followed by the account name. ("ROOT" in this
-instance).
+instance)::
 
     PWD_[DEVICE-ID]_ROOT='[password]'
 
@@ -61,13 +67,13 @@ instance).
 -----------------------------------------
 
 On your local workstation, update your hosts
-file: 
+file::
 
     sudo vim /etc/hosts
 
 Ensure that both the device id and the device
 codeword will resolve to the same static IP
-address taken from the Linode management console.
+address taken from the Linode management console::
 
     [IP-ADDRESS]   [DEVICE-ID]
     [IP-ADDRESS]   [DEVICE-NAME]
@@ -78,7 +84,7 @@ address taken from the Linode management console.
 
 On your local workstation, ensure that you
 have a ssh key pair in ~/.ssh. If not, create
-one using:
+one using::
 
     ssh-keygen -t rsa
 
@@ -88,7 +94,7 @@ one using:
 
 On your local workstation, copy your public
 key to the new device to enable passwordless
-ssh to the root account of the device.
+ssh to the root account of the device::
 
     cd ~/.ssh
     ssh-copy-id -i id_rsa.pub root@[DEVICE-NAME]
@@ -100,12 +106,12 @@ ssh to the root account of the device.
 On your local workstation, open the team
 member register and identify or add an
 alias for your user account on the new
-machine:
+machine::
 
     /h10_resource/registry/team_member.register.yaml
 
 Now SSH to the new device as root, and add a
-new user account for your selected alias.
+new user account for your selected alias::
 
     ssh root@[DEVICE-NAME]
     sudo adduser [ALIAS]
@@ -116,14 +122,14 @@ new user account for your selected alias.
 
 Back on your local workstation, update the
 default.env secrets file with a record of the
-user password:
+user password::
 
     /h10_resource/key/default.env
 
 The environment variable name should be written
 in underscore delimited all caps. It should begin
 with the prefix "PWD" followed by the device id
-followed by your selected user account name:
+followed by your selected user account name::
 
     PWD_[DEVICE-ID]_[USER]='[password]'
 
@@ -134,7 +140,7 @@ followed by your selected user account name:
 Still on your local workstation, copy your
 public key to the new device to enable
 passwordless ssh to your user account on
-the device.
+the device::
 
     cd ~/.ssh
     ssh-copy-id -i id_rsa.pub [USER]@[DEVICE-NAME]
@@ -143,15 +149,15 @@ the device.
 10. Setup access to github from the new device
 ----------------------------------------------
 
-Ensure you are logged into the remote machine:-
+Ensure you are logged into the remote machine::
 
     ssh [USER]@[DEVICE-NAME]
 
-Create a ssh key on the remote machine.
+Create a ssh key on the remote machine::
 
     ssh-keygen -t rsa
 
-Copy ssh key to your github settings:
+Copy ssh key to your github settings::
 
     cat ~/.ssh/id_rsa.pub
     https://github.com/settings/keys
@@ -160,11 +166,11 @@ Copy ssh key to your github settings:
 11. Upgrade packages on the new device
 --------------------------------------
 
-Ensure you are logged into the remote machine:-
+Ensure you are logged into the remote machine::
 
     ssh [USER]@[DEVICE-NAME]
 
-Upgrade all installed packages:-
+Upgrade all installed packages::
 
     sudo apt-get update
     sudo apt upgrade -y
@@ -177,11 +183,11 @@ management console.)
 12. Clone the software
 ----------------------
 
-Ensure you are logged into the remote machine:-
+Ensure you are logged into the remote machine::
 
     ssh [USER]@[DEVICE-NAME]
 
-Create a development directory
+Create a development directory::
 
     cd ~
     mkdir dev
@@ -192,13 +198,12 @@ Create a development directory
 13. Install prerequisites on the new device
 -------------------------------------------
 
-Ensure you are logged into the remote machine:-
+Ensure you are logged into the remote machine::
 
     ssh [USER]@[DEVICE-NAME]
 
-Install prerequisites:-
+Install prerequisites::
 
     sudo apt-get install python3-pip
     sudo apt-get install python3-venv
-
-TODO:- MAKE ./da INSTALL THESE ITSELF.
+    sudo apt-get install openssh-server

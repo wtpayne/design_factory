@@ -2,13 +2,17 @@
 Setting up a new workstation
 ============================
 
+This process provides guidance on how to set up
+a new workstation for design and development
+activities.
+
+.. contents:: Table of Contents
+   :local:
 
 
 Introduction
 ============
 
-This procedure describes how to set up a new
-workstation for design and development work.
 
 Instructions are included for workstations
 running Ubuntu Linux, Windows 10 or 11 (via WSL)
@@ -34,10 +38,10 @@ Instructions for workstations running Ubuntu 22.04
 ------------------------
 
 Use the Ubuntu Advanced Packaging Tool (APT) to
-install the prerequisites.
+install the prerequisites::
 
-   > sudo apt-get update
-   > sudo apt install python3-pip python3-venv openssh-server
+   sudo apt-get update
+   sudo apt install python3-pip python3-venv openssh-server
 
 
 2. Configure SSH for passwordless SSH to localhost
@@ -47,18 +51,18 @@ The stableflow framework uses ssh to deploy
 and run systems. This includes localhost for
 local development, so we need passwordless ssh
 to every machine that we wish to deploy or run
-on.
+on::
 
-   > ssh-keygen -t rsa
-   > sudo systemctl status ssh
-   > sudo systemctl start ssh
-   > ssh-copy-id ${USER}@localhost
+   ssh-keygen -t rsa
+   sudo systemctl status ssh
+   sudo systemctl start ssh
+   ssh-copy-id ${USER}@localhost
 
 
 3. Copy the workstation public SSH key to github
 ------------------------------------------------
 
-Open your github SSH keys settings page at:-
+Open your github SSH keys settings page at::
 
    https://github.com/settings/keys
 
@@ -66,9 +70,9 @@ Create a new entry for the SSH key. The title
 can be anything you like (<USERNAME>@<HOSTNAME>
 is a common convention). The key type should be
 "authentication key". Take the key value from
-the public key that we have just created:-
+the public key that we have just created::
 
-   > cat ~/.ssh/id_rsa.pub
+   cat ~/.ssh/id_rsa.pub
 
 
 4. Clone the source design document repository
@@ -76,11 +80,11 @@ the public key that we have just created:-
 
 Instructions and documentation will assume that
 the source repository has been checked out to
-~/dev/df, but this is not required.
+~/dev/df, but this is not required::
 
-   > mkdir dev
-   > cd dev
-   > git clone https://github.com/wtpayne/design_factory.git df
+   mkdir dev
+   cd dev
+   git clone https://github.com/wtpayne/design_factory.git df
 
 
 5. Get development API keys
@@ -96,10 +100,10 @@ it with others in any way.
 These will be provided as a default.env file,
 compressed as a .tar.gz. Download this file,
 decompress it, and move it to the resource/key
-directory.
+directory::
 
-   > tar -xzf ./default.env.tar.gz
-   > mv default.env ~/dev/df/a3_src/h10_resource/key
+   tar -xzf ./default.env.tar.gz
+   mv default.env ~/dev/df/a3_src/h10_resource/key
 
 
 6. Run the system
@@ -108,14 +112,14 @@ directory.
 Now that everything is set up, you should be able
 to run the system. The first time that you run
 a command, it should install any missing python
-dependencies for you.
+dependencies for you::
 
-   > cd ~/dev/df
-   > ./da
-   > ./da demo
-   > ./da demo dm006
-   > ./da demo dm006 start
-   > ./da demo dm006 stop
+   cd ~/dev/df
+   ./da
+   ./da demo
+   ./da demo dm006
+   ./da demo dm006 start
+   ./da demo dm006 stop
 
 
 7. Troubleshooting
@@ -124,7 +128,7 @@ dependencies for you.
 If you run into problems with the automatic
 dependency installation process, one way to
 get back to a clean slate is to delete the
-relevant virtual environment directory:
+relevant virtual environment directory::
 
    ~/dev/df/a0_env/venv/<ENVIRONMENT_ID>
 
@@ -144,11 +148,11 @@ the instructions given above for Ubuntu Linux.
 
 First of all, we need to ensure that we have
 the WSL set up at the right version and with
-an Ubuntu 22.04 image.
+an Ubuntu 22.04 image::
 
-   > wsl --set-default-version 2
-   > shutdown -r
-   > wsl.exe --install Ubuntu-22.04
+   wsl --set-default-version 2
+   shutdown -r
+   wsl.exe --install Ubuntu-22.04
 
 
 2. Launch Ubuntu 22.04 using WSL
@@ -157,17 +161,17 @@ an Ubuntu 22.04 image.
 Once we have an Ubuntu 22.04 image installed in
 WSL, we can launch it. If you only have one WSL
 image on your workstation, then you can simply
-invoke wsl with no arguments.
+invoke wsl with no arguments::
 
-   Open terminal / shell in admin mode
-   > wsl
+   # Open terminal / shell in admin mode
+   wsl
 
 If you have more than one WSL image installed,
 then you need to specify which one you want to
-launch:
+launch::
 
-   Open terminal / shell in admin mode
-   > wsl -d Ubuntu-22.04
+   # Open terminal / shell in admin mode
+   wsl -d Ubuntu-22.04
 
 
 3. Set up the Ubuntu 22.04 WSL instance
@@ -192,11 +196,11 @@ commands.
 1. Install prerequisites
 ------------------------
 
-Use homebrew to install the prerequisites.
+Use homebrew to install the prerequisites::
 
-   > brew update
-   > brew install python
-   > brew install openssh
+   brew update
+   brew install python
+   brew install openssh
 
 
 2. Configure SSH for passwordless SSH to localhost
@@ -206,18 +210,18 @@ The stableflow framework uses ssh to deploy
 and run systems. This includes localhost for
 local development, so we need passwordless ssh
 to every machine that we wish to deploy or run
-on.
+on::
 
-   > ssh-keygen -t rsa
-   > sudo systemsetup -getremotelogin
-   > sudo systemsetup -setremotelogin on
-   > ssh-copy-id $USER@localhost
+   ssh-keygen -t rsa
+   sudo systemsetup -getremotelogin
+   sudo systemsetup -setremotelogin on
+   ssh-copy-id $USER@localhost
 
 You might get the error message when running the
-third command:
+third command::
 
-   > setremotelogin: Turning Remote Login on or
-     off requires Full Disk Access privileges.
+   setremotelogin: Turning Remote Login on or
+   off requires Full Disk Access privileges.
 
 Here are steps to resolve this:
 
@@ -239,7 +243,7 @@ Here are steps to resolve this:
 
 
 3. Complete the setup process
-----------------------------
+-----------------------------
 
 Follow the remainder of the instructions for
 workstations running Ubuntu 22.04 given above
