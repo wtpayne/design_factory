@@ -540,24 +540,22 @@ def _discord_bot(cfg_bot,
         # We make some specififc errors visible
         # to the user on the client side.
         #
-        cmd = discord.ext.commands
-        for (typeobj, str_msg) in (
-                            (cmd.CommandNotFound,   'Command not found.'),
-                            (cmd.DisabledCommand,   'Command disabled.'),
-                            (cmd.CommandOnCooldown, 'Command on cooldown.')):
+        if isinstance(error, (discord.ext.commands.CommandNotFound,
+                              discord.ext.commands.DisabledCommand,
+                              discord.ext.commands.DisabledCommand)):
 
-            if isinstance(error, typeobj):
-                await ctx.send(str_msg)
-                return
+            await ctx.send(str(error))
 
         # Anything else, we send a generic error
         # message to the user and raise an
         # exception that is logged on the sever
         # so the developer can address it.
         #
-        str_msg = 'An error has been logged.'
-        await ctx.send(str_msg)
-        raise error
+        else:
+
+            str_msg = 'An error has been logged.'
+            await ctx.send(str_msg)
+            raise error
 
 
     # -------------------------------------------------------------------------
@@ -676,7 +674,7 @@ def _discord_bot(cfg_bot,
         """
         Clear all messages in the channel.
 
-        This is rate limited to about 4 commands
+        This is rate limited to about 2 commands
         per second. (Discord server side rate
         limit is 5 requests per second per API
         token).
@@ -688,7 +686,7 @@ def _discord_bot(cfg_bot,
 
         async for message in ctx.channel.history(limit = 300):
             await message.delete()
-            await asyncio.sleep(0.25)  # add delay to prevent hitting rate limits
+            await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
 
 
     # -------------------------------------------------------------------------
