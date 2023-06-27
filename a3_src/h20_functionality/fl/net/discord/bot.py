@@ -358,10 +358,10 @@ def _discord_bot(cfg_bot,
             Generic button press callback.
 
             """
-            map_cmd = dict(type    = 'interaction',
-                           id_btn  = interaction.data['custom_id'],
-                           id_user = interaction.user.id,
-                           id_name = interaction.user.name,
+            map_cmd = dict(type       = 'interaction',
+                           id_btn     = interaction.data['custom_id'],
+                           id_user    = interaction.user.id,
+                           name_user  = interaction.user.name,
                            id_channel = interaction.channel.id)
             try:
                 queue_cmd_from_bot.put(map_cmd, block = False)
@@ -537,7 +537,27 @@ def _discord_bot(cfg_bot,
 
         """
 
-        raise RuntimeError('Command error: {err}.'.format(err = error))
+        # We make some specififc errors visible
+        # to the user on the client side.
+        #
+        cmd = discord.ext.commands
+        for (typeobj, str_msg) in (
+                            (cmd.CommandNotFound,   'Command not found.'),
+                            (cmd.DisabledCommand,   'Command disabled.'),
+                            (cmd.CommandOnCooldown, 'Command on cooldown.')):
+
+            if isinstance(error, typeobj):
+                await ctx.send(str_msg)
+                return
+
+        # Anything else, we send a generic error
+        # message to the user and raise an
+        # exception that is logged on the sever
+        # so the developer can address it.
+        #
+        str_msg = 'An error has been logged.'
+        await ctx.send(str_msg)
+        raise error
 
 
     # -------------------------------------------------------------------------
@@ -625,61 +645,53 @@ def _discord_bot(cfg_bot,
             return
         
         if isinstance(msg_before.channel, discord.DMChannel):
-            msg = dict(msg_type  = 'dm',
-                    id_prev      = msg_before.id,
-                    id_msg       = msg_after.id,
-                    id_author    = msg_after.author.id,
-                    name_author  = msg_after.author.name,
-                    id_channel   = msg_after.channel.id,
-                    name_channel = None,
-                    content      = msg_after.content)
+            msg = dict(msg_type     = 'dm',
+                       id_prev      = msg_before.id,
+                       id_msg       = msg_after.id,
+                       id_author    = msg_after.author.id,
+                       name_author  = msg_after.author.name,
+                       id_channel   = msg_after.channel.id,
+                       name_channel = None,
+                       content      = msg_after.content)
         else:
             msg = dict(msg_type     = 'message',
-                    id_prev      = msg_before.id,
-                    id_msg       = msg_after.id,
-                    id_author    = msg_after.author.id,
-                    name_author  = msg_after.author.name,
-                    nick_author  = msg_after.author.nick,
-                    id_channel   = msg_after.channel.id,
-                    name_channel = msg_after.channel.name,
-                    content      = msg_after.content)
+                       id_prev      = msg_before.id,
+                       id_msg       = msg_after.id,
+                       id_author    = msg_after.author.id,
+                       name_author  = msg_after.author.name,
+                       nick_author  = msg_after.author.nick,
+                       id_channel   = msg_after.channel.id,
+                       name_channel = msg_after.channel.name,
+                       content      = msg_after.content)
 
         try:
             queue_msg_from_bot.put(msg, block = False)
         except queue.Full:
             log.error('Message dropped. queue_msg_from_bot is full.')
 
+
     # -------------------------------------------------------------------------
-    # Requires Manage Messages bot permission.
+    @bot.command(name = "clear_all_messages")
+    async def clear_all_messages(ctx):
+        """
+        Clear all messages in the channel.
 
-    @bot.command(name="nukebot")
-    async def delete_bot_messages(ctx):
-        bot_id = bot.user.id
-        counter = 0
+        This is rate limited to about 4 commands
+        per second. (Discord server side rate
+        limit is 5 requests per second per API
+        token).
 
-        async for message in ctx.channel.history(limit=100):
-            if message.author.id == bot_id:
-                counter += 1
-                await message.delete()
-                await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
-                    
-        # Inform the admin
-        await ctx.author.send(f"Deleted {counter} message(s) sent by the bot.")
+        This requires the "Manage Messages" bot
+        permission.
 
-    @bot.command(name="nukeme")
-    async def delete_my_messages(ctx):
-        author_id = ctx.author.id
-        counter = 0
-        async for message in ctx.channel.history(limit=100):
-            if message.author.id == author_id:
-                counter += 1
-                await message.delete()
-                await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
-                        
-            # Inform the admin
-        await ctx.author.send(f"Deleted {counter} message(s) from you.")
+        """
+
+        async for message in ctx.channel.history(limit = 300):
+            await message.delete()
+            await asyncio.sleep(0.25)  # add delay to prevent hitting rate limits
 
 
+    # -------------------------------------------------------------------------
     # Run the client.
     #
     # bot.run(token       = cfg_bot['str_token'],

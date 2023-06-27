@@ -75,11 +75,9 @@ node:
     state_type:       py_dict
     config:
       cmd:
-      - id_cmd:       create
-        desc:         Create a deliberation session.
-      - id_cmd:       question
-        desc:         Ask a question in the current session.
-      - id_cmd:       summarize
+      - id_cmd:       ask
+        desc:         Create a deliberation session with a specific question.
+      - id_cmd:       summary
         desc:         Summarise the responses so far.
       - id_cmd:       debug
         desc:         Print debug information.

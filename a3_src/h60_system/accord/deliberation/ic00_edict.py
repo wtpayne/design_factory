@@ -51,7 +51,6 @@ import fl.util
 import key
 
 import fl.net.discord.bot
-users_joined_array = []
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
@@ -59,9 +58,10 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Transcript aggregation coroutine.
 
     """
-    global users_joined_array
-    transcript = collections.defaultdict(list)
-    map_user   = collections.defaultdict(list)
+    transcript       = collections.defaultdict(list)
+    map_str_question = collections.defaultdict(str)
+    map_set_id_user  = collections.defaultdict(set)
+    map_name_user    = dict()
 
     signal = None
     fl.util.edict.init(outputs)
@@ -77,43 +77,42 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             for msg in inputs['msg']['list']:
                 transcript[msg['name_channel']].append((timestamp, msg))
 
-        list_request = list()
-        list_msg     = list()
+        list_request = list()  # To the LLM.
+        list_msg     = list()  # To discord.
 
         if inputs['cmd']['ena']:
             timestamp = inputs['cmd']['ts']
             for cmd in inputs['cmd']['list']:
-                type_cmd = cmd['type']
 
-                if (type_cmd == 'interaction'):
-                    id_btn = cmd['id_btn']
+                if (     cmd['type']         == 'command'
+                     and cmd['name_command'] == 'ask'):
 
-                    if id_btn.startswith('btn_join_'):
-                        join_messages = _create_join_message(cmd, map_user)
-                        for msg in join_messages:
-                            list_msg.append(msg)
+                    list_msg.extend(_init_deliberation(
+                                        cmd              = cmd,
+                                        map_str_question = map_str_question))
 
-                elif type_cmd == 'command':
-                    id_cmd = cmd['name_command']
+                elif (     cmd['type'] == 'interaction'
+                       and cmd['id_btn'].startswith('btn_join_')):
 
-                    if id_cmd == 'create':
-                        list_msg.append(_create_join_button(cmd))
+                    list_msg.extend(_join_deliberation(
+                                        cmd              = cmd,
+                                        map_str_question = map_str_question,
+                                        map_set_id_user  = map_set_id_user,
+                                        map_name_user    = map_name_user))
 
-                    if id_cmd == 'question':
-                        question = ' '.join(cmd['args'])
-                        send_list = (_create_question_messages(question))
-                        for recipient in send_list:
-                            list_msg.append(recipient)
+                elif (     cmd['type']         == 'command'
+                       and cmd['name_command'] == 'summary'):
 
-                    if id_cmd == 'summarize':
-                        list_request.append(_create_summary_request(
-                                                            cmd, transcript))
+                    list_request.append(_summarize(
+                                        cmd              = cmd,
+                                        map_str_question = map_str_question,
+                                        transcript       = transcript,
+                                        map_set_id_user  = map_set_id_user))
 
                 else:
                     raise RuntimeError(
                             'Command type not recognized: {type}'.format(
-                                                            type = type_cmd))
-                
+                                                        type = cmd['type']))
 
         if list_msg:
             outputs['msg']['ena'] = True
@@ -125,104 +124,84 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             outputs['request']['ts'].update(timestamp)
             outputs['request']['list'][:] = list_request
 
+
 # -----------------------------------------------------------------------------
-
-
-def _create_join_message(cmd, map_user):
+def _init_deliberation(cmd, map_str_question):
     """
+    Initiate a deliberation and yield a join button.
+
     """
-    global users_joined_array
-
-    join_messages_array = []
-
-    id_user = cmd['id_user']
-    user_name = cmd['id_name']
-    channel_id = cmd['id_channel']
-    
-    if id_user in users_joined_array:
+    try:
+        id_channel                   = cmd['id_channel']
+        str_question                 = ' '.join(cmd['args'])
+        map_str_question[id_channel] = str_question
+    except KeyError:
         return
-    
-    users_joined_array.append(id_user)
-
-    join_messages_array.append(dict(
-        type    = 'dm',
-        id_user = id_user,
-        content = 'You have joined the deliberation.')) 
-            
-    join_messages_array.append(dict(
-        type       = 'msg',
-        id_channel = channel_id,
-        content    = '{user_name_} has joined the deliberation.'.format(user_name_ = user_name)))
-            
-    for user in users_joined_array:
-        if user != id_user:
-            join_messages_array.append(dict(
-                type    = 'dm',
-                id_user = user,
-                content = 'User {user_name_} has joined the deliberation.'.format(user_name_ = user_name)))
-
-    return join_messages_array
+    else:
+        yield dict(
+            type       = 'msg',
+            id_channel = cmd['id_channel'],
+            content    = 'Join deliberation.',
+            button     =  fl.net.discord.bot.ButtonData(
+                                label  = 'Join',
+                                id_btn = 'btn_join_{uid}'.format(
+                                                uid = uuid.uuid4().hex[:16])))
 
 
 # -----------------------------------------------------------------------------
-def _create_join_button(cmd):
+def _join_deliberation(cmd,
+                       map_str_question,
+                       map_set_id_user,
+                       map_name_user):
     """
-    Return a message that contains a join button.
+    Yield all required join messages.
 
     """
-    str_uid = uuid.uuid4().hex[:16]
-    id_btn  = 'btn_join_{uid}'.format(uid = str_uid)
+    id_user    = cmd['id_user']
+    id_channel = cmd['id_channel']
 
-    return dict(
-        type       = 'msg',
-        id_channel = cmd['id_channel'],
-        content    = 'Join deliberation: {uid}'.format(uid = str_uid),
-        button     =  fl.net.discord.bot.ButtonData(label  = 'Join',
-                                                    id_btn = id_btn))
+    if id_user in map_set_id_user[id_channel]:
+        return
+
+    map_set_id_user[id_channel].add(id_user)
+
+    yield dict(type       = 'dm',
+               id_user    = id_user,
+               content    = map_str_question[id_channel])
+
+    yield dict(type       = 'msg',
+               id_channel = id_channel,
+               content    = '{user} joined the deliberation.'.format(
+                                                    user = cmd['name_user']))
 
 
 # -----------------------------------------------------------------------------
-def _create_question_messages(delib_question):
+def _summarize(cmd,
+               map_str_question,
+               transcript,
+               map_set_id_user):
     """
-    Return a list of messages that contain the question to each user that has joined the deliberation.
+    Yield a summary request for the LLM.
+
     """
-
-    send_questions_dict_array = list()
-    if delib_question is None:
-        raise Exception("Delib question is not provided")
-
-    if len(users_joined_array) == 0:
-        raise Exception("Users joined array is empty")
-
-    for user_id in users_joined_array:
-        send_questions_dict_array.append(dict(
-            type       = 'dm',
-            id_user    = user_id,
-            content    = delib_question))
-        
-    return send_questions_dict_array
-
-# -----------------------------------------------------------------------------
-def _create_summary_request(cmd, transcript):
-    """
-    """
+    id_channel     = cmd['id_channel']
+    list_id_user   = list(sorted(map_set_id_user[id_channel]))
     str_transcript = ''
-
     for (name_channel, list_tup_msg) in transcript.items():
-
         str_transcript += '\n Channel {name}:\n'.format(
                                         name = name_channel)
-
         for (timestamp, msg) in list_tup_msg:
             str_transcript += '\n {name}: "{txt}"'.format(
                                     name = msg['name_author'],
                                     txt  = msg['content'])
-
         str_transcript += '\n'
-
     str_transcript += '\n'
 
     str_prompt = """Please provide a summary for the given transcript.
+
+    The question given to the participants was:
+
+    {str_question}
 
     Make sure that the summary highlights the main different points of view
     that have been expressed and the main arguments that have been put forward
@@ -230,9 +209,12 @@ def _create_summary_request(cmd, transcript):
 
     {str_transcript}
 
-    """.format(str_transcript = str_transcript)
+    """.format(str_question   = map_str_question[id_channel],
+               str_transcript = str_transcript)
 
     request = {
+        'state':       dict(id_channel   = id_channel,
+                            list_id_user = list_id_user),
         'model':       'gpt-3.5-turbo',
         'messages':    [{
             'role':    'system',

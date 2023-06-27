@@ -54,19 +54,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    id_channel_admin     = 1115744080907997204
-    id_channel_room_01   = 1115744295845118032
-    id_channel_room_02   = 1115744329131106325
-    id_channel_room_03   = 1115744378623893675
-    id_channel_room_04   = 1115744396005097592
-    id_channel_room_05   = 1115744413751185570
-    set_channel_broacast = { id_channel_admin,
-                             id_channel_room_01,
-                             id_channel_room_02,
-                             id_channel_room_03,
-                             id_channel_room_04,
-                             id_channel_room_05 }
-
     signal = None
     fl.util.edict.init(outputs)
     while True:
@@ -77,7 +64,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
 
         timestamp = inputs['result']['ts']
-
+        list_msg  = list()
         for item in inputs['result']['list']:
 
             list_response_choices = item['response']['choices']
@@ -88,7 +75,19 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             if not content:
                 continue
 
-            outputs['msg']['ena']  = True
-            outputs['msg']['ts']   = timestamp
-            for id_channel in sorted(set_channel_broacast):
-                outputs['msg']['list'].append((id_channel, content))
+            # Send a message with the summary in to the channel.
+            #
+            list_msg.append(dict(type       = 'msg',
+                                 id_channel = item['state']['id_channel'],
+                                 content    = content))
+
+            # Send a message with the summary in to each user.
+            #
+            for id_user in item['state']['list_id_user']:
+                list_msg.append(dict(type    = 'dm',
+                                     id_user = id_user,
+                                     content = content))
+
+        outputs['msg']['ena']     = True
+        outputs['msg']['ts']      = timestamp
+        outputs['msg']['list'][:] = list_msg
