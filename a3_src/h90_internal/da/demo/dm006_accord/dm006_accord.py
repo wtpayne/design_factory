@@ -62,7 +62,7 @@ def test():
 
     _run   = da.test.run
     _path  = da.env.path
-    ID_ENV = 'e002_general_research'
+    ID_ENV = 'e003_accord'
 
     return _run(id_env    = ID_ENV,
                 iter_path = (_path(control_tier = 'h20_functionality',
