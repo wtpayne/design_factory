@@ -185,15 +185,20 @@ def _summarize(cmd,
 
     """
     id_channel     = cmd['id_channel']
-    list_id_user   = list(sorted(map_set_id_user[id_channel]))
+    set_id_user    = map_set_id_user[id_channel]
+    list_id_user   = list(sorted(set_id_user))
     str_transcript = ''
     for (name_channel, list_tup_msg) in transcript.items():
-        str_transcript += '\n Channel {name}:\n'.format(
-                                        name = name_channel)
-        for (timestamp, msg) in list_tup_msg:
-            str_transcript += '\n {name}: "{txt}"'.format(
-                                    name = msg['name_author'],
-                                    txt  = msg['content'])
+
+        is_dm = str(name_channel) == 'None'
+        if is_dm:
+            for (timestamp, msg) in list_tup_msg:
+                is_in_discussion = msg['id_author'] in set_id_user
+                if is_in_discussion:
+                    str_transcript += '\n {name}: "{txt}"'.format(
+                                            name = msg['name_author'],
+                                            txt  = msg['content'])
+
         str_transcript += '\n'
     str_transcript += '\n'
 
