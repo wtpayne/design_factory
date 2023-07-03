@@ -301,15 +301,9 @@ fi
 # and then passed to the click library to use as
 # the name of the command in the help string.
 #
-# We try to support both bash and zsh here.
-#
 NAME_APP=$(basename "$0")
-if (( ${#} != 0 )); then
-    if [[ $SHELL == *"/zsh"* ]]; then
-        python3 -m da.cli.command "${NAME_APP}" "${@[@]}"
-    else
-        python3 -m da.cli.command "${NAME_APP}" "${@}"
-    fi
-else
+if [ $# -eq 0 ]; then
     python3 -m da.cli.command "${NAME_APP}"
+else
+    python3 -m da.cli.command "${NAME_APP}" "${@}"
 fi
