@@ -129,7 +129,23 @@ def init(outputs, collection = 'list'):
         else:
             raise RuntimeError('Unrecognized collection type.')
 
+    signal = None
+    return signal
 
+
+
+# -----------------------------------------------------------------------------
+def is_ready(inputs, outputs):
+    """
+    Reset all outputs and return True if ready.
+
+    """
+    reset(outputs)
+
+    ready = True
+    if 'ctrl' in inputs:
+        ready = inputs['ctrl']['ena']
+    return ready
 
 
 # -----------------------------------------------------------------------------

@@ -53,9 +53,6 @@ import fl.util.edict
 import key
 
 
-DEFAULT_ENVVAR = 'TOKEN_DISCORD_BOT_DEFAULT'
-
-
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
@@ -63,73 +60,116 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    tup_id_in  = ('ctrl', 'cfg_cmd', 'msg')
-    tup_id_out = ('cmd', 'msg', 'log')
-    fl.util.edict.validate(inputs  = inputs,  must_equal = tup_id_in)
-    fl.util.edict.validate(outputs = outputs, must_equal = tup_id_out)
+    fl.util.edict.validate(inputs = inputs,  must_contain = ('ctrl',))
 
-    bot = init_discord_bot(
-                    filepath_env = cfg.get('filepath_env',  None),
-                    envvar_key   = cfg.get('envvar_key',    DEFAULT_ENVVAR),
-                    str_token    = cfg.get('str_token',     None),
-                    secs_sleep   = cfg.get('secs_sleep',    0.5))
+    str_token    = cfg.get('str_token',     None)
+    filepath_env = cfg.get('filepath_env',  None)
+    key_token    = cfg.get('key_token',     'TOKEN_DISCORD_BOT')
+    secs_sleep   = cfg.get('secs_sleep',    0.5)
+    list_cfg_msg = cfg.get('msg',           list())
 
-    timestamp = dict()
-    signal    = None
-    fl.util.edict.init(outputs)
+    if str_token is None:
+        str_token = key.load(id_value     = key_token,
+                             filepath_env = filepath_env)
+    bot = fl.net.discord.bot.coro(cfg_bot = dict(str_token  = str_token,
+                                                 secs_sleep = secs_sleep))
+
+    set_type_in = set((
+                'cfg_msgcmd',  # Configuration for message commands.
+                'cfg_appcmd',  # Configuration for application commands.
+                'msg_guild',   # Messages to a guild channel.
+                'msg_dm'))     # Messages to a DM channel.
+
+    # If there are one or more outputs which are
+    # named after a message type, then we will
+    # route messages of that type to the
+    # corresponding output.
+    #
+    set_type_out = set((
+                'log',           # Error messages and log messages.
+                'msgcmd_dm',     # Msg command invocations from DM channels.
+                'msgcmd_guild',  # Msg command invocations from guild channels.
+                'appcmd_dm',     # App command invocations from DM channels.
+                'appcmd_guild',  # App command invocations from guild channels.
+                'msg_dm',        # Messages from DM channels.
+                'msg_guild',     # Messages from guild channels.
+                'edit_dm',       # Message edits from DM channels.
+                'edit_guild',    # Message edits from guild channels.
+                'btn'))          # Button press events.
+
+    tup_key_in       = tuple(inputs.keys())
+    tup_key_out      = tuple(outputs.keys())
+    tup_key_msg_in   = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
+    tup_key_msg_out  = tuple((k for k in tup_key_out if k not in set_type_out))
+    tup_key_type_out = tuple((k for k in tup_key_out if k in set_type_out))
+
+    list_to_bot     = list()
+    list_to_bot[:]  = list_cfg_msg
+    list_from_bot   = list()
+    timestamp       = dict()
+    signal          = fl.util.edict.init(outputs)
+
     while True:
+
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
+
+        # Get timestamp from control input.
+        #
+        if not inputs['ctrl']['ena']:
+            continue
+        timestamp.update(inputs['ctrl']['ts'])
 
         # Pass messages and command
         # configuration to the discord
         # bot.
         #
-        list_msg_to_bot = list()
-        list_cmd_to_bot = list()
-        for (id_in, list_in) in (('msg',     list_msg_to_bot),
-                                 ('cfg_cmd', list_cmd_to_bot)):
-
-            timestamp.update(inputs[id_in]['ts'])
-            list_in.extend(inputs[id_in]['list'])
-
-        (list_msg_from_bot,
-         list_cmd_from_bot,
-         list_log_from_bot) = bot.send((list_msg_to_bot,
-                                       list_cmd_to_bot))
+        for str_key in tup_key_msg_in:
+            list_to_bot.extend(inputs[str_key]['list'])
 
         # Recieve messages, command
         # invocations and log items
-        # from the doscord bot and
-        # pass them on to the rest
-        # of the system.
+        # from the doscord bot.
         #
-        for (id_out, list_out) in (('msg', list_msg_from_bot),
-                                   ('cmd', list_cmd_from_bot),
-                                   ('log', list_log_from_bot)):
+        list_from_bot.clear()
+        list_from_bot[:] = bot.send(list_to_bot)
+        list_to_bot.clear()
+        if not list_from_bot:
+            continue
 
-            if id_out in outputs and list_out:
-                outputs[id_out]['ena'] = True
-                outputs[id_out]['ts'].update(timestamp)
-                outputs[id_out]['list'][:] = list_out
+        # Route messages to type-specific
+        # outputs.
+        #
+        list_msg     = list_from_bot
+        list_include = list()
+        list_exclude = list()
+        for key_type in tup_key_type_out:
+            list_include.clear()
+            list_exclude.clear()
 
+            for msg in list_msg:
+                if msg['type'] == key_type:
+                    list_include.append(msg)
+                else:
+                    list_exclude.append(msg)
 
-# -----------------------------------------------------------------------------
-def init_discord_bot(filepath_env = None,
-                     envvar_key   = DEFAULT_ENVVAR,
-                     str_token    = None,
-                     secs_sleep   = 0.5):
-    """
-    Return the discord client coroutine.
+            if list_include:
+                outputs[key_type]['ena'] = True
+                outputs[key_type]['ts'].update(timestamp)
+                outputs[key_type]['list'][:] = list_include
 
-    """
+            if list_exclude:
+                list_msg[:] = list_exclude
+                continue
+            else:
+                break
 
-    if str_token is None:
-        str_token = key.load(id_value     = envvar_key,
-                             filepath_env = filepath_env)
-
-    cfg_bot = { 'secs_sleep': secs_sleep,
-                'str_token':  str_token  }
-    discord    = fl.net.discord.bot.coro(cfg_bot)
-
-    return discord
+        # If we have any remaining unrouted
+        # output, then we copy that to every
+        # other output channel.
+        #
+        if list_msg:
+            for str_key in tup_key_msg_out:
+                outputs[str_key]['ena'] = True
+                outputs[str_key]['ts'].update(timestamp)
+                outputs[str_key]['list'][:] = list_msg

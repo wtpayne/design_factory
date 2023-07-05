@@ -58,6 +58,14 @@ import fl.util
 BOT_COMMAND_PREFIX = '/'
 
 
+# This global register exists so that we
+# can reference callbacks and loggers from
+# generated code that is being evaluated
+# with eval().
+#
+map_register = dict()
+
+
 # -----------------------------------------------------------------------------
 FileData   = collections.namedtuple(
                             'FileData',
@@ -78,81 +86,56 @@ def coro(cfg_bot):
 
     """
 
-    tup_key_required = ('str_token',)
-    for str_key in tup_key_required:
+    for str_key in ('str_token', 'secs_sleep'):
         if str_key not in cfg_bot:
             raise ValueError(
                 'Missing required configuration: {key}'.format(key = str_key))
+
     if not isinstance(cfg_bot['str_token'], str):
         raise ValueError(
                 'cfg_bot["str_token"] must be a string.')
-    cfg_bot['secs_sleep'] = cfg_bot.get('secs_sleep', 0.5)
+
     if not isinstance(cfg_bot['secs_sleep'], (int, float)):
         raise ValueError(
                 'cfg_bot["secs_sleep"] must be an integer or float value.')
 
-    str_name_process   = 'discord-bot'
-    fcn_bot            = _discord_bot
-    queue_msg_to_bot   = multiprocessing.Queue()  # msg system  --> discord
-    queue_cmd_to_bot   = multiprocessing.Queue()  # cmd system  --> discord
-    queue_msg_from_bot = multiprocessing.Queue()  # msg discord --> system
-    queue_cmd_from_bot = multiprocessing.Queue()  # cmd discord --> system
-    queue_log_from_bot = multiprocessing.Queue()  # log discord --> system
-    tup_args           = (cfg_bot,
-                          queue_msg_to_bot,
-                          queue_cmd_to_bot,
-                          queue_msg_from_bot,
-                          queue_cmd_from_bot,
-                          queue_log_from_bot)
-    proc_bot           = multiprocessing.Process(
+    str_name_process = 'discord-bot'
+    fcn_bot          = _discord_bot
+    queue_to_bot     = multiprocessing.Queue()  # system  --> discord
+    queue_from_bot   = multiprocessing.Queue()  # discord --> system
+    tup_args         = (cfg_bot, queue_to_bot, queue_from_bot)
+    proc_bot         = multiprocessing.Process(
                                         target = fcn_bot,
                                         args   = tup_args,
                                         name   = str_name_process,
                                         daemon = True)  # So we get terminated
     proc_bot.start()
 
-    list_msg_to_bot   = list()
-    list_cmd_to_bot   = list()
-    list_msg_from_bot = list()
-    list_cmd_from_bot = list()
-    list_log_from_bot = list()
+    list_to_bot   = list()
+    list_from_bot = list()
 
     while True:
 
-        list_msg_to_bot.clear()
-        list_cmd_to_bot.clear()
-
-        (list_msg_to_bot,
-         list_cmd_to_bot) = yield (list_msg_from_bot,
-                                   list_cmd_from_bot,
-                                   list_log_from_bot)
-
-        list_msg_from_bot.clear()
-        list_cmd_from_bot.clear()
-        list_log_from_bot.clear()
+        list_to_bot.clear()
+        (list_to_bot) = yield (list_from_bot)
+        list_from_bot.clear()
 
         # If the rest of the system sends us
         # any system messages or new commands
         # to configure, then forward them
         # on to the discord client process
         # to either be sent to the relevant
-        # channel (in the case of messages),
+        # DM or channel (in the case of messages),
         # or to use to configure new commands
         # (in the case of command configuration).
         #
-        for map_msg in list_msg_to_bot:
+        for item in list_to_bot:
             try:
-                queue_msg_to_bot.put(map_msg, block = False)
+                queue_to_bot.put(item, block = False)
             except queue.Full as err:
-                list_log_from_bot.append(
-                        'Message dropped: queue_msg_to_bot is full.')
-
-        for cfg_cmd in list_cmd_to_bot:
-            try:
-                queue_cmd_to_bot.put(cfg_cmd, block = False)
-            except queue.Full as err:
-                list_log_from_bot.append(
-                        'Command config dropped: queue_cmd_to_bot is full.')
+                list_from_bot.append(
+                        dict(type    = 'log',
+                             content = 'Item dropped: queue_to_bot is full.'))
 
         # Retrieve any user messages, command
         # invocations or log messages from the
@@ -162,30 +145,13 @@ def coro(cfg_bot):
         #
         while True:
             try:
-                list_msg_from_bot.append(queue_msg_from_bot.get(block = False))
-            except queue.Empty:
-                break
-
-        while True:
-            try:
-                list_cmd_from_bot.append(queue_cmd_from_bot.get(block = False))
-            except queue.Empty:
-                break
-
-        while True:
-            try:
-                list_log_from_bot.append(queue_log_from_bot.get(block = False))
+                list_from_bot.append(queue_from_bot.get(block = False))
             except queue.Empty:
                 break
 
 
 # -----------------------------------------------------------------------------
-def _discord_bot(cfg_bot,
-                 queue_msg_to_bot,
-                 queue_cmd_to_bot,
-                 queue_msg_from_bot,
-                 queue_cmd_from_bot,
-                 queue_log_from_bot):
+def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     """
     Run the discord client.
 
@@ -196,10 +162,14 @@ def _discord_bot(cfg_bot,
     import collections.abc
     import functools
     import io
+    import keyword
     import logging
     import os
+    import textwrap
+    import typing
 
     import discord
+    import discord.app_commands
     import discord.ext
     import discord.ext.commands
 
@@ -215,9 +185,12 @@ def _discord_bot(cfg_bot,
                                         command_prefix = BOT_COMMAND_PREFIX,
                                         intents        = intents)
 
+    id_admin   = cfg_bot.get('id_admin', None)
     buffer_log = io.StringIO()
     loghandler = logging.StreamHandler(buffer_log)
     log        = logging.getLogger('discord')
+    map_register['log'] = log
+
 
     # -------------------------------------------------------------------------
     @bot.event
@@ -235,17 +208,15 @@ def _discord_bot(cfg_bot,
 
         """
 
+        log.info('Discord bot is ready.')
         task_msg = bot.loop.create_task(coro = _service_all_queues(
-                                                        cfg_bot,
-                                                        queue_msg_to_bot,
-                                                        queue_cmd_to_bot,
-                                                        queue_log_from_bot))
+                                                            cfg_bot,
+                                                            queue_to_bot,
+                                                            queue_from_bot))
+
 
     # -------------------------------------------------------------------------
-    async def _service_all_queues(cfg_bot,
-                                  queue_msg_to_bot,
-                                  queue_cmd_to_bot,
-                                  queue_log_from_bot):
+    async def _service_all_queues(cfg_bot, queue_to_bot, queue_from_bot):
         """
         Message queue servicing coroutine.
 
@@ -269,10 +240,11 @@ def _discord_bot(cfg_bot,
         #
         await bot.wait_until_ready()
 
-        count_log_attempt = 0
-        map_user          = dict()
-        map_chan          = dict()
-        map_cmd           = dict()
+        state = dict(count_log_attempt = 0,
+                     map_channel       = dict(),
+                     map_user          = dict(),
+                     map_cmd           = dict(),
+                     map_app_cmd       = dict())
 
         while True:
 
@@ -281,35 +253,24 @@ def _discord_bot(cfg_bot,
             # system. (Print to stdout if it
             # doesn't work for some reason).
             #
-            str_log = buffer_log.getvalue()
-            if str_log:
-                if await _service_log_queue(queue_log_from_bot, str_log):
-                    count_log_attempt = 0
-                elif count_log_attempt < 10:
-                    count_log_attempt += 1
-                else:
-                    print(str_log)
-                    loghandler.flush()
+            await _service_queue_from_bot(state, queue_from_bot)
 
             # Service outbound messages from the
             # system to discord, then command
             # configuration from the system to
-            # discord. Don't sleep if any data
-            # is ready.
+            # discord. Sleep only if we need to
+            # wait for new data to be ready.
             #
-            do_sleep = True
-            if await _service_msg_queue(queue_msg_to_bot, map_chan, map_user):
-                do_sleep = False
-            if await _service_cmd_queue(queue_cmd_to_bot, map_cmd):
-                do_sleep = False
-            if do_sleep:
+            is_data_rx = await _service_queue_to_bot(state, queue_to_bot)
+            do_wait    = not is_data_rx
+            if do_wait:
                 await asyncio.sleep(cfg_bot['secs_sleep'])
 
 
     # -------------------------------------------------------------------------
-    async def _service_log_queue(queue_log_from_bot, str_log):
+    async def _service_queue_from_bot(state, queue_from_bot):
         """
-        Send log data from the discord bot to the rest of the system.
+        Send data from the discord bot to the rest of the system.
 
         If there is any log data in the
         buffer, then enqueue it to be
@@ -317,115 +278,366 @@ def _discord_bot(cfg_bot,
         system.
 
         """
-        is_ok = False
+
+        str_buffer = buffer_log.getvalue()
+        if not str_buffer:
+            return
+
         try:
-            queue_log_from_bot.put(str_log, block = False)
+            for str_line in str_buffer.split('\n'):
+                if not str_line:
+                    continue
+                queue_from_bot.put(dict(type    = 'log',
+                                        content = str_line),
+                                   block = False)
         except queue.Full:
-            log.error(
-                'Log message dropped. ' \
-                'queue_log_from_bot is full.')
+            log.error('One or more log messages dropped. ' \
+                      'queue_from_bot is full.')
+
+
+    # ---------------------------------`---------------------------------------
+    async def _service_queue_to_bot(state, queue_to_bot):
+        """
+        Recieve items being sent from the system to the discord bot.
+
+        """
+
+        try:
+            item = queue_to_bot.get(block = False)
+        except queue.Empty:
+            is_data_rx = False
         else:
-            is_ok = True
-            loghandler.flush()
-        return is_ok
+            is_data_rx = True
+            type_item  = item['type']
+            if type_item in {'cfg_msgcmd', 'cfg_appcmd'}:
+                await _configure_command(state = state, cfg_cmd = item)
+            elif type_item in {'msg_guild', 'msg_dm'}:
+                await _send_message(state = state, msg = item)
+            else:
+                raise RuntimeError(
+                        'Did not recognise item type: {type}'.format(
+                                                            type = type_item))
+        return is_data_rx
 
 
     # -------------------------------------------------------------------------
-    async def _service_msg_queue(queue_msg_to_bot, map_chan, map_user):
+    async def _configure_command(state, cfg_cmd):
         """
-        Service outbound messages from the system to discord.
+        Configure discord with the specified command.
 
         """
 
-        try:
-            map_msg = queue_msg_to_bot.get(block = False)
-        except queue.Empty:
-            is_ok = False
-            return is_ok
-        else:
-            is_ok = True
+        _validate_command_configuration(cfg_cmd)
 
-        # Validate map_msg
+        # Configure message commands.
         #
-        if not isinstance(map_msg, collections.abc.Mapping):
-            raise RuntimeError(
-                    'Invalid message recieved: {map_msg}'.format(
-                                                    map_msg = repr(map_msg)))
+        str_type = cfg_cmd['type']
+        if str_type == 'cfg_msgcmd':
+
+            str_name = cfg_cmd['name']
+            log.info('Configure msgcmd {name}.'.format(name = str_name))
+
+            str_desc = cfg_cmd['description']
+            obj_cmd  = discord.ext.commands.Command(map_register['on_cmd'],
+                                                    name = str_name,
+                                                    help = str_desc)
+            bot.add_command(obj_cmd)
+            state['map_cmd'][str_name] = obj_cmd
+
+        # Configure application commands.
+        #
+        elif str_type == 'cfg_appcmd':
+
+            str_name = cfg_cmd['name']
+            log.info('Configure appcmd {name}.'.format(name = str_name))
+
+            str_desc   = cfg_cmd['description']
+            map_param  = cfg_cmd.get('param', dict())
+            list_param = list(('interaction',))
+            list_arg   = list(('interaction',))
+            for (id_param, type_param) in map_param.items():
+                list_param.append('{id}: {type}'.format(id   = id_param,
+                                                        type = type_param))
+                list_arg.append(id_param)
+            str_generated = textwrap.dedent("""
+                                    async def {id}({param}):
+                                        await map_register['on_appcmd']({arg})
+                                    """.format(id    = str_name,
+                                               param = ', '.join(list_param),
+                                               arg   = ', '.join(list_arg)))
+            exec(str_generated, globals())
+            cmd = discord.app_commands.Command(
+                                            name        = str_name,
+                                            description = str_desc,
+                                            callback    = globals()[str_name])
+            bot.tree.add_command(cmd)
+            state['map_app_cmd'][str_name] = cmd
+
+        else:
+            pass
+
+
+    # -------------------------------------------------------------------------
+    def _validate_command_configuration(cfg_cmd):
+        """
+        Validate the provided cfg_cmd dict.
+
+        Throws a ValueError if it is not valid.
+
+        """
 
         # ---------------------------------------------------------------------
-        async def on_button_press_generic(interaction, *args):
+        def _is_valid_name(name):
             """
-            Generic button press callback.
-
-            """
-            map_cmd = dict(type       = 'interaction',
-                           id_btn     = interaction.data['custom_id'],
-                           id_user    = interaction.user.id,
-                           name_user  = interaction.user.name,
-                           id_channel = interaction.channel.id)
-            try:
-                queue_cmd_from_bot.put(map_cmd, block = False)
-            except queue.Full:
-                log.error('Button input dropped. ' \
-                          'queue_cmd_from_bot is full.')
-
-            await interaction.response.defer()
-
-
-        # =================================================================
-        class ButtonView(discord.ui.View):
-            """
-            A view containing a single button.
+            Return True iff name is valid, false otherwise.
 
             """
+            is_identifier = name.isidentifier()
+            is_keyword    = keyword.iskeyword(name)
+            is_valid      = is_identifier and (not is_keyword)
 
-            # -------------------------------------------------------------
-            def __init__(self,
-                         style,
-                         label,
-                         id_btn,
-                         callback,
-                         timeout = 360):
+            return is_valid
 
-                """
-                Construct the button view.
+        set_key_required = set(('type', 'name', 'description'))
+        set_key_optional = set(('param',))
+        set_key_str      = set(('type', 'name', 'description'))
+        set_key_dict     = set(('param',))
+        set_key_allowed  = set_key_required | set_key_optional
+        set_key_actual   = set(cfg_cmd.keys())
+        set_key_missing  = set_key_required - set_key_actual
+        set_key_surplus  = set_key_actual   - set_key_allowed
+        set_type_allowed = set(('cfg_msgcmd', 'cfg_appcmd'))
 
-                """
-                super().__init__(timeout = timeout)
-                self.button = discord.ui.Button(style     = style,
-                                                label     = label,
-                                                custom_id = id_btn)
-                self.button.callback = callback
-                self.add_item(self.button)
+        if set_key_missing:
+            raise ValueError(
+                        'Command config is missing fields: ' \
+                        '"{key}".'.format(key = '", "'.join(set_missing)))
+
+        if set_key_surplus:
+            raise ValueError(
+                        'Command config has extra fields: ' \
+                        '"{key}".'.format(key = '", "'.join(set_key_surplus)))
+
+        for key in set_key_str:
+            if (key in cfg_cmd) and (not isinstance(cfg_cmd[key], str)):
+                raise ValueError(
+                        'Command config "{key}" value should be a string. ' \
+                        'Got a {typ} instead.'.format(
+                                        key = key,
+                                        typ = type(cfg_cmd[key]).__name__))
+
+        for key in set_key_dict:
+            if (key in cfg_cmd) and (not isinstance(cfg_cmd[key], dict)):
+                raise ValueError(
+                        'Command config "{key}" value should be a dict. ' \
+                        'Got a {typ} instead.'.format(
+                                        key = key,
+                                        typ = type(cfg_cmd[key]).__name__))
+
+        str_type = cfg_cmd['type']
+        if str_type not in set_type_allowed:
+            raise ValueError(
+                        'Command config "type" value should be one of ' \
+                        '"{allow}". Got "{act}" instead.'.format(
+                                        allow = '", "'.join(set_type_allowed),
+                                        act   = str_type))
+
+        str_name = cfg_cmd['name']
+        if not _is_valid_name(str_name):
+            raise ValueError(
+                        'Command name should be a valid Python identifier ' \
+                        'and not a reserved keyword. Got "{name}".'.format(
+                                                            name = str_name))
+
+        map_param = cfg_cmd.get('param', dict())
+        for (name_param, type_param) in map_param.items():
+            if not _is_valid_name(name_param):
+                raise ValueError(
+                        'Parameter name should be valid Python identifier ' \
+                        'and not a reserved keyword. Got "{name}".'.format(
+                                                            name = name_param))
+
+
+    # -------------------------------------------------------------------------
+    async def on_cmd(ctx):
+        """
+        Callback for all configured message commands.
+
+        This callback provides a generic
+        implementation for all message
+        commands which are set via
+        configuration.
+
+        """
+
+        log.debug('Msgcmd "{name}" invoked.'.format(name = ctx.command.name))
+        if ctx.guild is None:
+            map_cmd  = dict(type         = 'msgcmd_dm')
+        else:
+            map_cmd  = dict(type         = 'msgcmd',
+                            id_guild     = ctx.guild.id,
+                            name_guild   = ctx.guild.name,
+                            name_channel = ctx.channel.name,
+                            nick_author  = ctx.author.nick)
+        map_cmd.update(dict(name_command = ctx.command.name,
+                            args         = ctx.args[1:],
+                            id_channel   = ctx.channel.id,
+                            id_author    = ctx.author.id,
+                            name_author  = ctx.author.name))
+        try:
+            queue_from_bot.put(map_cmd, block = False)
+        except queue.Full:
+            log.error('Command input dropped: queue_from_bot is full.')
+
+    # Update the global callback register so that
+    # on_cmd can be called from generated code
+    # inside a call to eval().
+    #
+    map_register['on_cmd'] = on_cmd
+
+
+    # -------------------------------------------------------------------------
+    async def on_appcmd(interaction, *args):
+        """
+        Callback for all configured application commands.
+
+        This callback provides a generic
+        implementation for all application
+        commands which are set via
+        configuration.
+
+        """
+
+        await interaction.response.defer(ephemeral = True)
+        log.debug('Appcmd "{name}" invoked.'.format(
+                                            name = interaction.command.name))
+        if interaction.guild is None:
+            map_cmd  = dict(type         = 'appcmd_dm')
+        else:
+            map_cmd  = dict(type         = 'appcmd_guild',
+                            id_guild     = interaction.guild.id,
+                            name_guild   = interaction.guild.name,
+                            name_channel = interaction.channel.name,
+                            nick_user    = interaction.user.nick)
+        map_cmd.update(dict(name_command = interaction.command.name,
+                            id_channel   = interaction.channel.id,
+                            id_user      = interaction.user.id,
+                            name_user    = interaction.user.name,
+                            args         = args))
+
+        try:
+            queue_from_bot.put(map_cmd, block = False)
+        except queue.Full:
+            log.error('Command input dropped: queue_from_bot is full.')
+        await interaction.followup.send('OK', ephemeral = True)
+
+    # Update the global callback register so that
+    # on_appcmd can be called from generated code
+    # inside a call to eval().
+    #
+    map_register['on_appcmd'] = on_appcmd
+
+
+    # -------------------------------------------------------------------------
+    async def on_button(interaction, *args):
+        """
+        Generic button press callback.
+
+        """
+
+        await interaction.response.defer(ephemeral = True)
+        id_btn = interaction.data['custom_id']
+        log.debug('Button pressed: {id}'.format(id = id_btn))
+
+        map_cmd = dict(type       = 'btn',
+                       id_btn     = id_btn,
+                       id_user    = interaction.user.id,
+                       name_user  = interaction.user.name,
+                       id_channel = interaction.channel.id)
+        try:
+            queue_from_bot.put(map_cmd, block = False)
+        except queue.Full:
+            log.error('Button input dropped: queue_from_bot is full.')
+
+
+    # =========================================================================
+    class ButtonView(discord.ui.View):
+        """
+        A view containing a single button.
+
+        """
+
+        # ---------------------------------------------------------------------
+        def __init__(self,
+                     style,
+                     label,
+                     id_btn,
+                     callback,
+                     timeout = 600):
+
+            """
+            Construct the button view.
+
+            """
+
+            super().__init__(timeout = timeout)
+            self.button = discord.ui.Button(style     = style,
+                                            label     = label,
+                                            custom_id = id_btn)
+            self.button.callback = callback
+            self.add_item(self.button)
+
+
+    # -------------------------------------------------------------------------
+    async def _send_message(state, msg):
+        """
+        Send the specified message to the discord API.
+
+        """
+
+        _validate_message_data(msg)
 
         # If we have a new message to
         # handle, then simply send it
         # to the specified channel.
         #
-        type_msg = map_msg.pop('type', 'msg')
-        if type_msg == 'dm':
-            id_user = map_msg.pop('id_user')
-            if id_user not in map_user.keys() or map_user[id_user] is None:
-                map_user[id_user] = await bot.fetch_user(id_user)
-            if map_user[id_user] is None:
-                log.critical(
-                    'Unable to access user: {id}. ' \
-                    'Please check permissions.'.format(id = str(id_user)))
-            destination = map_user[id_user]
+        type_msg = msg.pop('type')
+        if type_msg == 'msg_dm':
 
-        elif type_msg == 'msg':
-            id_chan = map_msg.pop('id_channel')
-            if id_chan not in map_chan.keys() or map_chan[id_chan] is None:
-                map_chan[id_chan] = await bot.fetch_channel(id_chan)
-            if map_chan[id_chan] is None:
-                log.critical(
-                    'Unable to access channel: {id}. ' \
-                    'Please check permissions.'.format(id = str(id_chan)))
-            destination = map_chan[id_chan]
+            map_user = state['map_user']
+            id_user  = msg.pop('id_user')
+            if id_user not in map_user.keys():
+                map_user[id_user] = await bot.fetch_user(id_user)
+
+            if map_user[id_user] is None:
+                map_user[id_user] = await bot.fetch_user(id_user)
+
+            if map_user[id_user] is None:
+                log.critical('Unable to access user: {id}. ' \
+                             'Please check permissions.'.format(
+                                                            id = str(id_user)))
+
+            maybe_user_or_channel = map_user[id_user]
+
+        elif type_msg == 'msg_guild':
+
+            map_channel = state['map_channel']
+            id_chan  = msg.pop('id_channel')
+            if id_chan not in map_channel:
+                map_channel[id_chan] = await bot.fetch_channel(id_chan)
+
+            if map_channel[id_chan] is None:
+                map_channel[id_chan] = await bot.fetch_channel(id_chan)
+
+            if map_channel[id_chan] is None:
+                log.critical('Unable to access channel: {id}. ' \
+                             'Please check permissions.'.format(
+                                                            id = str(id_chan)))
+
+            maybe_user_or_channel = map_channel[id_chan]
 
         else:
-            raise RuntimeError(
-                    'Did not recognise message type: {type}'.format(
+            raise RuntimeError('Unknown message type: {type}'.format(
                                                             type = type_msg))
 
         # Messages are a dict with fields
@@ -445,88 +657,38 @@ def _discord_bot(cfg_bot,
         # in an in-memory buffer rather
         # than as a file handle.
         #
+        if 'file' in msg and isinstance(msg['file'], FileData):
+            file_data   = msg.pop('file')
+            msg['file'] = discord.File(
+                                fp          = io.BytesIO(file_data.buffer),
+                                filename    = file_data.filename,
+                                spoiler     = file_data.spoiler,
+                                description = file_data.description)
 
-        if 'file' in map_msg and isinstance(map_msg['file'], FileData):
-            file_data       = map_msg['file']
-            map_msg['file'] = discord.File(
-                                    fp          = io.BytesIO(file_data.buffer),
-                                    filename    = file_data.filename,
-                                    spoiler     = file_data.spoiler,
-                                    description = file_data.description)
+        if 'button' in msg and isinstance(msg['button'], ButtonData):
+            button_data = msg.pop('button')
+            msg['view'] = ButtonView(style    = discord.ButtonStyle.green,
+                                     label    = button_data.label,
+                                     id_btn   = button_data.id_btn,
+                                     callback = on_button)
 
-        if 'button' in map_msg and isinstance(map_msg['button'], ButtonData):
-            button_data     = map_msg.pop('button')
-            map_msg['view'] = ButtonView(
-                                    style    = discord.ButtonStyle.green,
-                                    label    = button_data.label,
-                                    id_btn   = button_data.id_btn,
-                                    callback = on_button_press_generic)
-
-        await destination.send(**map_msg)
-
-        return is_ok
+        if maybe_user_or_channel is not None:
+            await maybe_user_or_channel.send(**msg)
 
 
     # -------------------------------------------------------------------------
-    async def _service_cmd_queue(queue_cmd_to_bot, map_cmd):
+    def _validate_message_data(msg):
         """
-        Service command configuration from the system to discord.
+        Validate the provided msg dict.
+
+        Throws a ValueError if it is not valid.
 
         """
-        try:
-            cfg_cmd = queue_cmd_to_bot.get(block = False)
-        except queue.Empty:
-            is_ok = False
-            return is_ok
-        else:
-            is_ok = True
 
-        # Validate cfg_cmd.
-        #
-        tup_key_required = ('name', 'description')
-        for str_key in tup_key_required:
-            if str_key not in cfg_cmd:
-                raise ValueError(
-                        'Command configuration is '\
-                        'Missing key: {key}.'.format(key = str_key))
-            if not isinstance(cfg_cmd[str_key], str):
-                raise ValueError(
-                        'Command configuration {key} should be '\
-                        'a string. Got {typ} instead.'.format(
-                                key = str_key,
-                                typ = type(cfg_cmd[str_key]).__name__))
-
-        # ---------------------------------------------------------------------
-        async def on_command_generic(ctx, *args):
-            """
-            Generic command callback.
-
-            """
-            map_cmd = dict(type         = 'command',
-                           args         = ctx.args[1:],
-                           kwargs       = ctx.kwargs,
-                           prefix       = ctx.prefix,
-                           name_command = ctx.command.name,
-                           id_guild     = ctx.guild.id,
-                           name_guild   = ctx.guild.name,
-                           id_channel   = ctx.channel.id,
-                           name_channel = ctx.channel.name,
-                           id_author    = ctx.author.id,
-                           name_author  = ctx.author.name,
-                           nick_author  = ctx.author.nick)
-            try:
-                queue_cmd_from_bot.put(map_cmd, block = False)
-            except queue.Full:
-                log.error('Command input dropped. ' \
-                          'queue_cmd_from_bot is full.')
-
-        map_cmd[cfg_cmd['name']] = discord.ext.commands.Command(
-                                        on_command_generic,
-                                        name = cfg_cmd['name'],
-                                        help = cfg_cmd['description'])
-        bot.add_command(map_cmd[cfg_cmd['name']])
-
-        return is_ok
+        if not isinstance(msg, collections.abc.Mapping):
+            raise ValueError(
+                    'Invalid message recieved: {msg}'.format(
+                                                    msg = type(msg)))
 
 
     # -------------------------------------------------------------------------
@@ -536,6 +698,8 @@ def _discord_bot(cfg_bot,
         Handle errors in commands.
 
         """
+
+        log.error('on_command_error: "{err}"'.format(err = str(error)))
 
         # We make some specififc errors visible
         # to the user on the client side.
@@ -571,7 +735,7 @@ def _discord_bot(cfg_bot,
         This coroutine is intended to
         simply forward the content of
         the message to the rest of the
-        system via the queue_msg_from_bot
+        system via the queue_from_bot
         queue.
 
         """
@@ -583,30 +747,30 @@ def _discord_bot(cfg_bot,
 
         if message.content.startswith(BOT_COMMAND_PREFIX):
             return
-        
+
         if isinstance(message.channel, discord.DMChannel):
-            msg = dict(msg_type     = 'dm',
-                    id_prev      = None,
-                    id_msg       = message.id,
-                    id_author    = message.author.id,
-                    name_author  = message.author.name,
-                    id_channel   = message.channel.id,
-                    name_channel = None,
-                    content      = message.content)
+            item = dict(type         = 'msg_dm',
+                        id_msg       = message.id,
+                        id_author    = message.author.id,
+                        name_author  = message.author.name,
+                        content      = message.content)
+            log.info('DM: "{txt}"'.format(txt = message.content))
         else:
-            msg = dict(msg_type     = 'message',
-                    id_prev      = None,
-                    id_msg       = message.id,
-                    id_author    = message.author.id,
-                    name_author  = message.author.name,
-                    id_channel   = message.channel.id,
-                    name_channel = message.channel.name,
-                    content      = message.content)
+            item = dict(type         = 'msg_guild',
+                        id_prev      = None,
+                        id_msg       = message.id,
+                        id_author    = message.author.id,
+                        name_author  = message.author.name,
+                        id_channel   = message.channel.id,
+                        name_channel = message.channel.name,
+                        content      = message.content)
+            log.info('Guild message: "{txt}"'.format(txt = message.content))
 
         try:
-            queue_msg_from_bot.put(msg, block = False)
+            queue_from_bot.put(item, block = False)
         except queue.Full:
-            log.error('Message dropped. queue_msg_from_bot is full.')
+            log.error('Message dropped. queue_from_bot is full.')
+
 
     # -------------------------------------------------------------------------
     @bot.event
@@ -631,7 +795,7 @@ def _discord_bot(cfg_bot,
         This coroutine is intended to
         simply forward the content of
         the message to the rest of the
-        system via the queue_msg_from_bot
+        system via the queue_from_bot
         queue.
 
         """
@@ -643,50 +807,182 @@ def _discord_bot(cfg_bot,
             return
         
         if isinstance(msg_before.channel, discord.DMChannel):
-            msg = dict(msg_type     = 'dm',
-                       id_prev      = msg_before.id,
-                       id_msg       = msg_after.id,
-                       id_author    = msg_after.author.id,
-                       name_author  = msg_after.author.name,
-                       id_channel   = msg_after.channel.id,
-                       name_channel = None,
-                       content      = msg_after.content)
+            item = dict(type         = 'edit_dm',
+                        id_prev      = msg_before.id,
+                        id_msg       = msg_after.id,
+                        id_author    = msg_after.author.id,
+                        name_author  = msg_after.author.name,
+                        content      = msg_after.content)
+            log.info('DM edit: "{txt}"'.format(txt = message.content))
         else:
-            msg = dict(msg_type     = 'message',
-                       id_prev      = msg_before.id,
-                       id_msg       = msg_after.id,
-                       id_author    = msg_after.author.id,
-                       name_author  = msg_after.author.name,
-                       nick_author  = msg_after.author.nick,
-                       id_channel   = msg_after.channel.id,
-                       name_channel = msg_after.channel.name,
-                       content      = msg_after.content)
+            item = dict(msg_type     = 'edit_guild',
+                        id_prev      = msg_before.id,
+                        id_msg       = msg_after.id,
+                        id_author    = msg_after.author.id,
+                        name_author  = msg_after.author.name,
+                        nick_author  = msg_after.author.nick,
+                        id_channel   = msg_after.channel.id,
+                        name_channel = msg_after.channel.name,
+                        content      = msg_after.content)
+            log.info('Guild msg edit: "{txt}"'.format(txt = message.content))
 
         try:
-            queue_msg_from_bot.put(msg, block = False)
+            queue_from_bot.put(item, block = False)
         except queue.Full:
-            log.error('Message dropped. queue_msg_from_bot is full.')
+            log.error('Message dropped. queue_from_bot is full.')
 
 
     # -------------------------------------------------------------------------
-    @bot.command(name = "clear_all_messages")
-    async def clear_all_messages(ctx):
+    @bot.command(name = 'bot_sync_commands')
+    async def bot_sync_commands(
+                    ctx,
+                    operation:typing.Literal['global', 'guild'] = 'global'):
         """
-        Clear all messages in the channel.
+        Sync bot commands either globally or to a specific guild.
 
-        This is rate limited to about 2 commands
-        per second. (Discord server side rate
-        limit is 5 requests per second per API
-        token).
+        """
+
+        if not await bot.is_owner(ctx.author):
+            msg = 'Error: Only the bot owner is permitted ' \
+                  'to use the bot_sync_commands command.'
+            log.error(msg)
+            await ctx.send(msg)
+            return
+
+        elif operation == 'global':
+
+            tup_cmd   = bot.tree.get_commands()
+            count_cmd = len(tup_cmd)
+            msg       = 'Sync {count} commands to ' \
+                        'the global scope.'.format(count = count_cmd)
+            log.info(msg)
+            await ctx.send(msg)
+            for (idx, cmd) in enumerate(tup_cmd, start = 1):
+                msg = '{idx:02}: "{name}"'.format(idx  = idx,
+                                                  name = cmd.name)
+                log.info(msg)
+                await ctx.send(msg)
+            await bot.tree.sync()
+
+        elif operation == 'guild':
+
+            tup_cmd   = bot.tree.get_commands()
+            count_cmd = len(tup_cmd)
+            msg       = 'Sync {count} commands to ' \
+                        'the guild scope.'.format(count = count_cmd)
+            log.info(msg)
+            await ctx.send(msg)
+            for (idx, cmd) in enumerate(tup_cmd, start = 1):
+                msg = '{idx:02}: "{name}"'.format(idx  = idx,
+                                                  name = cmd.name)
+                log.info(msg)
+                await ctx.send(msg)
+            bot.tree.copy_global_to(guild = ctx.guild)
+            await bot.tree.sync(guild = ctx.guild)
+
+        else:
+
+            msg = 'Unsupported bot_sync_commands ' \
+                  'operation: "{op}".'.format(op = operation)
+            log.warning(msg)
+            await ctx.send(msg)
+
+
+    # -------------------------------------------------------------------------
+    @bot.command(name = 'bot_show_commands')
+    async def bot_show_commands(
+                    ctx,
+                    operation:typing.Literal['global', 'guild'] = 'global'):
+        """
+        Sync bot commands either globally or to a specific guild.
+
+        """
+
+        if not await bot.is_owner(ctx.author):
+            msg = 'Error: Only the bot owner is permitted ' \
+                  'to use the bot_show_commands command.'
+            log.error(msg)
+            await ctx.send(msg)
+            return
+
+        if operation == 'global':
+
+            tup_cmd   = bot.tree.get_commands()
+            count_cmd = len(tup_cmd)
+            msg       = 'There are {count} commands in the ' \
+                        'global scope.'.format(count = count_cmd)
+            log.info(msg)
+            await ctx.send(msg)
+            for (idx, cmd) in enumerate(tup_cmd, start = 1):
+                msg  = '{idx:02}: "{name}"'.format(idx  = idx,
+                                                   name = cmd.name)
+                log.info(msg)
+                await ctx.send(msg)
+
+        elif operation == 'guild':
+
+            tup_cmd   = bot.tree.get_commands(guild = ctx.guild)
+            count_cmd = len(tup_cmd)
+            msg       = 'There are {count} commands in the ' \
+                        'guild scope.'.format(count = count_cmd)
+            log.info(msg)
+            await ctx.send(msg)
+            for (idx, cmd) in enumerate(tup_cmd, start = 1):
+                msg  = '{idx:02}: "{name}"'.format(idx  = idx,
+                                                   name = cmd.name)
+                log.info(msg)
+                await ctx.send(msg)
+
+        else:
+
+            msg = 'Unsupported bot_show_commands ' \
+                  'operation: "{op}".'.format(op = operation)
+            log.warning(msg)
+            await ctx.send(msg)
+
+
+    # -------------------------------------------------------------------------
+    @bot.command(name = 'bot_delete_all_messages')
+    async def bot_delete_all_messages(ctx, limit:int = 100):
+        """
+        Delete all messages in the channel.
+
+        Function is rate limited on the client
+        side to about 1 deletion per second.
+
+        The Discord server side rate limit is
+        documented as being 5 requests per second
+        per API token, but in practice is somewhat
+        less than that.
 
         This requires the "Manage Messages" bot
         permission.
 
         """
 
-        async for message in ctx.channel.history(limit = 300):
-            await message.delete()
-            await asyncio.sleep(0.5)  # add delay to prevent hitting rate limits
+        if not await bot.is_owner(ctx.author):
+            msg = 'Error: Only the bot owner is permitted ' \
+                  'to use the bot_delete_all_messages command.'
+            log.error(msg)
+            await ctx.send(msg)
+            return
+
+        count = 0
+        async for msg in ctx.channel.history(limit = limit):
+            try:
+                await msg.delete()
+            except discord.Forbidden:
+                pass
+            except discord.HTTPException as err:
+                msg = 'Unable to delete message: {err}'.format(err = str(err))
+                log.error(msg)
+            else:
+                count += 1
+            finally:
+                await asyncio.sleep(1.0)
+
+        msg = 'Deleted {count} messages.'.format(count = count)
+        log.info(msg)
 
 
     # -------------------------------------------------------------------------

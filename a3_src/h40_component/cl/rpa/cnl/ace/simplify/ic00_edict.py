@@ -68,7 +68,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
      template_handler,
      workflow_handler) = cl.net.openai.client.ic00_edict.init_openai_client(
                 filepath_env  = cfg['filepath_env'],
-                envvar_key    = cfg.get('envvar_key',    'OPENAI_API_KEY'),
+                envvar_key    = cfg.get('envvar_key',    'APIKEY_OPENAI'),
                 is_bit        = cfg.get('is_bit',        True),  # Builtin test
                 is_async      = cfg.get('is_async',      False), # Asynchronous
                 secs_interval = cfg.get('secs_interval', 2),

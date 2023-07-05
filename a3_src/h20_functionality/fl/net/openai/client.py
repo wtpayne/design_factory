@@ -50,7 +50,8 @@ description:
 
     Here is an example of a result data structure:
 
-    {'error':       None,
+    {'type':        'openai_result'
+     'error':       None,
      'state':       {},
      'request':     {'engine':      '<OPENAI_MODEL_ID>',
                      'max_tokens':  100,
@@ -542,7 +543,8 @@ def _process_one_request(request_raw, default, is_bit):
                                                     request_raw = request_raw,
                                                     default     = default)
 
-    result  = dict(request  = request_full,
+    result  = dict(type     = 'openai_result',
+                   request  = request_full,
                    response = None,
                    error    = None,
                    state    = state)

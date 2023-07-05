@@ -68,7 +68,7 @@ node:
     state_type:     py_dict
     config:
       filepath_env:         Null
-      envvar_key:           OPENAI_API_KEY
+      envvar_key:           APIKEY_OPENAI
       secs_interval:        0.1
       is_bit:               False
       is_async:             True

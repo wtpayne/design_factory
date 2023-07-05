@@ -1,24 +1,24 @@
 system:
-  id_system: accord
+  id_system:                accord
 
 
 ###############################################################################
 host:
   localhost:
-    hostname:        'localhost'
-    acct_run:        ''
-    acct_provision:  ''
-    port_range:      '8090-9000'
-    dirpath_log:     ''
-    launch_cmd:      ''
-    environment:     'e003_accord'
-    log_level:       'TRACE'
+    hostname:               'localhost'
+    acct_run:               ''
+    acct_provision:         ''
+    port_range:             '8090-9000'
+    dirpath_log:            ''
+    launch_cmd:             ''
+    environment:            'e003_accord'
+    log_level:              'TRACE'
 
 
 ###############################################################################
 process:
   proc_main:
-    host: localhost
+    host:                   localhost
 
 
 ###############################################################################
@@ -28,79 +28,102 @@ node:
   # System clock and state management for the entire system.
   #
   ctrl_sys:
-    process:          proc_main
-    req_host_cfg:     default_configuration
+    process:                proc_main
+    req_host_cfg:           default_configuration
     functionality:
-      py_module:      cl.ctrl.sys.ic00_edict
-    state_type:       py_dict
+      py_module:            cl.ctrl.sys.ic00_edict
+    state_type:             py_dict
     config:
-      frequency_hz:   5
+      frequency_hz:         5
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
   #
   ctrl_main:
-    process:          proc_main
-    req_host_cfg:     default_configuration
+    process:                proc_main
+    req_host_cfg:           default_configuration
     functionality:
-      py_module:      cl.ctrl.proc.ic00_edict
-    state_type:       py_dict
+      py_module:            cl.ctrl.proc.ic00_edict
+    state_type:             py_dict
+
+  # ---------------------------------------------------------------------------
+  # Main deliberation engine.
+  #
+  deliberation:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            accord.deliberation.ic00_edict
+    state_type:             py_dict
+    config:
+      prompt:
+        summary:            |
+                            "Please provide a summary for the given
+                            transcript. The topic given to the
+                            participants was:
+
+                            '{str_topic}'
+
+                            Make sure that the summary highlights the
+                            main different points of view that have been
+                            expressed and the main arguments that have
+                            been put forward and suggests potential
+                            consensus solutions.
+
+                            '{str_transcript}'
+                            "
 
   # ---------------------------------------------------------------------------
   # Discord bot integration.
   #
-  msgmux:
-    process:          proc_main
-    req_host_cfg:     default_configuration
-    functionality:
-      py_module:      cl.net.discord.mux.ic00_edict
-    state_type:       py_dict
-
   discord:
-    process:          proc_main
-    req_host_cfg:     default_configuration
+    process:                proc_main
+    req_host_cfg:           default_configuration
     functionality:
-      py_module:      cl.net.discord.bot.ic00_edict
-    state_type:       py_dict
-    config:
-      filepath_env:   Null
-      envvar_key:     TOKEN_DISCORD_BOT_ACCORD
-      secs_sleep:     0.2
-
-  command:
-    process:          proc_main
-    req_host_cfg:     default_configuration
-    functionality:
-      py_module:      cl.net.discord.cmd.ic00_edict
-    state_type:       py_dict
-    config:
-      cmd:
-      - id_cmd:       ask
-        desc:         Create a deliberation session with a specific question.
-      - id_cmd:       summary
-        desc:         Summarise the responses so far.
-      - id_cmd:       debug
-        desc:         Print debug information.
-
-  # ---------------------------------------------------------------------------
-  # Meeting tasks
-  #
-  deliberation:
-    process:        proc_main
-    req_host_cfg:   default_configuration
-    functionality:
-      py_module:    accord.deliberation.ic00_edict
-    state_type:     py_dict
-
-  openai:
-    process:        proc_main
-    req_host_cfg:   default_configuration
-    functionality:
-      py_module:    cl.net.openai.request.ic00_edict
-    state_type:     py_dict
+      py_module:            cl.net.discord.bot.ic00_edict
+    state_type:             py_dict
     config:
       filepath_env:         Null
-      envvar_key:           OPENAI_API_KEY
+      envvar_key:           TOKEN_DISCORD_BOT_ACCORD
+      secs_sleep:           0.2
+      msg:
+      - type:               msg_dm
+        id_user:            563330464220446726
+        content:            "Accord has started OK."
+
+      - type:               cfg_appcmd
+        name:               dbg_transcript_show
+        description:        "Show the current transcript."
+
+      - type:               cfg_appcmd
+        name:               dbg_prompt_show
+        description:        "Show the currently configured prompts."
+
+      - type:               cfg_appcmd
+        name:               dbg_prompt_set
+        description:        "Set one of the configured prompts."
+        param:
+          id_prompt:        str
+          prompt:           str
+
+      - type:               cfg_appcmd
+        name:               ask
+        description:        "Create a deliberation session with a specific question."
+        param:
+          question:         str
+
+  # ---------------------------------------------------------------------------
+  # OpenAI ChatGPT integration.
+  #
+  openai:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.net.openai.request.ic00_edict
+    state_type:             py_dict
+    config:
+      filepath_env:         Null
+      envvar_key:           APIKEY_OPENAI
       secs_interval:        0.1
       is_bit:               False
       is_async:             True
@@ -114,33 +137,21 @@ node:
         frequency_penalty:  0.0
         user:               ''
 
-  distribution:
-    process:        proc_main
-    req_host_cfg:   default_configuration
-    functionality:
-      py_module:    accord.distribution.ic00_edict
-    state_type:     py_dict
-
   # ---------------------------------------------------------------------------
   # Logging.
   #
   log:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:                proc_main
+    req_host_cfg:           default_configuration
     functionality:
-      py_module:    cl.util.noop.ic00_edict
-    state_type:     py_dict
+      py_module:            cl.util.noop.ic00_edict
+    state_type:             py_dict
 
 
 ###############################################################################
 edge:
 
-# -----------------------------------------------------------------------------
-# Fan out from the system controller
-# component to all of the process
-# specific subsidiary controller
-# components.
-#
+# Control signals
 
 - owner: ctrl_sys
   data:  py_dict
@@ -149,84 +160,48 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
-  src:   ctrl_main.outputs.ctrl_discord
-  dst:   discord.inputs.ctrl
-
-- owner: ctrl_main
-  data:  py_dict
-  src:   ctrl_main.outputs.ctrl_command
-  dst:   command.inputs.ctrl
-
-- owner: ctrl_main
-  data:  py_dict
   src:   ctrl_main.outputs.ctrl_deliberation
   dst:   deliberation.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
-  src:   ctrl_main.outputs.ctrl_msgmux
-  dst:   msgmux.inputs.ctrl
+  src:   ctrl_main.outputs.ctrl_discord
+  dst:   discord.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_openai
+  dst:   openai.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_log
   dst:   log.inputs.ctrl
 
-#  Functional chain for discord bot configuration and mux/demux.
+# Discord integration
 
-- owner: msgmux
+- owner: deliberation
   data:  py_dict
-  src:   msgmux.outputs.msg
+  src:   deliberation.outputs.discord
   dst:   discord.inputs.msg
 
 - owner: discord
   data:  py_dict
-  src:   discord.outputs.cmd
-  dst:   command.inputs.cmd
-
-- owner: command
-  data:  py_dict
-  src:   command.outputs.cfg_cmd
-  dst:   discord.inputs.cfg_cmd
-  dirn:  feedback
-
-# Functional chain for summary generation.
-
-- owner: discord
-  data:  py_dict
   src:   discord.outputs.msg
-  dst:   deliberation.inputs.msg
-
-- owner: command
-  data:  py_dict
-  src:   command.outputs.cmd
-  dst:   deliberation.inputs.cmd
-
-- owner: deliberation
-  data:  py_dict
-  src:   deliberation.outputs.msg
-  dst:   msgmux.inputs.msg
+  dst:   deliberation.inputs.discord
   dirn:  feedback
 
+# OpenAI integration
+
 - owner: deliberation
   data:  py_dict
-  src:   deliberation.outputs.request
+  src:   deliberation.outputs.openai
   dst:   openai.inputs.request
 
 - owner: openai
   data:  py_dict
   src:   openai.outputs.result
-  dst:   distribution.inputs.result
-
-- owner: openai
-  data:  py_dict
-  src:   openai.outputs.error
-  dst:   log.inputs.error
-
-- owner: distribution
-  data:  py_dict
-  src:   distribution.outputs.msg
-  dst:   msgmux.inputs.summary
+  dst:   deliberation.inputs.openai
   dirn:  feedback
 
 # Logging
@@ -235,6 +210,11 @@ edge:
   data:  py_dict
   src:   discord.outputs.log
   dst:   log.inputs.discord
+
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.log
+  dst:   log.inputs.openai
 
 - owner: deliberation
   data:  py_dict

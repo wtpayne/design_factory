@@ -61,7 +61,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     (_, _, workflow_handler) = init_openai_client(
                 filepath_env  = cfg.get('filepath_env',  None),
-                envvar_key    = cfg.get('envvar_key',    'OPENAI_API_KEY'),
+                envvar_key    = cfg.get('envvar_key',    'APIKEY_OPENAI'),
                 api_key       = cfg.get('api_key',       None),
                 is_bit        = cfg.get('is_bit',        True),  # Builtin test
                 is_async      = cfg.get('is_async',      False), # Asynchronous
@@ -111,7 +111,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
 # -----------------------------------------------------------------------------
 def init_openai_client(filepath_env  = None,
-                       envvar_key    = 'OPENAI_API_KEY',
+                       envvar_key    = 'APIKEY_OPENAI',
                        api_key       = None,
                        is_bit        = True,  # Built-in-test
                        is_async      = False, # Asynchronous API access.

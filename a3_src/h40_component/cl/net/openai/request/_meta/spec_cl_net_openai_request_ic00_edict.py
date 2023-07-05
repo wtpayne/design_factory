@@ -84,7 +84,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               control_tier  = 'h10_resource',
                               relpath       = 'key/default.env')
         cfg_client     = dict(filepath_env  = filepath_env,
-                              envvar_key    = 'OPENAI_API_KEY',
+                              envvar_key    = 'APIKEY_OPENAI',
                               secs_interval = 0.001,
                               is_bit        = True,  # Built-in-test.
                               is_async      = False, # Asynchronous.

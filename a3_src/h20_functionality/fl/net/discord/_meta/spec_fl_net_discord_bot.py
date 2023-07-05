@@ -50,10 +50,11 @@ class SpecifyFlNetDiscordBotCoro:
         # bot.coro is a generator function, and
         # when we run it it spawns a subprocess.
         #
-        str_token         = key.load('TOKEN_DISCORD_BOT_ACCORD')
+        str_token         = key.load('TOKEN_DISCORD_BOT')
         proc_child_before = psutil.Process().children()
-        bot               = fl.net.discord.bot.coro({'str_token':  str_token,
-                                                     'secs_sleep': 0.1 })
+        cfg_bot           = dict(str_token  = str_token,
+                                 secs_sleep = 0.1)
+        bot               = fl.net.discord.bot.coro(cfg_bot = cfg_bot)
         assert inspect.isgenerator(bot)
         for _ in range(40):
             time.sleep(0.05)
@@ -64,14 +65,8 @@ class SpecifyFlNetDiscordBotCoro:
 
         # Sending nothing gets nothing back.
         #
-        list_msg_to_bot = []
-        list_cmd_to_bot = []
+        list_to_bot = []
 
-        (list_msg_from_bot,
-         list_cmd_from_bot,
-         list_log_from_bot) = bot.send((list_msg_to_bot,
-                                        list_cmd_to_bot))
+        (list_from_bot) = bot.send(list_to_bot)
 
-        assert list_msg_from_bot == []
-        assert list_cmd_from_bot == []
-        # assert list_log_from_bot == []
+        assert list_from_bot == []
