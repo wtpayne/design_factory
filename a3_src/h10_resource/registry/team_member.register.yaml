@@ -31,3 +31,9 @@ register:
   t004_az:
     name:
       Artem Zhiganov
+
+  t005_sg:
+    name:
+      Somebody Granonymous
+    alias:
+      - batmanosama
