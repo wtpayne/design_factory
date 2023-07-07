@@ -815,7 +815,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         content      = msg_after.content)
             log.info('DM edit: "{txt}"'.format(txt = msg_after.content))
         else:
-            item = dict(msg_type     = 'edit_guild',
+            item = dict(type         = 'edit_guild',
                         id_prev      = msg_before.id,
                         id_msg       = msg_after.id,
                         id_author    = msg_after.author.id,
