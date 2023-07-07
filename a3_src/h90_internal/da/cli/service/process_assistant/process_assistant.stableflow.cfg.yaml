@@ -315,7 +315,7 @@ node:
     state_type:     py_dict
     config:
       filepath_env:   Null
-      envvar_token:   TOKEN_DISCORD_BOT_PROCESS_ASSISTANT
+      key_token:      TOKEN_DISCORD_PROCESS_ASSISTANT
       secs_sleep:     0.5
 
 

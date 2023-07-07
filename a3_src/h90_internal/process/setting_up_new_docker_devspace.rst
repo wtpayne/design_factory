@@ -67,7 +67,7 @@ containing the Dockerfile using the 'cd' command.
 
 Run the following command, replacing <YOURUSERNAME> with your chosen username::
 
-   docker build --build-arg USERNAME=<YOURUSERNAME> -t accord .
+   docker build --build-arg USERNAME=<YOURUSERNAME> -t harmonica .
 
 Docker will start building the container based
 on the instructions in the Dockerfile.
@@ -81,7 +81,7 @@ container, you can run it using the following
 command, again replacing <YOURUSERNAME> with
 your chosen username::
 
-   docker run -v $(pwd):/home/<YOURUSERNAME> /dev -it accord /bin/bash
+   docker run -v $(pwd):/home/<YOURUSERNAME> /dev -it harmonica /bin/bash
 
 Note: If you are using Windows PowerShell,
 change ``$(pwd)`` to ``$(PWD)``.
@@ -175,7 +175,7 @@ Editing docker image files in VSC
 =================================
 
 1. Find the name of the container that is
-   currently running the accord docker image by
+   currently running the harmonica docker image by
    clicking on the 'Containers' tab in the top
    left of your docker app. Make a note of it.
 

@@ -87,7 +87,7 @@ to a server.
 Running your bot
 ================
 
-To run your version of the accord bot, make the
+To run your version of the harmonica bot, make the
 following changes to the df files:
 
 * Open the 'default.env' file in located in::
@@ -97,14 +97,14 @@ following changes to the df files:
 * Paste your token to the following line and
   save the file::
 
-    TOKEN_DISCORD_BOT_ACCORD='<YOUR_BOT_TOKEN>
+    TOKEN_DISCORD_<YOUR_BOT_NAME>='<YOUR_BOT_TOKEN>
 
 * Go to the discord server where your bot has
   been added and check that it has been added.
 * Once it has been added, make sure that the
   bot has the correct channels id's in::
 
-    ~/df/a3_src/h60_system/accord/accord.stableflow.cfg.yaml
+    ~/df/a3_src/h60_system/harmonica/harmonica.stableflow.cfg.yaml
 
   This can be found under the
   ``# Discord bot integration.`` section where

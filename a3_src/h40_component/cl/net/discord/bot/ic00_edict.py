@@ -64,7 +64,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     str_token    = cfg.get('str_token',     None)
     filepath_env = cfg.get('filepath_env',  None)
-    key_token    = cfg.get('key_token',     'TOKEN_DISCORD_BOT')
+    key_token    = cfg.get('key_token',     'TOKEN_DISCORD_DEFAULT')
     secs_sleep   = cfg.get('secs_sleep',    0.5)
     list_cfg_msg = cfg.get('msg',           list())
 

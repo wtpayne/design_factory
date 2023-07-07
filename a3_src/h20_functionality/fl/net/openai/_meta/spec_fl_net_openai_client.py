@@ -100,6 +100,7 @@ def testvector_completions_valid_bit():
         'prompt':           prompt_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -177,6 +178,7 @@ def testvector_chat_completions_valid_bit():
         'messages':         messages_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -256,6 +258,7 @@ def testvector_edits_valid_bit():
         'instruction':      instruction_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -329,6 +332,7 @@ def testvector_images_generations_valid_bit():
         'prompt':           prompt_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -404,6 +408,7 @@ def testvector_images_edits_valid_bit():
         'prompt':           prompt_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -476,6 +481,7 @@ def testvector_images_variations_valid_bit():
         'image':            image_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -552,6 +558,7 @@ def testvector_embeddings_valid_bit():
         'input':            input_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -631,6 +638,7 @@ def testvector_audio_transcriptions_valid_bit():
         'prompt':           prompt_test}
 
     result_valid = [{
+        'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -710,6 +718,7 @@ def testvector_audio_translations_valid_bit():
         'prompt':           prompt_test}
 
     result_valid = [{
+         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
@@ -870,7 +879,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_import_of_fl_net_openai_client(self):
         """
         fl.net.openai.client can be imported.
@@ -880,7 +889,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_creation_of_the_request_handler_coroutine(
                                             self,
                                             testvector_completions_valid_bit):
@@ -897,7 +906,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_creation_of_the_template_handler_coroutine(
                                             self,
                                             testvector_completions_valid_bit):
@@ -917,7 +926,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_creation_of_the_workflow_handler_coroutine(
                                             self,
                                             testvector_completions_valid_bit):
@@ -941,7 +950,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_validates_provided_configuration(self):
         """
         All fl.net.openai.client.coro_request_handler validates config.
@@ -953,7 +962,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_completions_input(
                         self,
                         testvector_completions_valid_bit,
@@ -1009,7 +1018,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_chat_completions_input(
                         self,
                         testvector_chat_completions_valid_bit,
@@ -1065,7 +1074,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_edits_input(
                         self,
                         testvector_edits_valid_bit,
@@ -1121,7 +1130,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_images_generations_input(
                         self,
                         testvector_images_generations_valid_bit,
@@ -1177,7 +1186,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_images_edits_input(
                         self,
                         testvector_images_edits_valid_bit,
@@ -1233,7 +1242,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_images_variations_input(
                         self,
                         testvector_images_variations_valid_bit,
@@ -1289,7 +1298,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_embeddings_input(
                         self,
                         testvector_embeddings_valid_bit,
@@ -1345,7 +1354,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_audio_transcriptions_input(
                         self,
                         testvector_audio_transcriptions_valid_bit,
@@ -1401,7 +1410,7 @@ class SpecifyFlNetOpenAiClient:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_yields_expected_bit_response_for_valid_audio_translations_input(
                         self,
                         testvector_audio_translations_valid_bit,

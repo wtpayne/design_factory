@@ -129,7 +129,8 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               usage         = {'completion_tokens': 20,
                                                'prompt_tokens':     10,
                                                'total_tokens':      30})
-        result_valid   = dict(error         = None,
+        result_valid   = dict(type          = 'openai_result',
+                              error         = None,
                               request       = {'messages': messages_test,
                                                'model':    id_model},
                               response      =  response_valid,

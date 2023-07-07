@@ -50,7 +50,7 @@ class SpecifyFlNetDiscordBotCoro:
         # bot.coro is a generator function, and
         # when we run it it spawns a subprocess.
         #
-        str_token         = key.load('TOKEN_DISCORD_BOT')
+        str_token         = key.load('TOKEN_DISCORD_DEFAULT')
         proc_child_before = psutil.Process().children()
         cfg_bot           = dict(str_token  = str_token,
                                  secs_sleep = 0.1)

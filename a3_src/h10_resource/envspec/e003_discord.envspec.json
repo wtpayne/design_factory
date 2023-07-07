@@ -47,7 +47,7 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
-    "# Packages required by accord.",
+    "# Packages required by the harmonica system.",
     "#",
 
     { "type": "pep508", "spec":    "appdirs==1.4.4"                           },

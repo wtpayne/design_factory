@@ -41,7 +41,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_import_of_cl_net_openai_client_e00_edict(self):
         """
         cl.net.openai.template.ic00_edict can be imported.
@@ -51,7 +51,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_supports_creation_of_the_main_coroutine(self):
         """
         cl.net.openai.template.ic00_edict:coro() can be created.
@@ -68,7 +68,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
-    @pytest.mark.e003_accord
+    @pytest.mark.e003_discord
     def it_runs(self):
         """
         cl.net.openai.template.ic00_edict:coro() rybs.
@@ -124,7 +124,8 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               usage         = {'completion_tokens': 20,
                                                'prompt_tokens':     10,
                                                'total_tokens':      30})
-        result_valid   = dict(error         = None,
+        result_valid   = dict(type          = 'openai_result',
+                              error         = None,
                               request       = {'messages': messages_test,
                                                'model':    id_model},
                               response      =  response_valid,

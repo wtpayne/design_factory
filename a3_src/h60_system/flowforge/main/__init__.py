@@ -103,7 +103,7 @@ def _configure_recent_files_list(ctx):
     _add_to_recent_files(
             ctx,
             da.env.path(control_tier = 'h60_system',
-                        relpath      = 'accord/accord.stableflow.cfg.yaml'))
+                        relpath      = 'harmonica/harmonica.stableflow.cfg.yaml'))
 
     # _add_to_recent_files(
     #         ctx,

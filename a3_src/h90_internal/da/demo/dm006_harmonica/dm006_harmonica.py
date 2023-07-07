@@ -3,11 +3,11 @@
 ---
 
 title:
-    "dm006_accord demo commands."
+    "dm006_harmonica demo commands."
 
 description:
     "This module defines commands for the 
-    dm006_accord demonstration."
+    dm006_harmonica demonstration."
 
 id:
     "0eb2b163-d4af-4b9d-8309-8f7b795f0aca"
@@ -62,7 +62,7 @@ def test():
 
     _run   = da.test.run
     _path  = da.env.path
-    ID_ENV = 'e003_accord'
+    ID_ENV = 'e003_discord'
 
     return _run(id_env    = ID_ENV,
                 iter_path = (_path(control_tier = 'h20_functionality',
@@ -78,7 +78,7 @@ def test():
                                    relpath      = 'cl/net/openai',
                                    id_env       = ID_ENV),
                              _path(control_tier = 'h60_system',
-                                   relpath      = 'accord',
+                                   relpath      = 'harmonica',
                                    id_env       = ID_ENV)))
 
 
@@ -119,7 +119,7 @@ def _dirpath_log():
     import da.env
     return da.env.path(process_area = 'a4_tmp',
                        control_tier = 'h80_research',
-                       relpath      = 'dm006_accord')
+                       relpath      = 'dm006_harmonica')
 
 
 # -----------------------------------------------------------------------------
@@ -147,7 +147,7 @@ def _filepath_cfg():
     return da.env.path(
                 process_area = 'a3_src',
                 control_tier = 'h60_system',
-                relpath      = 'accord/accord.stableflow.cfg.yaml')
+                relpath      = 'harmonica/harmonica.stableflow.cfg.yaml')
 
 
 # -----------------------------------------------------------------------------

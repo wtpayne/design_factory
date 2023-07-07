@@ -1,5 +1,5 @@
 system:
-  id_system:                accord
+  id_system:                harmonica
 
 
 ###############################################################################
@@ -11,7 +11,7 @@ host:
     port_range:             '8090-9000'
     dirpath_log:            ''
     launch_cmd:             ''
-    environment:            'e003_accord'
+    environment:            'e003_discord'
     log_level:              'TRACE'
 
 
@@ -53,7 +53,7 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            accord.deliberation.ic00_edict
+      py_module:            harmonica.deliberation.ic00_edict
     state_type:             py_dict
     config:
       prompt:
