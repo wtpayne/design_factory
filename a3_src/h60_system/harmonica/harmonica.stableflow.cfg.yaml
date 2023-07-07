@@ -84,12 +84,12 @@ node:
     state_type:             py_dict
     config:
       filepath_env:         Null
-      key_token:            TOKEN_DISCORD_HARMONICA_DEV
+      key_token:            TOKEN_DISCORD_HARMONICA_PRD
       secs_sleep:           0.2
       msg:
       - type:               msg_dm
         id_user:            563330464220446726
-        content:            "Accord has started OK."
+        content:            "Harmonica has started OK."
 
       - type:               cfg_appcmd
         name:               dbg_transcript_show

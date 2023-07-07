@@ -1,6 +1,6 @@
-==========================================
-Accord Docker Container Installation Guide
-==========================================
+===================================
+Docker Container Installation Guide
+===================================
 
 This process provides guidance on how to set up
 a docker container as a development environment.

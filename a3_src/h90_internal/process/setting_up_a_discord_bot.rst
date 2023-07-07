@@ -3,7 +3,7 @@ Creating a Discord Bot
 ======================
 
 This process provides guidance on how to set up
-a new instance of the Accord discord bot.
+a new instance of the Harmonica discord bot.
 
 .. contents:: Table of Contents
    :local:
@@ -56,29 +56,13 @@ to a server.
 #. Under 'Bot Permissions', enable each of the
    following permissions::
 
-    * Create Instant Invite
-    * Change Nickname
-    * Create Expressions
     * Read Messages/View Channels
-    * Create Events
     * Send Messages
-    * Create Public Threads
-    * Send Messages In Threads
+    * Manage Messages
     * Embed Links
     * Attach Files
     * Read Message History
-    * Use External Emojis
-    * Use External Stickers
     * Add Reactions
-    * Use Slash Commands
-    * Connect
-    * Speak
-    * Video
-    * Use Voice Activity
-    * Request To Speak
-    * Use Embedded Activities
-    * Use Soundboard
-    * Use External Sounds
 
 #. Copy the generated URL and open it in your
    web browser to add your bot to a server.
