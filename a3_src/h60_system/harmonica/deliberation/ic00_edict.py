@@ -220,8 +220,14 @@ def _on_btn_join(state, msg):
     if id_user in state['user']:
         id_session_prev  = state['user'][id_user]['session']
         map_session_prev = state['session'][id_session_prev]
-        map_session_prev['participant'].remove(id_user)
-        map_session_prev['contributor'].remove(id_user)
+        try:
+            map_session_prev['participant'].remove(id_user)
+        except KeyError:
+            pass
+        try:
+            map_session_prev['contributor'].remove(id_user)
+        except KeyError:
+            pass
 
     # Add the user to the current session.
     #
