@@ -813,7 +813,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_author    = msg_after.author.id,
                         name_author  = msg_after.author.name,
                         content      = msg_after.content)
-            log.info('DM edit: "{txt}"'.format(txt = message.content))
+            log.info('DM edit: "{txt}"'.format(txt = msg_after.content))
         else:
             item = dict(msg_type     = 'edit_guild',
                         id_prev      = msg_before.id,
@@ -824,7 +824,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_channel   = msg_after.channel.id,
                         name_channel = msg_after.channel.name,
                         content      = msg_after.content)
-            log.info('Guild msg edit: "{txt}"'.format(txt = message.content))
+            log.info('Guild msg edit: "{txt}"'.format(txt = msg_after.content))
 
         try:
             queue_from_bot.put(item, block = False)

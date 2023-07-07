@@ -84,7 +84,7 @@ node:
     state_type:             py_dict
     config:
       filepath_env:         Null
-      envvar_key:           TOKEN_DISCORD_BOT_ACCORD
+      key_token:            TOKEN_DISCORD_HARMONICA_DEV
       secs_sleep:           0.2
       msg:
       - type:               msg_dm
