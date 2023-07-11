@@ -172,6 +172,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     import copy
     import functools
     import io
+    import itertools
     import keyword
     import logging
     import os
