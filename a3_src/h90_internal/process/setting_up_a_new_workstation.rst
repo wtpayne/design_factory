@@ -87,23 +87,38 @@ the source repository has been checked out to
    git clone https://github.com/wtpayne/design_factory.git df
 
 
-5. Get development API keys
----------------------------
+5. Get development API keys and tokens
+--------------------------------------
 
-Obtain the development API keys from the team
-member responsible (currently t000_wtp).
+If you are working on a system, functional chain
+or component that makes use of a third party API
+(e.g. OpenAI or Discord) they you will likely need
+to set up your own API keys or tokens. Please
+refer to the relevant procedure for more detailed
+instructions.
 
-This file contains the development API key so
-keep it secret and do not commit it, or share
-it with others in any way.
+In production, these API keys and tokens are
+stored in environment variables. During
+development, we use a default.env file to
+simplify the management of these secrets::
 
-These will be provided as a default.env file,
-compressed as a .tar.gz. Download this file,
-decompress it, and move it to the resource/key
-directory::
+   <REPO_ROOT>/a3_src/h10_resource/key/default.env
 
-   tar -xzf ./default.env.tar.gz
-   mv default.env ~/dev/df/a3_src/h10_resource/key
+This file contains a number of API keys and
+tokens stored as key=value pairs::
+
+   TOKEN_DISCORD_DEFAULT=<....>
+   TOKEN_DISCORD_HARMONICA_DEV=<....>
+   TOKEN_DISCORD_HARMONICA_UAT=<....>
+   TOKEN_DISCORD_HARMONICA_PRD=<....>
+   TOKEN_DISCORD_PROCESS_ASSISTANT=<....>
+   APIKEY_OPENAI=<....>
+
+Each developer should create their own version of
+this file with their own keys. Take care not to
+commit this file or to share it with others. If
+this happens accidentally, regenerate your keys
+or tokens as quickly as possible.
 
 
 6. Run the system

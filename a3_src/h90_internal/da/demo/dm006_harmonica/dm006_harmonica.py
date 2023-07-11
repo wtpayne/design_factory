@@ -83,30 +83,116 @@ def test():
 
 
 # -----------------------------------------------------------------------------
-def start():
+def dev_start():
     """
-    Start dm006 system.
+    Start a development instance of the dm006 system.
 
     """
-
-    tup_overrides = ('host.localhost.dirpath_log',          _dirpath_log(),
-                     'node.discord.config.filepath_dotenv', _filepath_dotenv(),
-                     'host.localhost.acct_run',             _username())
 
     import da.env.run
-    sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
-                                         tup_overrides = tup_overrides))
+    sys.exit(da.env.run.stableflow_start(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'DEV')))
 
 
 # -----------------------------------------------------------------------------
-def stop():
+def dev_stop():
     """
-    Stop dm006 system.
+    Stop any running development instances of the dm006 system.
 
     """
 
     import da.env.run
-    sys.exit(da.env.run.stableflow_stop(path_cfg = _filepath_cfg()))
+    sys.exit(da.env.run.stableflow_stop(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'DEV')))
+
+
+# -----------------------------------------------------------------------------
+def uat_start():
+    """
+    Start a user acceptance testing instance of the dm006 system.
+
+    """
+
+    import da.env.run
+    sys.exit(da.env.run.stableflow_start(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'UAT')))
+
+
+# -----------------------------------------------------------------------------
+def uat_stop():
+    """
+    Stop any running user acceptance testing instances of the dm006 system.
+
+    """
+
+    import da.env.run
+    sys.exit(da.env.run.stableflow_stop(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'UAT')))
+
+
+# -----------------------------------------------------------------------------
+def prd_start():
+    """
+    Start a production instance of the dm006 system.
+
+    """
+
+    import da.env.run
+    sys.exit(da.env.run.stableflow_start(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'PRD')))
+
+
+# -----------------------------------------------------------------------------
+def prd_stop():
+    """
+    Stop any running production instances of the dm006 system.
+
+    """
+
+    import da.env.run
+    sys.exit(da.env.run.stableflow_stop(
+                                path_cfg      = _filepath_cfg(),
+                                tup_overrides = _overrides(stage = 'PRD')))
+
+
+# -----------------------------------------------------------------------------
+def _overrides(stage = 'PRD'):
+    """
+    Return the standard tuple of configuration overrides.
+
+    """
+    tup_overrides = (
+        'host.localhost.dirpath_log',         _dirpath_log(),
+        'node.log_event.config.dirpath_log',  _dirpath_log(),
+        'node.log_metric.config.dirpath_log', _dirpath_log(),
+        'node.log_data.config.dirpath_log',   _dirpath_log(),
+        'node.discord.config.filepath_env',   _filepath_env(),
+        'host.localhost.acct_run',            _username())
+
+    if stage == 'DEV':
+        tup_overrides += (
+            # 'system.id_system',               'harmonica_dev',
+            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_DEV')
+
+    elif stage == 'UAT':
+        tup_overrides += (
+            # 'system.id_system',               'harmonica_uat',
+            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_UAT')
+
+    elif stage == 'PRD':
+        tup_overrides += (
+            # 'system.id_system',               'harmonica',
+            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_PRD')
+
+    else:
+        raise RuntimeError('Logic error. Did not recognise development stage.')
+
+    return tup_overrides
 
 
 # -----------------------------------------------------------------------------
@@ -123,7 +209,7 @@ def _dirpath_log():
 
 
 # -----------------------------------------------------------------------------
-def _filepath_dotenv():
+def _filepath_env():
     """
     Return the filepath to the dotenv .env file containing the API key.
 

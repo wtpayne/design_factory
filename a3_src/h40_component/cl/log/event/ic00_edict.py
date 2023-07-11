@@ -3,13 +3,13 @@
 ---
 
 title:
-    "Multiplexer stableflow-edict component."
+    "Event logging stableflow-edict component."
 
 description:
-    "."
+    "Event logging component. Records log events"
 
 id:
-    "6ffedbc1-d2d1-4731-bf64-30ecaed26c85"
+    "a735fe84-a53d-49d7-b80f-272dcee3b716"
 
 type:
     dt004_python_stableflow_edict_component
@@ -44,38 +44,41 @@ license:
 """
 
 
-import fl.util
+import fl.log.event
+import fl.util.edict
 
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Enabled dictionary multiplexer component coroutine.
+    Event log persistence component coroutine.
 
     """
 
-    map_ts   = dict()
-    list_msg = list()
+    set_key_all   = set(inputs.keys())
+    set_key_ctrl  = set(('ctrl', ))
+    set_key_event = set_key_all - set_key_ctrl
 
-    signal = None
-    fl.util.edict.init(outputs)
+    writer = fl.log.event.writer(id_system   = runtime['id']['id_system'],
+                                 dirpath_log = cfg.get('dirpath_log', None))
+
+    # Main loop.
+    #
+    signal = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
 
-        map_ts.clear()
-        list_msg.clear()
+        if not inputs['ctrl']['ena']:
+            continue
 
-        for (id_in, pkt_in) in inputs.items():
-            if not pkt_in['ena']:
-                continue
-            if id_in == 'ctrl':
-                map_ts = pkt_in['ts']
-                continue
-            list_msg.extend(pkt_in['list'])
+        timestamp = inputs['ctrl']['ts']
 
-        if list_msg:
-            for (id_out, pkt_out) in outputs.items():
-                pkt_out['ena'] = True
-                pkt_out['ts'].update(map_ts)
-                pkt_out['list'][:] = list_msg
+        for key in set_key_event:
+            packet = inputs[key]
+
+            if not packet['ena']:
+                continue
+
+            for item in packet['list']:
+                writer.send(item)

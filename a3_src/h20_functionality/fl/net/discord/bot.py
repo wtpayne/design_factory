@@ -48,20 +48,21 @@ license:
 
 import asyncio
 import collections
+import logging
 import multiprocessing
 import os
 import queue
 
 import fl.util
+import fl.log.event
 
 
-BOT_COMMAND_PREFIX = '/'
+PREFIX_COMMAND = '/'
 
 
 # This global register exists so that we
-# can reference callbacks and loggers from
-# generated code that is being evaluated
-# with eval().
+# can reference callbacks from generated
+# code that is being evaluated with eval().
 #
 map_register = dict()
 
@@ -86,7 +87,7 @@ def coro(cfg_bot):
 
     """
 
-    for str_key in ('str_token', 'secs_sleep'):
+    for str_key in ('str_token', 'secs_sleep', 'id_system', 'id_node'):
         if str_key not in cfg_bot:
             raise ValueError(
                 'Missing required configuration: {key}'.format(key = str_key))
@@ -98,6 +99,14 @@ def coro(cfg_bot):
     if not isinstance(cfg_bot['secs_sleep'], (int, float)):
         raise ValueError(
                 'cfg_bot["secs_sleep"] must be an integer or float value.')
+
+    if not isinstance(cfg_bot['id_system'], str):
+        raise ValueError(
+                'cfg_bot["id_system"] must be a string.')
+
+    if not isinstance(cfg_bot['id_node'], str):
+        raise ValueError(
+                'cfg_bot["id_node"] must be a string.')
 
     str_name_process = 'discord-bot'
     fcn_bot          = _discord_bot
@@ -134,7 +143,7 @@ def coro(cfg_bot):
                 queue_to_bot.put(item, block = False)
             except queue.Full as err:
                 list_from_bot.append(
-                        dict(type    = 'log',
+                        dict(type    = 'log_event',
                              content = 'Item dropped: queue_to_bot is full.'))
 
         # Retrieve any user messages, command
@@ -160,6 +169,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     """
 
     import collections.abc
+    import copy
     import functools
     import io
     import keyword
@@ -173,6 +183,39 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     import discord.ext
     import discord.ext.commands
 
+    # We distinguish between event logging, metric
+    # logging and data logging. Event logging is
+    # primarily concerned with qualtitatively
+    # recording the occurrence of significant
+    # events such as errors or warnings. Metric
+    # logging by contrast is primarily concerned
+    # with regular quantitative measurements of
+    # performance characteristics of the system.
+    # Finally, data logging is primarily concerned
+    # with recording functional chain inputs and
+    # outputs for resimulation and regression
+    # testing. We use two event loggers here.
+    # One is set up by discord.py, and another
+    # is set up here to handle logging in this
+    # wrapper.
+    #
+    list_log_event = list()
+    map_log_metric = dict(type = 'log_metric')
+
+    id_system       = cfg_bot.get('id_system', None)
+    id_node         = cfg_bot.get('id_node',   None)
+    level_log_event = cfg_bot.get('level_log', logging.INFO)
+
+    if id_system and id_node:
+        id_log_event = '{id_sys}.{id_node}.bot'.format(id_sys  = id_system,
+                                                       id_node = id_node)
+    else:
+        id_log_event = 'discord.bot'
+    log_event         = logging.getLogger(id_log_event)
+    handler_log_event = fl.log.event.ListHandler(list_log_event)
+    log_event.addHandler(handler_log_event)
+    log_event.setLevel(level_log_event)
+
     intents                 = discord.Intents.default()
     intents.guilds          = True
     intents.dm_messages     = True
@@ -182,15 +225,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     intents.reactions       = True
     intents.guild_messages  = True
     bot                     = discord.ext.commands.Bot(
-                                        command_prefix = BOT_COMMAND_PREFIX,
-                                        intents        = intents)
-
-    id_admin   = cfg_bot.get('id_admin', None)
-    buffer_log = io.StringIO()
-    loghandler = logging.StreamHandler(buffer_log)
-    log        = logging.getLogger('discord')
-    map_register['log'] = log
-
+                                            command_prefix = PREFIX_COMMAND,
+                                            intents        = intents)
 
     # -------------------------------------------------------------------------
     @bot.event
@@ -208,7 +244,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         """
 
-        log.info('Discord bot is ready.')
+        log_event.info('Discord bot is ready.')
         task_msg = bot.loop.create_task(coro = _service_all_queues(
                                                             cfg_bot,
                                                             queue_to_bot,
@@ -279,20 +315,38 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         """
 
-        str_buffer = buffer_log.getvalue()
-        if not str_buffer:
-            return
+        # Send event log.
+        #
+        while list_log_event:
+            event   = list_log_event.pop(0)
+            message = dict(type         = 'log_event',
+                           name         = event.name,
+                           level        = event.levelname,
+                           pathname     = event.pathname,
+                           lineno       = event.lineno,
+                           msg          = event.msg,
+                           args         = event.args,
+                           exc_info     = event.exc_info,
+                           created      = event.created,
+                           thread       = event.thread,
+                           thread_name  = event.threadName,
+                           process      = event.process,
+                           process_name = event.processName)
 
-        try:
-            for str_line in str_buffer.split('\n'):
-                if not str_line:
-                    continue
-                queue_from_bot.put(dict(type    = 'log',
-                                        content = str_line),
-                                   block = False)
-        except queue.Full:
-            log.error('One or more log messages dropped. ' \
-                      'queue_from_bot is full.')
+            try:
+                queue_from_bot.put(message, block = False)
+            except queue.Full:
+                log_event.error('One or more log_event messages ' \
+                                'dropped. queue_from_bot is full.')
+                break
+
+        # Send metrics log.
+        #
+        # try:
+        #     queue_from_bot.put(copy.deepcopy(log_metric), block = False)
+        # except queue.Full:
+        #     log_event.error('One or more log_metric messages dropped. ' \
+        #                     'queue_from_bot is full.')
 
 
     # ---------------------------------`---------------------------------------
@@ -335,7 +389,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if str_type == 'cfg_msgcmd':
 
             str_name = cfg_cmd['name']
-            log.info('Configure msgcmd {name}.'.format(name = str_name))
+            log_event.info('Configure msgcmd {name}.'.format(name = str_name))
 
             str_desc = cfg_cmd['description']
             obj_cmd  = discord.ext.commands.Command(map_register['on_cmd'],
@@ -349,7 +403,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         elif str_type == 'cfg_appcmd':
 
             str_name = cfg_cmd['name']
-            log.info('Configure appcmd {name}.'.format(name = str_name))
+            log_event.info('Configure appcmd {name}.'.format(name = str_name))
 
             str_desc   = cfg_cmd['description']
             map_param  = cfg_cmd.get('param', dict())
@@ -470,7 +524,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         """
 
-        log.debug('Msgcmd "{name}" invoked.'.format(name = ctx.command.name))
+        log_event.debug(
+                    'Msgcmd "{name}" invoked.'.format(name = ctx.command.name))
         if ctx.guild is None:
             map_cmd  = dict(type         = 'msgcmd_dm')
         else:
@@ -487,7 +542,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log.error('Command input dropped: queue_from_bot is full.')
+            log_event.error('Command input dropped: queue_from_bot is full.')
 
     # Update the global callback register so that
     # on_cmd can be called from generated code
@@ -509,8 +564,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         """
 
         await interaction.response.defer(ephemeral = True)
-        log.debug('Appcmd "{name}" invoked.'.format(
-                                            name = interaction.command.name))
+        log_event.debug(
+            'Appcmd "{name}" invoked.'.format(name = interaction.command.name))
         if interaction.guild is None:
             map_cmd  = dict(type         = 'appcmd_dm')
         else:
@@ -528,7 +583,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log.error('Command input dropped: queue_from_bot is full.')
+            log_event.error('Command input dropped: queue_from_bot is full.')
         await interaction.followup.send('OK', ephemeral = True)
 
     # Update the global callback register so that
@@ -547,7 +602,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         await interaction.response.defer(ephemeral = True)
         id_btn = interaction.data['custom_id']
-        log.debug('Button pressed: {id}'.format(id = id_btn))
+        log_event.debug('Button pressed: {id}'.format(id = id_btn))
 
         map_cmd = dict(type       = 'btn',
                        id_btn     = id_btn,
@@ -557,7 +612,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log.error('Button input dropped: queue_from_bot is full.')
+            log_event.error('Button input dropped: queue_from_bot is full.')
 
 
     # =========================================================================
@@ -613,9 +668,9 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                 map_user[id_user] = await bot.fetch_user(id_user)
 
             if map_user[id_user] is None:
-                log.critical('Unable to access user: {id}. ' \
-                             'Please check permissions.'.format(
-                                                            id = str(id_user)))
+                log_event.critical(
+                        'Unable to access user: {id}. ' \
+                        'Please check permissions.'.format(id = str(id_user)))
 
             maybe_user_or_channel = map_user[id_user]
 
@@ -630,9 +685,9 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                 map_channel[id_chan] = await bot.fetch_channel(id_chan)
 
             if map_channel[id_chan] is None:
-                log.critical('Unable to access channel: {id}. ' \
-                             'Please check permissions.'.format(
-                                                            id = str(id_chan)))
+                log_event.critical(
+                        'Unable to access channel: {id}. ' \
+                        'Please check permissions.'.format(id = str(id_chan)))
 
             maybe_user_or_channel = map_channel[id_chan]
 
@@ -699,7 +754,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         """
 
-        log.error('on_command_error: "{err}"'.format(err = str(error)))
+        log_event.error('on_command_error: "{err}"'.format(err = str(error)))
 
         # We make some specififc errors visible
         # to the user on the client side.
@@ -745,7 +800,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if message.author.bot:
             return
 
-        if message.content.startswith(BOT_COMMAND_PREFIX):
+        if message.content.startswith(PREFIX_COMMAND):
             return
 
         if isinstance(message.channel, discord.DMChannel):
@@ -754,7 +809,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_author    = message.author.id,
                         name_author  = message.author.name,
                         content      = message.content)
-            log.info('DM: "{txt}"'.format(txt = message.content))
+            log_event.info('DM: "{txt}"'.format(txt = message.content))
         else:
             item = dict(type         = 'msg_guild',
                         id_prev      = None,
@@ -764,12 +819,12 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_channel   = message.channel.id,
                         name_channel = message.channel.name,
                         content      = message.content)
-            log.info('Guild message: "{txt}"'.format(txt = message.content))
+            log_event.info('Guild message: "{txt}"'.format(txt = message.content))
 
         try:
             queue_from_bot.put(item, block = False)
         except queue.Full:
-            log.error('Message dropped. queue_from_bot is full.')
+            log_event.error('Message dropped. queue_from_bot is full.')
 
 
     # -------------------------------------------------------------------------
@@ -803,7 +858,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if msg_after.author.bot:
             return
 
-        if msg_after.content.startswith(BOT_COMMAND_PREFIX):
+        if msg_after.content.startswith(PREFIX_COMMAND):
             return
         
         if isinstance(msg_before.channel, discord.DMChannel):
@@ -813,7 +868,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_author    = msg_after.author.id,
                         name_author  = msg_after.author.name,
                         content      = msg_after.content)
-            log.info('DM edit: "{txt}"'.format(txt = msg_after.content))
+            log_event.info('DM edit: "{txt}"'.format(txt = msg_after.content))
         else:
             item = dict(type         = 'edit_guild',
                         id_prev      = msg_before.id,
@@ -824,12 +879,12 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                         id_channel   = msg_after.channel.id,
                         name_channel = msg_after.channel.name,
                         content      = msg_after.content)
-            log.info('Guild msg edit: "{txt}"'.format(txt = msg_after.content))
+            log_event.info('Guild msg edit: "{txt}"'.format(txt = msg_after.content))
 
         try:
             queue_from_bot.put(item, block = False)
         except queue.Full:
-            log.error('Message dropped. queue_from_bot is full.')
+            log_event.error('Message dropped. queue_from_bot is full.')
 
 
     # -------------------------------------------------------------------------
@@ -845,7 +900,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if not await bot.is_owner(ctx.author):
             msg = 'Error: Only the bot owner is permitted ' \
                   'to use the bot_sync_commands command.'
-            log.error(msg)
+            log_event.error(msg)
             await ctx.send(msg)
             return
 
@@ -855,12 +910,12 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             count_cmd = len(tup_cmd)
             msg       = 'Sync {count} commands to ' \
                         'the global scope.'.format(count = count_cmd)
-            log.info(msg)
+            log_event.info(msg)
             await ctx.send(msg)
             for (idx, cmd) in enumerate(tup_cmd, start = 1):
                 msg = '{idx:02}: "{name}"'.format(idx  = idx,
                                                   name = cmd.name)
-                log.info(msg)
+                log_event.info(msg)
                 await ctx.send(msg)
             await bot.tree.sync()
 
@@ -870,12 +925,12 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             count_cmd = len(tup_cmd)
             msg       = 'Sync {count} commands to ' \
                         'the guild scope.'.format(count = count_cmd)
-            log.info(msg)
+            log_event.info(msg)
             await ctx.send(msg)
             for (idx, cmd) in enumerate(tup_cmd, start = 1):
                 msg = '{idx:02}: "{name}"'.format(idx  = idx,
                                                   name = cmd.name)
-                log.info(msg)
+                log_event.info(msg)
                 await ctx.send(msg)
             bot.tree.copy_global_to(guild = ctx.guild)
             await bot.tree.sync(guild = ctx.guild)
@@ -884,7 +939,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
             msg = 'Unsupported bot_sync_commands ' \
                   'operation: "{op}".'.format(op = operation)
-            log.warning(msg)
+            log_event.warning(msg)
             await ctx.send(msg)
 
 
@@ -901,7 +956,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if not await bot.is_owner(ctx.author):
             msg = 'Error: Only the bot owner is permitted ' \
                   'to use the bot_show_commands command.'
-            log.error(msg)
+            log_event.error(msg)
             await ctx.send(msg)
             return
 
@@ -911,12 +966,12 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             count_cmd = len(tup_cmd)
             msg       = 'There are {count} commands in the ' \
                         'global scope.'.format(count = count_cmd)
-            log.info(msg)
+            log_event.info(msg)
             await ctx.send(msg)
             for (idx, cmd) in enumerate(tup_cmd, start = 1):
                 msg  = '{idx:02}: "{name}"'.format(idx  = idx,
                                                    name = cmd.name)
-                log.info(msg)
+                log_event.info(msg)
                 await ctx.send(msg)
 
         elif operation == 'guild':
@@ -925,19 +980,19 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             count_cmd = len(tup_cmd)
             msg       = 'There are {count} commands in the ' \
                         'guild scope.'.format(count = count_cmd)
-            log.info(msg)
+            log_event.info(msg)
             await ctx.send(msg)
             for (idx, cmd) in enumerate(tup_cmd, start = 1):
                 msg  = '{idx:02}: "{name}"'.format(idx  = idx,
                                                    name = cmd.name)
-                log.info(msg)
+                log_event.info(msg)
                 await ctx.send(msg)
 
         else:
 
             msg = 'Unsupported bot_show_commands ' \
                   'operation: "{op}".'.format(op = operation)
-            log.warning(msg)
+            log_event.warning(msg)
             await ctx.send(msg)
 
 
@@ -963,7 +1018,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         if not await bot.is_owner(ctx.author):
             msg = 'Error: Only the bot owner is permitted ' \
                   'to use the bot_delete_all_messages command.'
-            log.error(msg)
+            log_event.error(msg)
             await ctx.send(msg)
             return
 
@@ -975,23 +1030,20 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                 pass
             except discord.HTTPException as err:
                 msg = 'Unable to delete message: {err}'.format(err = str(err))
-                log.error(msg)
+                log_event.error(msg)
             else:
                 count += 1
             finally:
                 await asyncio.sleep(1.0)
 
         msg = 'Deleted {count} messages.'.format(count = count)
-        log.info(msg)
+        log_event.info(msg)
 
 
     # -------------------------------------------------------------------------
     # Run the client.
     #
-    # bot.run(token       = cfg_bot['str_token'],
-    #         reconnect   = False,
-    #         log_level   = logging.INFO,
-    #         log_handler = loghandler)
     bot.run(token       = cfg_bot['str_token'],
             reconnect   = False,
-            log_level   = logging.INFO)
+            log_handler = handler_log_event,
+            log_level   = level_log_event)

@@ -48,6 +48,7 @@ import collections
 import uuid
 
 import fl.util
+import fl.util.edict
 import key
 
 import fl.net.discord.bot
@@ -220,10 +221,12 @@ def _on_btn_join(state, msg):
     if id_user in state['user']:
         id_session_prev  = state['user'][id_user]['session']
         map_session_prev = state['session'][id_session_prev]
+
         try:
             map_session_prev['participant'].remove(id_user)
         except KeyError:
             pass
+
         try:
             map_session_prev['contributor'].remove(id_user)
         except KeyError:

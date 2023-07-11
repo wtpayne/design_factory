@@ -47,6 +47,7 @@ license:
 
 import dotenv
 import os
+import logging
 
 import fl.net.discord.bot
 import fl.util.edict
@@ -66,13 +67,20 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     filepath_env = cfg.get('filepath_env',  None)
     key_token    = cfg.get('key_token',     'TOKEN_DISCORD_DEFAULT')
     secs_sleep   = cfg.get('secs_sleep',    0.5)
+    log_level    = cfg.get('log_level',     logging.WARNING)
     list_cfg_msg = cfg.get('msg',           list())
+    map_id       = runtime.get('id',        dict())
+    id_system    = map_id.get('id_system',  'unknown')
+    id_node      = map_id.get('id_node',    'unknown')
 
     if str_token is None:
         str_token = key.load(id_value     = key_token,
                              filepath_env = filepath_env)
-    bot = fl.net.discord.bot.coro(cfg_bot = dict(str_token  = str_token,
-                                                 secs_sleep = secs_sleep))
+    bot = fl.net.discord.bot.coro(cfg_bot = dict(id_log_event = 'discord',
+                                                 str_token    = str_token,
+                                                 secs_sleep   = secs_sleep,
+                                                 id_system    = id_system,
+                                                 id_node      = id_node))
 
     set_type_in = set((
                 'cfg_msgcmd',  # Configuration for message commands.
@@ -86,7 +94,9 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     # corresponding output.
     #
     set_type_out = set((
-                'log',           # Error messages and log messages.
+                'log_event',     # Error messages and log messages.
+                'log_metric',    # Quantitative metrics for KPIs etc...
+                'log_data',      # Raw data for resimulation.
                 'msgcmd_dm',     # Msg command invocations from DM channels.
                 'msgcmd_guild',  # Msg command invocations from guild channels.
                 'appcmd_dm',     # App command invocations from DM channels.

@@ -84,8 +84,9 @@ node:
     state_type:             py_dict
     config:
       filepath_env:         Null
-      key_token:            TOKEN_DISCORD_HARMONICA_PRD
+      key_token:            TOKEN_DISCORD_HARMONICA_DEV
       secs_sleep:           0.2
+      log_level:            'TRACE'
       msg:
       - type:               msg_dm
         id_user:            563330464220446726
@@ -140,12 +141,35 @@ node:
   # ---------------------------------------------------------------------------
   # Logging.
   #
-  log:
+  log_event:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.log.event.ic00_edict
+    state_type:             py_dict
+    config:
+      dirpath_log:          Null
+      log_level:            'INFO'
+
+  log_metric:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
       py_module:            cl.util.noop.ic00_edict
+      # py_module:            cl.log.metric.ic00_edict
     state_type:             py_dict
+    config:
+      dirpath_log:          Null
+
+  log_data:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+      # py_module:            cl.log.data.ic00_edict
+    state_type:             py_dict
+    config:
+      dirpath_log:          Null
 
 
 ###############################################################################
@@ -175,8 +199,19 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
-  src:   ctrl_main.outputs.ctrl_log
-  dst:   log.inputs.ctrl
+  src:   ctrl_main.outputs.ctrl_log_event
+  dst:   log_event.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_log_metric
+  dst:   log_metric.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_log_data
+  dst:   log_data.inputs.ctrl
+
 
 # Discord integration
 
@@ -208,20 +243,48 @@ edge:
 
 - owner: discord
   data:  py_dict
-  src:   discord.outputs.log
-  dst:   log.inputs.discord
+  src:   discord.outputs.log_event
+  dst:   log_event.inputs.discord
 
 - owner: openai
   data:  py_dict
-  src:   openai.outputs.log
-  dst:   log.inputs.openai
+  src:   openai.outputs.log_event
+  dst:   log_event.inputs.openai
 
 - owner: deliberation
   data:  py_dict
-  src:   deliberation.outputs.log
-  dst:   log.inputs.deliberation
+  src:   deliberation.outputs.log_event
+  dst:   log_event.inputs.deliberation
 
+- owner: discord
+  data:  py_dict
+  src:   discord.outputs.log_metric
+  dst:   log_metric.inputs.discord
 
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.log_metric
+  dst:   log_metric.inputs.openai
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.log_metric
+  dst:   log_metric.inputs.deliberation
+
+- owner: discord
+  data:  py_dict
+  src:   discord.outputs.log_data
+  dst:   log_data.inputs.discord
+
+- owner: openai
+  data:  py_dict
+  src:   openai.outputs.log_data
+  dst:   log_data.inputs.openai
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.log_data
+  dst:   log_data.inputs.deliberation
 
 ###############################################################################
 data:

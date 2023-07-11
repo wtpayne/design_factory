@@ -108,7 +108,7 @@ def stableflow_start(path_cfg = None, map_cfg = None, tup_overrides = None):
 
 
 # -----------------------------------------------------------------------------
-def stableflow_stop(path_cfg):
+def stableflow_stop(path_cfg, tup_overrides = None):
     """
     Run a python module in the specified environment.
 
@@ -122,7 +122,8 @@ def stableflow_stop(path_cfg):
 
         try:
 
-            cfg = fl.stableflow.cfg.prepare(path_cfg = path_cfg)
+            cfg = fl.stableflow.cfg.prepare(path_cfg      = path_cfg,
+                                            tup_overrides = tup_overrides)
             _configure_all_launch_commands(cfg)
 
         except fl.stableflow.cfg.exception.CfgError as err:
