@@ -86,9 +86,33 @@ def writer(id_system, dirpath_log = None):
 
     """
 
+    # Create a directory for the event log file.
+    # If the dirpath is not provided, then we use
+    # the appdirs library to generate a platform
+    # the appdirs library to generate a platform
+    # system specific default path. On Unix
+    # platforms this will be:
+    #
+    #   ~/.local/share/{id_system}/
+    #
     if dirpath_log is None:
         dirpath_log = appdirs.user_data_dir(appname = id_system)
-    os.makedirs(dirpath_log, exist_ok = True)
+
+    # Create the directory where the event logs
+    # are going to be stored. If we cannot create
+    # the directory then we consider that to
+    # be a critical (nonrecoverable) error, so
+    # we signal the system to shut down by
+    # raising an exception.
+    #
+    try:
+        os.makedirs(dirpath_log, exist_ok = True)
+    except OSerror as err:
+        raise RuntimeError(
+            'Critical error creating directory "{dirpath}": {err}'.format(
+                                                        dirpath = dirpath_log,
+                                                        err     = err))
+
     filename_log = 'log_event.db'
     filepath_log = os.path.join(dirpath_log, filename_log)
     connection   = sqlite3.connect(filepath_log)
@@ -141,47 +165,4 @@ def writer(id_system, dirpath_log = None):
                         event['process'],
                         event['process_name']))
         connection.commit()
-
-
-#     # Load configuration. If the dirpath is not
-#     # provided, then we use the appdirs library
-#     # to generate a system specific default path.
-#     # On Unix systems, this will be:
-#     #
-#     #   ~/.local/share/{id_system}/
-#     #
-#     id_system   = runtime['id']['id_system']
-#     dirpath_log = cfg.get('dirpath_log', None)
-#     if dirpath_log is None:
-#         dirpath_log = appdirs.user_data_dir(appname = id_system)
-
-#     # Create the directory where the logs are
-#     # going to be saved. If we cannot create
-#     # the directory then we consider that to
-#     # be a critical (nonrecoverable) error, so
-#     # we signal the system to shut down by
-#     # raising an exception.
-#     #
-#     try:
-#         os.makedirs(dirpath_log, exist_ok = True)
-#     except OSerror as err:
-#         raise RuntimeError(
-#             'Critical error creating directory "{dirpath}": {err}'.format(
-#                                                         dirpath = dirpath_log,
-#                                                         err     = err))
-
-#     # Set up a logger. We'll use the logging library's
-#     # TimedRotatingFileHandler to automatically rotate
-#     # the logs based on time.
-#     #
-#     # logger = logging.getLogger(runtime['id']['id_system'])
-#     # logger.setLevel(logging.INFO)
-#     # handler = logging.handlers.TimedRotatingFileHandler(
-#     #                                     os.path.join(dirpath, 'log.txt'),
-#     #                                     when = 'midnight',
-#     #                                     backupCount = 7)  # Keep last 7 days logs
-#     # formatter = logging.Formatter('%(asctime)s: %(message)s')
-#     # handler.setFormatter(formatter)
-#     # logger.addHandler(handler)
-
 

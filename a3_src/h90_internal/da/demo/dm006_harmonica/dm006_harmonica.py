@@ -166,33 +166,26 @@ def _overrides(stage = 'PRD'):
     Return the standard tuple of configuration overrides.
 
     """
-    tup_overrides = (
-        'host.localhost.dirpath_log',         _dirpath_log(),
-        'node.log_event.config.dirpath_log',  _dirpath_log(),
-        'node.log_metric.config.dirpath_log', _dirpath_log(),
-        'node.log_data.config.dirpath_log',   _dirpath_log(),
-        'node.discord.config.filepath_env',   _filepath_env(),
-        'host.localhost.acct_run',            _username())
 
-    if stage == 'DEV':
-        tup_overrides += (
-            # 'system.id_system',               'harmonica_dev',
-            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_DEV')
-
-    elif stage == 'UAT':
-        tup_overrides += (
-            # 'system.id_system',               'harmonica_uat',
-            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_UAT')
-
-    elif stage == 'PRD':
-        tup_overrides += (
-            # 'system.id_system',               'harmonica',
-            'node.discord.config.key_token',  'TOKEN_DISCORD_HARMONICA_PRD')
-
-    else:
+    if stage not in ('DEV', 'UAT', 'PRD'):
         raise RuntimeError('Logic error. Did not recognise development stage.')
 
-    return tup_overrides
+    map_id_system = dict(DEV = 'harmonica',
+                         UAT = 'harmonica',
+                         PRD = 'harmonica')
+
+    map_token     = dict(DEV = 'TOKEN_DISCORD_HARMONICA_DEV',
+                         UAT = 'TOKEN_DISCORD_HARMONICA_UAT',
+                         PRD = 'TOKEN_DISCORD_HARMONICA_PRD')
+
+    return ('system.id_system',                   map_id_system[stage],
+            'host.localhost.dirpath_log',         _dirpath_log(),
+            'node.log_event.config.dirpath_log',  _dirpath_log(),
+            'node.log_metric.config.dirpath_log', _dirpath_log(),
+            'node.log_data.config.dirpath_log',   _dirpath_log(),
+            'node.discord.config.filepath_env',   _filepath_env(),
+            'node.discord.config.key_token',      map_token[stage],
+            'host.localhost.acct_run',            _username())
 
 
 # -----------------------------------------------------------------------------

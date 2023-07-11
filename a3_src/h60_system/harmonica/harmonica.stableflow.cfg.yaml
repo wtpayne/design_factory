@@ -239,7 +239,7 @@ edge:
   dst:   deliberation.inputs.openai
   dirn:  feedback
 
-# Logging
+# Event logging
 
 - owner: discord
   data:  py_dict
@@ -256,6 +256,8 @@ edge:
   src:   deliberation.outputs.log_event
   dst:   log_event.inputs.deliberation
 
+# Metric logging
+
 - owner: discord
   data:  py_dict
   src:   discord.outputs.log_metric
@@ -270,6 +272,8 @@ edge:
   data:  py_dict
   src:   deliberation.outputs.log_metric
   dst:   log_metric.inputs.deliberation
+
+# Data logging
 
 - owner: discord
   data:  py_dict
