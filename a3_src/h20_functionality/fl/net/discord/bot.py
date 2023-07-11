@@ -200,7 +200,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     # wrapper.
     #
     list_log_event = list()
-    map_log_metric = dict(type = 'log_metric')
+    map_log_metric = dict()
 
     id_system       = cfg_bot.get('id_system', None)
     id_node         = cfg_bot.get('id_node',   None)
@@ -286,10 +286,10 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
             # Try to send log data from the
             # discord bot to the rest of the
-            # system. (Print to stdout if it
-            # doesn't work for some reason).
+            # system.
             #
-            await _service_queue_from_bot(state, queue_from_bot)
+            _service_queue_from_bot(
+                            list_log_event, map_log_metric, queue_from_bot)
 
             # Service outbound messages from the
             # system to discord, then command
@@ -304,19 +304,25 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
 
     # -------------------------------------------------------------------------
-    async def _service_queue_from_bot(state, queue_from_bot):
+    def _service_queue_from_bot(list_log_event,
+                                map_log_metric,
+                                queue_from_bot):
         """
-        Send data from the discord bot to the rest of the system.
-
-        If there is any log data in the
-        buffer, then enqueue it to be
-        sent back to the rest of the
-        system.
+        Send log data from the discord bot to the rest of the system.
 
         """
 
-        # Send event log.
-        #
+        _send_event_log_to_system(  list_log_event, queue_from_bot )
+        _send_metric_log_to_system( map_log_metric, queue_from_bot )
+
+
+    # ---------------------------------`---------------------------------------
+    def _send_event_log_to_system(list_log_event, queue_from_bot):
+        """
+        Send event log data from the discord bot to the rest of the system.
+
+        """
+
         while list_log_event:
             event   = list_log_event.pop(0)
             message = dict(type         = 'log_event',
@@ -332,7 +338,6 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                            thread_name  = event.threadName,
                            process      = event.process,
                            process_name = event.processName)
-
             try:
                 queue_from_bot.put(message, block = False)
             except queue.Full:
@@ -340,13 +345,24 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                                 'dropped. queue_from_bot is full.')
                 break
 
-        # Send metrics log.
-        #
-        # try:
-        #     queue_from_bot.put(copy.deepcopy(log_metric), block = False)
-        # except queue.Full:
-        #     log_event.error('One or more log_metric messages dropped. ' \
-        #                     'queue_from_bot is full.')
+
+    # ---------------------------------`---------------------------------------
+    def _send_metric_log_to_system(map_log_metric, queue_from_bot):
+        """
+        Send metric log data from the discord bot to the rest of the system.
+
+        """
+
+        if map_log_metric:
+            message = dict(type = 'log_metric')
+            message.update(map_log_metric)
+            try:
+                queue_from_bot.put(message, block = False)
+            except queue.Full:
+                log_event.error('One or more log_metric messages ' \
+                                'dropped. queue_from_bot is full.')
+            finally:
+                map_log_metric.clear()
 
 
     # ---------------------------------`---------------------------------------
@@ -395,8 +411,14 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             obj_cmd  = discord.ext.commands.Command(map_register['on_cmd'],
                                                     name = str_name,
                                                     help = str_desc)
-            bot.add_command(obj_cmd)
-            state['map_cmd'][str_name] = obj_cmd
+            try:
+                bot.add_command(obj_cmd)
+            except discord.DiscordException as err:
+                log_event.error(
+                        'Could not add message command: {err}'.format(
+                                                                    err = err))
+            else:
+                state['map_cmd'][str_name] = obj_cmd
 
         # Configure application commands.
         #
@@ -424,8 +446,14 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                                             name        = str_name,
                                             description = str_desc,
                                             callback    = globals()[str_name])
-            bot.tree.add_command(cmd)
-            state['map_app_cmd'][str_name] = cmd
+            try:
+                bot.tree.add_command(cmd)
+            except discord.DiscordException as err:
+                log_event.error(
+                        'Could not add application command: {err}'.format(
+                                                                    err = err))
+            else:
+                state['map_app_cmd'][str_name] = cmd
 
         else:
             pass
@@ -722,13 +750,18 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         if 'button' in msg and isinstance(msg['button'], ButtonData):
             button_data = msg.pop('button')
-            msg['view'] = ButtonView(style    = discord.ButtonStyle.green,
-                                     label    = button_data.label,
-                                     id_btn   = button_data.id_btn,
-                                     callback = on_button)
+            msg['view'] = ButtonView(
+                                style    = discord.ButtonStyle.green,
+                                label    = button_data.label,
+                                id_btn   = button_data.id_btn,
+                                callback = on_button)
 
         if maybe_user_or_channel is not None:
-            await maybe_user_or_channel.send(**msg)
+            try:
+                await maybe_user_or_channel.send(**msg)
+            except discord.DiscordException as err:
+                log_event.error(
+                        'Failed to send message: {err}'.format(err = err))
 
 
     # -------------------------------------------------------------------------
@@ -1043,7 +1076,32 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     # -------------------------------------------------------------------------
     # Run the client.
     #
-    bot.run(token       = cfg_bot['str_token'],
-            reconnect   = False,
-            log_handler = handler_log_event,
-            log_level   = level_log_event)
+    #   Note: bot.run is a blocking call.
+    #
+    for idx_retry in itertools.count(start = 1, step = 1):
+
+        try:
+
+            bot.run(token       = cfg_bot['str_token'],
+                    reconnect   = True,
+                    log_handler = handler_log_event,
+                    log_level   = level_log_event,
+                    root_logger = False)
+
+        except (discord.app_commands.MissingApplicationID,
+                discord.Forbidden,
+                discord.GatewayNotFound,
+                discord.InvalidArgument,
+                discord.InvalidData,
+                discord.LoginFailure,
+                discord.NotFound,
+                discord.PrivilegedIntentsRequired) as err:
+            log_event.error('Fatal error: {err}'.format(err = str(err)))
+            _send_event_log_to_system(list_log_event, queue_from_bot)
+            break
+
+        except Exception as err:
+            log_event.error('Non-fatal error: {err}'.format(err = str(err)))
+            log_event.warning('Restarting. ({idx}).'.format(idx = idx_retry))
+            _send_event_log_to_system(list_log_event, queue_from_bot)
+            continue
