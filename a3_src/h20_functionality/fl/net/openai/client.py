@@ -554,6 +554,8 @@ def _daemon_main(cfg):
     queue_from_api = cfg['queue_from_api']
     queue_to_api   = cfg['queue_to_api']
 
+    log_event.info('OpenAI client is ready.')
+
     while True:
 
         # Attempt to retrieve the next request
@@ -628,12 +630,23 @@ def _process_one_request(request_raw, default, is_bit, log_event):
     if is_bit:
         result['response'] = response_bit
     else:
+        log_event.info('Make request to OpenAI API.')
         try:
             result['response'] = fcn_endpoint(**request_full)
         except openai.OpenAIError as err:
             result['error'] = err.user_message
             log_event.exception('Error calling OpenAI: ' \
                                 '{msg}.'.format(msg = err.user_message))
+        else:
+
+            try:
+                count_token = result['usage']['total_tokens']
+                log_event.info('Response recieved from the OpenAI API. ' \
+                               '{num} tokens used in total.'.format(
+                                                            num = count_token))
+            except KeyError as err:
+                log_event.info('Response recieved from the OpenAI API.')
+
     return result
 
 

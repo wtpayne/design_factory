@@ -335,7 +335,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                 queue_from_bot.put(handler_log_event.list_event.pop(0),
                                    block = False)
             except queue.Full:
-                log_event.exception('One or more log_event messages ' \
+                log_event.error('One or more log_event messages ' \
                                     'dropped. queue_from_bot is full.')
                 break
 
@@ -353,7 +353,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 queue_from_bot.put(message, block = False)
             except queue.Full:
-                log_event.exception('One or more log_metric messages ' \
+                log_event.error('One or more log_metric messages ' \
                                     'dropped. queue_from_bot is full.')
             finally:
                 map_log_metric.clear()
@@ -408,7 +408,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 bot.add_command(obj_cmd)
             except discord.DiscordException as err:
-                log_event.exception(
+                log_event.error(
                         'Could not add message command: {err}'.format(
                                                                     err = err))
             else:
@@ -443,7 +443,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 bot.tree.add_command(cmd)
             except discord.DiscordException as err:
-                log_event.exception(
+                log_event.error(
                         'Could not add application command: {err}'.format(
                                                                     err = err))
             else:
@@ -564,7 +564,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log_event.exception('Command input dropped: ' \
+            log_event.error('Command input dropped: ' \
                                 'queue_from_bot is full.')
 
     # Update the global callback register so that
@@ -606,7 +606,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log_event.exception('Command input dropped: ' \
+            log_event.error('Command input dropped: ' \
                                 'queue_from_bot is full.')
         await interaction.followup.send('OK', ephemeral = True)
 
@@ -782,7 +782,6 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         Handle errors in commands.
 
         """
-
         log_event.error('on_command_error: "{err}"'.format(err = str(error)))
 
         # We make some specififc errors visible
@@ -803,7 +802,6 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
             str_msg = 'An error has been logged.'
             await ctx.send(str_msg)
-            raise error
 
 
     # -------------------------------------------------------------------------
