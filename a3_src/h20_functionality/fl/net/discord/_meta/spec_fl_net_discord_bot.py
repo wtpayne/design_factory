@@ -53,7 +53,9 @@ class SpecifyFlNetDiscordBotCoro:
         str_token         = key.load('TOKEN_DISCORD_DEFAULT')
         proc_child_before = psutil.Process().children()
         cfg_bot           = dict(str_token  = str_token,
-                                 secs_sleep = 0.1)
+                                 secs_sleep = 0.1,
+                                 id_system  = 'test',
+                                 id_node    = 'discord-bot')
         bot               = fl.net.discord.bot.coro(cfg_bot = cfg_bot)
         assert inspect.isgenerator(bot)
         for _ in range(40):

@@ -6,30 +6,13 @@ Functional specification for cl.net.openai.request.ic00_edict
 
 
 import inspect
+import logging
 
 import pytest
 
 import da.env
 import fl.test.component
 import pl.stableflow.sys
-
-
-WORKFLOW_LOGIC = """
-
-def coro(cfg):
-
-    list_template_out = [{template}]
-    list_param_out    = [{param}]
-    list_error_out    = []
-
-    while True:
-        (list_param_in,
-         list_result_in,
-         list_error_in) = yield (list_template_out,
-                                 list_param_out,
-                                 list_error_out)
-
-"""
 
 
 # =============================================================================
@@ -89,7 +72,10 @@ class SpecifyClNetOpenAiClientIc00_edict:
                               is_bit        = True,  # Built-in-test.
                               is_async      = False, # Asynchronous.
                               default       = dict(id_endpoint = id_endpoint,
-                                                   model       = id_model))
+                                                   model       = id_model),
+                              id_system     = 'test',
+                              id_node       = 'openai-client',
+                              level_log     = logging.INFO)
         request_valid  = dict(model         = id_model,
                               messages      = messages_test)
         message_valid  = dict(role          = 'assistant',
@@ -136,12 +122,10 @@ class SpecifyClNetOpenAiClientIc00_edict:
         cfg_sys = fl.test.component.functional_test_cfg(
                   module = 'cl.net.openai.request.ic00_edict',
                   config = cfg_client,
-                  script = [{'in':  { 'request': edict_request_ena     },
-                             'out': { 'result':  edict_result_ena,
-                                      'error':   edict_error_none      }},
-                            {'in':  { 'request': edict_request_none    },
-                             'out': { 'result':  edict_result_none,
-                                      'error':   edict_error_none      }}])
+                  script = [{'in':  { 'to_api':   edict_request_ena  },
+                             'out': { 'from_api': edict_result_ena   }},
+                            {'in':  { 'to_api':   edict_request_none },
+                             'out': { 'from_api': edict_result_none  }}])
 
         exit_code = pl.stableflow.sys.prep_and_start(map_cfg  = cfg_sys,
                                                      is_local = True)

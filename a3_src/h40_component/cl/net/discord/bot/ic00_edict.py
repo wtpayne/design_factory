@@ -70,8 +70,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     log_level    = cfg.get('log_level',     logging.WARNING)
     list_cfg_msg = cfg.get('msg',           list())
     map_id       = runtime.get('id',        dict())
-    id_system    = map_id.get('id_system',  'unknown')
-    id_node      = map_id.get('id_node',    'unknown')
+    id_system    = map_id.get('id_system',  None)
+    id_node      = map_id.get('id_node',    None)
 
     if str_token is None:
         str_token = key.load(id_value     = key_token,
@@ -112,12 +112,11 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     tup_key_msg_in   = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
     tup_key_msg_out  = tuple((k for k in tup_key_out if k not in set_type_out))
     tup_key_type_out = tuple((k for k in tup_key_out if k in set_type_out))
-
-    list_to_bot     = list()
-    list_to_bot[:]  = list_cfg_msg
-    list_from_bot   = list()
-    timestamp       = dict()
-    signal          = fl.util.edict.init(outputs)
+    list_to_bot      = list()
+    list_to_bot[:]   = list_cfg_msg
+    list_from_bot    = list()
+    timestamp        = dict()
+    signal           = fl.util.edict.init(outputs)
 
     while True:
 

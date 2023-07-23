@@ -64,22 +64,23 @@ def test():
     _path  = da.env.path
     ID_ENV = 'e003_discord'
 
-    return _run(id_env    = ID_ENV,
-                iter_path = (_path(control_tier = 'h20_functionality',
-                                   relpath      = 'fl/net/discord',
-                                   id_env       = ID_ENV),
-                             _path(control_tier = 'h20_functionality',
-                                   relpath      = 'fl/net/openai',
-                                   id_env       = ID_ENV),
-                             _path(control_tier = 'h40_component',
-                                   relpath      = 'cl/net/discord',
-                                   id_env       = ID_ENV),
-                             _path(control_tier = 'h40_component',
-                                   relpath      = 'cl/net/openai',
-                                   id_env       = ID_ENV),
-                             _path(control_tier = 'h60_system',
-                                   relpath      = 'harmonica',
-                                   id_env       = ID_ENV)))
+    return _run(id_env        = ID_ENV,
+                verbose_level = 0,
+                iter_path     = (_path(control_tier = 'h20_functionality',
+                                       relpath      = 'fl/net/discord',
+                                       id_env       = ID_ENV),
+                                 _path(control_tier = 'h20_functionality',
+                                       relpath      = 'fl/net/openai',
+                                       id_env       = ID_ENV),
+                                 _path(control_tier = 'h40_component',
+                                       relpath      = 'cl/net/discord',
+                                       id_env       = ID_ENV),
+                                 _path(control_tier = 'h40_component',
+                                       relpath      = 'cl/net/openai',
+                                       id_env       = ID_ENV),
+                                 _path(control_tier = 'h60_system',
+                                       relpath      = 'harmonica',
+                                       id_env       = ID_ENV)))
 
 
 # -----------------------------------------------------------------------------

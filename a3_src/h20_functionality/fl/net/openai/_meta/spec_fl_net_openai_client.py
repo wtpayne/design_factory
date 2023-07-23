@@ -6,6 +6,7 @@ Functional specification for fl.net.openai.client
 
 
 import inspect
+import logging
 import time
 
 import pytest
@@ -17,22 +18,14 @@ import itertools
 
 def coro(cfg):
 
-    list_template_out = [{template}]
-    list_param_out    = [{param}]
-    list_error_out    = []
+    list_out = [{template},{param}]
 
     for idx in itertools.count():
 
         if idx == 1:
-            (list_param_in,
-             list_result_in,
-             list_error_in) = yield (list_template_out,
-                                     list_param_out,
-                                     list_error_out)
+            list_in = yield (list_out)
         else:
-            (list_param_in,
-             list_result_in,
-             list_error_in) = yield ([], [], [])
+            list_in = yield ([])
 
 """
 
@@ -61,13 +54,16 @@ def testvector_completions_valid_bit():
     prompt_test   = 'completions_test_prompt_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -99,7 +95,7 @@ def testvector_completions_valid_bit():
         'model':            id_model,
         'prompt':           prompt_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -107,15 +103,12 @@ def testvector_completions_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -139,13 +132,16 @@ def testvector_chat_completions_valid_bit():
                       'content': 'chat_completions_test_msg_content'}]
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -177,7 +173,7 @@ def testvector_chat_completions_valid_bit():
         'model':            id_model,
         'messages':         messages_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -185,15 +181,12 @@ def testvector_chat_completions_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -217,13 +210,16 @@ def testvector_edits_valid_bit():
     instruction_test = 'edits_test_instruction_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -257,7 +253,7 @@ def testvector_edits_valid_bit():
         'input':            input_test,
         'instruction':      instruction_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -265,15 +261,12 @@ def testvector_edits_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -295,12 +288,15 @@ def testvector_images_generations_valid_bit():
     prompt_test   = 'images_generations_test_prompt_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
-            'id_endpoint':  id_endpoint}}
+            'id_endpoint':  id_endpoint},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -331,7 +327,7 @@ def testvector_images_generations_valid_bit():
     request_valid = {
         'prompt':           prompt_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -339,15 +335,12 @@ def testvector_images_generations_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid  = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -370,12 +363,15 @@ def testvector_images_edits_valid_bit():
     prompt_test   = 'images_edits_test_prompt_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
-            'id_endpoint':  id_endpoint}}
+            'id_endpoint':  id_endpoint},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -407,7 +403,7 @@ def testvector_images_edits_valid_bit():
         'image':            image_test,
         'prompt':           prompt_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -415,15 +411,12 @@ def testvector_images_edits_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -445,12 +438,15 @@ def testvector_images_variations_valid_bit():
     image_test    = 'images_variations_test_image_data'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
-            'id_endpoint':  id_endpoint}}
+            'id_endpoint':  id_endpoint},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -480,7 +476,7 @@ def testvector_images_variations_valid_bit():
     request_valid = {
         'image':            image_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -488,15 +484,12 @@ def testvector_images_variations_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -519,13 +512,16 @@ def testvector_embeddings_valid_bit():
     input_test    = 'embeddings_test_input_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -557,7 +553,7 @@ def testvector_embeddings_valid_bit():
         'model':            id_model,
         'input':            input_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -565,15 +561,12 @@ def testvector_embeddings_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -597,13 +590,16 @@ def testvector_audio_transcriptions_valid_bit():
     prompt_test     = 'audio_transcriptions_test_prompt_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -637,7 +633,7 @@ def testvector_audio_transcriptions_valid_bit():
         'model':            id_model,
         'prompt':           prompt_test}
 
-    result_valid = [{
+    output_valid = [{
         'type':            'openai_result',
         'error':            None,
         'request':          request_valid,
@@ -645,15 +641,12 @@ def testvector_audio_transcriptions_valid_bit():
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -677,13 +670,16 @@ def testvector_audio_translations_valid_bit():
     prompt_test     = 'audio_translations_test_prompt_text'
 
     cfg_valid = {
-        'is_bit':           True,
-        'is_async':         IS_ASYNC,
         'api_key':          'test_api_key',
         'secs_interval':    0.01,
+        'is_bit':           True,
+        'is_async':         IS_ASYNC,
         'default':          {
             'id_endpoint':  id_endpoint,
-            'model':        id_model}}
+            'model':        id_model},
+        'id_system':        'test',
+        'id_node':          'openai-client',
+        'level_log':        logging.INFO}
 
     template_valid = {
         'id_endpoint':      id_endpoint,
@@ -705,8 +701,8 @@ def testvector_audio_translations_valid_bit():
         'state':            dict()} # <-- Process state
 
     workflow_valid = {
-        'uid_workflow':     uid_workflow,
         'type':             {'id': 'prompt_workflow', 'ver': '1.0'},
+        'uid_workflow':     uid_workflow,
         'spec':             WORKFLOW_LOGIC.format(template = template_valid,
                                                   param    = param_valid),
         'coroutine':        None
@@ -717,23 +713,20 @@ def testvector_audio_translations_valid_bit():
         'model':            id_model,
         'prompt':           prompt_test}
 
-    result_valid = [{
-         'type':            'openai_result',
+    output_valid = [{
+        'type':             'openai_result',
         'error':            None,
         'request':          request_valid,
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
 
-    error_valid  = []
-
     return (cfg_valid,
             workflow_valid,
             template_valid,
             param_valid,
             request_valid,
-            result_valid,
-            error_valid)
+            output_valid)
 
 
 # -----------------------------------------------------------------------------
@@ -745,7 +738,7 @@ def testrunner_coro_request_handler_singleshot():
     """
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
-                               list_request,
+                               list_list_input,
                                maxiter     = TESTRUNNER_MAXITER,
                                delay_secs  = TESTRUNNER_DELAY_SECS):
         """
@@ -753,24 +746,22 @@ def testrunner_coro_request_handler_singleshot():
 
         """
         import fl.net.openai.client
-        list_input_test = list()
-        list_input_test.append(list_request)
-
         client = fl.net.openai.client.coro_request_handler(cfg = cfg)
+
         for _ in range(maxiter):
 
-            if list_input_test:
-                input_test = list_input_test.pop()
+            if list_list_input:
+                list_input = list_list_input.pop()
             else:
-                input_test = []
+                list_input = []
 
-            (list_result, list_error) = client.send(input_test)
-            if (len(list_result) > 0) or (len(list_error) > 0):
-                return (list_result, list_error)
+            (list_output) = client.send(list_input)
+            if len(list_output) > 0:
+                return list_output
 
             time.sleep(delay_secs)
 
-        return ([], [])
+        return []
 
     return _get_result_singleshot
 
@@ -784,8 +775,7 @@ def testrunner_coro_template_handler_singleshot():
     """
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
-                               list_template,
-                               list_param,
+                               list_list_input,
                                maxiter     = TESTRUNNER_MAXITER,
                                delay_secs  = TESTRUNNER_DELAY_SECS):
         """
@@ -793,8 +783,6 @@ def testrunner_coro_template_handler_singleshot():
 
         """
         import fl.net.openai.client
-        list_tup_input_test = list()
-        list_tup_input_test.append((list_template, list_param))
 
         request_handler  = fl.net.openai.client.coro_request_handler(
                                             cfg              = cfg)
@@ -804,18 +792,18 @@ def testrunner_coro_template_handler_singleshot():
 
         for _ in range(maxiter):
 
-            if list_tup_input_test:
-                tup_input_test = list_tup_input_test.pop()
+            if list_list_input:
+                list_input = list_list_input.pop()
             else:
-                tup_input_test = ([], [])
+                list_input = []
 
-            (list_result, list_error) = template_handler.send(tup_input_test)
-            if (len(list_result) > 0) or (len(list_error) > 0):
-                return (list_result, list_error)
+            list_output = template_handler.send(list_input)
+            if len(list_output) > 0:
+                return list_output
 
             time.sleep(delay_secs)
 
-        return ([], [])
+        return []
 
     return _get_result_singleshot
 
@@ -829,8 +817,7 @@ def testrunner_coro_workflow_handler_singleshot():
     """
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
-                               list_workflow,
-                               list_param,
+                               list_list_input,
                                maxiter     = TESTRUNNER_MAXITER,
                                delay_secs  = TESTRUNNER_DELAY_SECS):
         """
@@ -838,8 +825,6 @@ def testrunner_coro_workflow_handler_singleshot():
 
         """
         import fl.net.openai.client
-        list_tup_input_test = list()
-        list_tup_input_test.append((list_workflow, list_param))
 
         request_handler  = fl.net.openai.client.coro_request_handler(
                                         cfg              = cfg)
@@ -853,19 +838,18 @@ def testrunner_coro_workflow_handler_singleshot():
 
         for _ in range(maxiter):
 
-            if list_tup_input_test:
-                tup_input_test = list_tup_input_test.pop()
+            if list_list_input:
+                list_input = list_list_input.pop()
             else:
-                tup_input_test = ([], [])
+                list_input = []
 
-            (list_result, list_error) = workflow_handler.send(tup_input_test)
-
-            if (len(list_result) > 0) or (len(list_error) > 0):
-                return (list_result, list_error)
+            list_output = workflow_handler.send(list_input)
+            if len(list_output) > 0:
+                return list_output
 
             time.sleep(delay_secs)
 
-        return ([], [])
+        return []
 
     return _get_result_singleshot
 
@@ -957,7 +941,7 @@ class SpecifyFlNetOpenAiClient:
 
         """
         import fl.net.openai.client
-        with pytest.raises(AssertionError):
+        with pytest.raises(RuntimeError):
             fl.net.openai.client.coro_request_handler(cfg = {})
 
     # -------------------------------------------------------------------------
@@ -978,43 +962,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_completions_valid_bit
+         list_output_expected) = testvector_completions_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1034,43 +1009,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_chat_completions_valid_bit
+         list_output_expected) = testvector_chat_completions_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1090,43 +1056,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_edits_valid_bit
+         list_output_expected) = testvector_edits_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1146,43 +1103,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_images_generations_valid_bit
+         list_output_expected) = testvector_images_generations_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1202,43 +1150,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_images_edits_valid_bit
+         list_output_expected) = testvector_images_edits_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1258,43 +1197,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_images_variations_valid_bit
+         list_output_expected) = testvector_images_variations_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1314,43 +1244,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_embeddings_valid_bit
+         list_output_expected) = testvector_embeddings_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1370,43 +1291,34 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_audio_transcriptions_valid_bit
+         list_output_expected) = testvector_audio_transcriptions_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
     @pytest.mark.e002_general_research
@@ -1426,40 +1338,31 @@ class SpecifyFlNetOpenAiClient:
          template_valid,
          param_valid,
          request_valid,
-         list_result_expected,
-         list_error_expected) = testvector_audio_translations_valid_bit
+         list_output_expected) = testvector_audio_translations_valid_bit
 
         # Check that the low-level request
         # handler coroutine also works when
         # given valid input.
         #
-        (list_result_1,
-         list_error_1) = testrunner_coro_request_handler_singleshot(
-                                                            cfg_valid,
-                                                            [request_valid])
-        assert list_result_1 == list_result_expected
-        assert list_error_1  == list_error_expected
+        list_output_1 = testrunner_coro_request_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[request_valid]])
+        assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
         # template handler coroutine works when
         # given valid input.
         #
-        (list_result_2,
-         list_error_2) = testrunner_coro_template_handler_singleshot(
-                                                            cfg_valid,
-                                                            [template_valid],
-                                                            [param_valid])
-        assert list_result_2 == list_result_expected
-        assert list_error_2  == list_error_expected
+        list_output_2 = testrunner_coro_template_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[template_valid, param_valid]])
+        assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
         # handler coroutine works when given
         # valid input.
         #
-        (list_result_3,
-         list_error_3) = testrunner_coro_workflow_handler_singleshot(
-                                                            cfg_valid,
-                                                            [workflow_valid],
-                                                            [param_valid])
-        assert list_result_3 == list_result_expected
-        assert list_error_3  == list_error_expected
+        list_output_3 = testrunner_coro_workflow_handler_singleshot(
+                            cfg             = cfg_valid,
+                            list_list_input = [[workflow_valid, param_valid]])
+        assert list_output_3 == list_output_expected

@@ -31,4 +31,16 @@ def step(inputs, state, outputs):
         for name in channel['path']:
             cursor = cursor[name]
 
-        assert cursor == expected_value
+        if not isinstance(cursor, dict):
+            assert cursor == expected_value
+        else:
+
+            print('#' * 80)
+            import pprint
+            pprint.pprint(cursor)
+            print('#' * 80)
+
+            for (key, value) in cursor.items():
+                if key == 'ts':
+                    continue
+                assert cursor[key] == expected_value[key]

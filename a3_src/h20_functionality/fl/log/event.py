@@ -53,6 +53,22 @@ import sqlite3
 import fl.util
 
 
+
+# -----------------------------------------------------------------------------
+def logger(str_id, level):
+    """
+    Return logging components.
+
+    """
+    list_event = list()
+    handler    = ListHandler(list_event)
+    logger     = logging.getLogger(str_id)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+
+    return (logger, handler)
+
+
 # =============================================================================
 class ListHandler(logging.Handler):
     """
@@ -75,7 +91,19 @@ class ListHandler(logging.Handler):
         Append the specified logging record to the list.
 
         """
-        self.list_event.append(record)
+        self.list_event.append(dict(type         = 'log_event',
+                                    name         = record.name,
+                                    level        = record.levelname,
+                                    pathname     = record.pathname,
+                                    lineno       = record.lineno,
+                                    msg          = record.msg,
+                                    args         = record.args,
+                                    exc_info     = record.exc_info,
+                                    created      = record.created,
+                                    thread       = record.thread,
+                                    thread_name  = record.threadName,
+                                    process      = record.process,
+                                    process_name = record.processName))
 
 
 # -----------------------------------------------------------------------------

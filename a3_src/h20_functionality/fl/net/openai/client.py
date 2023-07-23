@@ -109,6 +109,7 @@ license:
 
 
 import importlib
+import logging
 import multiprocessing
 import queue
 import re
@@ -126,241 +127,57 @@ def coro_workflow_handler(cfg, request_handler, template_handler):
     Yield results for workflow coroutines sent to the OpenAI web API.
 
     """
-    map_workflow     = dict()  # id_workflow -> workflow data structure
-    list_workflow    = list()
-    list_param       = list()
-    list_result      = list()
-    list_error       = list()
+
+    # Configure logging for the workflow handling coroutine.
+    #
+    id_system       = cfg['id_system']
+    id_node         = cfg['id_node']
+    level_log_event = cfg['level_log']
+    if id_system and id_node:
+        id_log_event = '{sys}.{node}.workflow'.format(sys  = id_system,
+                                                      node = id_node)
+    else:
+        id_log_event = 'openai.workflow'
+    (log_event, handler_log_event) = fl.log.event.logger(
+                                                    str_id = id_log_event,
+                                                    level  = level_log_event)
+
+    map_workflow  = dict()  # id_workflow -> workflow data structure
+    list_to_api   = list()
+    list_from_api = list()
 
     while True:
 
-        list_workflow.clear()
-        list_param.clear()
-        (list_workflow, list_param) = yield (list_result, list_error)
-        list_result.clear()
-        list_error.clear()
+        list_to_api.clear()
+        list_to_api = yield list_from_api
 
         # Update the workflow table.
         #
-        for workflow in list_workflow:
-            uid_workflow               = workflow['uid_workflow']
-            map_workflow[uid_workflow] = _ensure_init_workflow(cfg, workflow)
-        list_workflow.clear()
+        for item in list_to_api:
+
+            try:
+                id_type = item['type']['id']
+            except KeyError:
+                msg = 'Badly formed prompt or parameter message. ' \
+                      'Could not find type id information.'
+                log_event.error(msg)
+                raise RuntimeError(msg)
+
+            if id_type == 'prompt_workflow':
+                uid_workflow               = item['uid_workflow']
+                map_workflow[uid_workflow] = _ensure_init_workflow(cfg, item)
 
         # Run each workflow in turn and
         # build up the result and error
         # lists.
         #
-        for workflow in map_workflow.values():
-
-            (list_result_new,
-             list_error_new) = _step_workflow(
-                                        workflow         = workflow,
-                                        template_handler = template_handler,
-                                        list_param_in    = list_param,
-                                        list_result_in   = list_result,
-                                        list_error_in    = list_error)
-
-            list_result.extend(list_result_new)
-            list_error.extend(list_error_new)
-
-
-# -----------------------------------------------------------------------------
-def _step_workflow(workflow,
-                   template_handler,
-                   list_param_in,
-                   list_result_in,
-                   list_error_in):
-    """
-    Single-step the workflow.
-
-    """
-    uid_workflow = workflow['uid_workflow']
-
-    list_param_workflow = list()
-    for param in list_param_in:
-        if param['uid_workflow'] == uid_workflow:
-            list_param_workflow.append(param)
-
-    list_result_workflow = list()
-    for result in list_result_in:
-        if result['uid_workflow'] == uid_workflow:
-            list_result_workflow.append(result)
-
-    list_error_workflow = list()
-    # TODO: ADD UID_WORKFLOW TO ERROR
-    # for error in list_error_in:
-    #     if error['uid_workflow'] == uid_workflow:
-    #         list_error_wkflow.append(result)
-
-    (list_template_workflow,
-     list_param_updated,
-     list_error_updated) = workflow['coroutine'].send(
-                                                    (list_param_workflow,
-                                                     list_result_workflow,
-                                                     list_error_workflow))
-
-    # TODO: DECIDE WHAT TO DO WITH ERRORS FROM WORKFLOW
-
-    # TODO: ADD LOGGING AND METRICS FROM WORKFLOW
-
-    # TODO: ADD ROUTING OF RESULTS FROM WORKFLOW
-
-    (list_result_out,
-     list_error_out) = template_handler.send((list_template_workflow,
-                                              list_param_updated))
-
-    return (list_result_out, list_error_out)
-
-
-# -----------------------------------------------------------------------------
-@fl.util.coroutine
-def coro_template_handler(cfg, request_handler):
-    """
-    Yield results for templates/parameters sent to the OpenAI web API.
-
-    Initialize 'database' of prompt templates.
-
-    Prompt templates are persisted
-    in memory so they don't need to
-    be provided anew at each time step.
-
-    It is envisaged that the templates
-    will be updated from time to time
-    as part of a continuous improvement
-    process.
-
-    """
-    map_template    = dict()  # id_prompt -> dict with template.
-    list_request    = list()
-    list_result     = list()
-    list_error      = list()
-
-    while True:
-
-        (list_template, list_param) = yield (list_result, list_error)
-
-        # Update map_map_template with new
-        # and updated templates. Any old
-        # templates with the same id_prompt
-        # get overwritten.
-        #
-        for template in list_template:
-            map_template[template['uid_template']] = template
-
-        list_request.clear()
-        for param in list_param:
-            try:
-                list_request.append(
-                        _build_request(
-                            template = map_template[param['uid_template']],
-                            param    = param))
-            except KeyError:
-                pass  # TODO: Raise or log error?
-
-        (list_result, list_error) = request_handler.send(list_request)
-
-
-# -----------------------------------------------------------------------------
-@fl.util.coroutine
-def coro_request_handler(cfg):
-    """
-    Yield results for requests sent to the OpenAI web API.
-
-    For each list of request items that are
-    sent to this coroutine, it will yield a
-    tuple containing a list of result items
-    followed by a list of errors encountered.
-
-    This coroutine is responsible
-    for inter process communication
-    with the OpenAI client daemon
-    process.
-
-    """
-    assert 'api_key'       in cfg
-    assert 'secs_interval' in cfg
-    assert 'is_bit'        in cfg
-    assert 'is_async'      in cfg
-
-    # Configure queues and start the
-    # client in a separate process.
-    #
-    cfg['queue_request'] = multiprocessing.Queue()  # coro   --> daemon
-    cfg['queue_result']  = multiprocessing.Queue()  # daemon --> coro
-    cfg['queue_error']   = multiprocessing.Queue()  # daemon --> coro
-
-    if cfg['is_async']:
-        daemon = multiprocessing.Process(target = _daemon_main,
-                                         args   = (cfg,),
-                                         name   = 'openai-client',
-                                         daemon = True)
-        daemon.start()
-
-    # Loop forever, sending data to
-    # and from the openai client via
-    # the multiprocessing queues.
-    #
-    list_request = list()
-    list_result  = list()
-    list_error   = list()
-
-    # Loop forever
-    #
-    while True:
-
-        # At each step, yield results
-        # and errors to the controlling
-        # context, and get any new
-        # requests to send to the client.
-        #
-        list_request.clear()
-        list_request = yield (list_result, list_error)
-
-        # Enqueue any newly submitted
-        # requests to send to the
-        # daemon process, then dequeue
-        # any newly returned results
-        # and errors.
-        #
-        if cfg['is_async']:
-
-            list_error.clear()
-            for request in list_request:
-                try:
-                    cfg['queue_request'].put(request, block = False)
-                except queue.Full as err:
-                    list_error.append(err)
-
-            list_result.clear()
-            while True:
-                try:
-                    list_result.append(cfg['queue_result'].get(block = False))
-                except queue.Empty:
-                    break
-
-            while True:
-                try:
-                    list_error.append(cfg['queue_error'].get(block = False))
-                except queue.Empty:
-                    break
-
-        # Synchronously process
-        # one request at a time,
-        # filling result and error
-        # lists as we go.
-        #
-        else:
-
-            list_error.clear()
-            list_result.clear()
-            for request in list_request:
-                result = _process_one_request(request_raw = request,
-                                              default     = cfg['default'],
-                                              is_bit      = cfg['is_bit'])
-                list_result.append(result)
-                if result['error'] is not None:
-                    list_error.append(result['error'])
+        list_from_api.clear()
+        for (uid_workflow, workflow) in map_workflow.items():
+            list_filt = list(item for item in list_to_api
+                                    if item['uid_workflow'] == uid_workflow)
+            list_from_api.extend(
+                            template_handler.send(
+                                        workflow['coroutine'].send(list_filt)))
 
 
 # -----------------------------------------------------------------------------
@@ -389,6 +206,115 @@ def _ensure_init_workflow(cfg, workflow):
     workflow['coroutine'] = coroutine_function(cfg)
     workflow['coroutine'].send(None)  # Prime the coroutine
     return workflow
+
+
+# -----------------------------------------------------------------------------
+@fl.util.coroutine
+def coro_template_handler(cfg, request_handler):
+    """
+    Yield results for templates/parameters sent to the OpenAI web API.
+
+    Initialize 'database' of prompt templates.
+
+    Prompt templates are persisted
+    in memory so they don't need to
+    be provided anew at each time step.
+
+    It is envisaged that the templates
+    will be updated from time to time
+    as part of a continuous improvement
+    process.
+
+    """
+
+    # Configure logging for the template handling coroutine.
+    #
+    id_system       = cfg['id_system']
+    id_node         = cfg['id_node']
+    level_log_event = cfg['level_log']
+    if id_system and id_node:
+        id_log_event = '{sys}.{node}.template'.format(sys  = id_system,
+                                                      node = id_node)
+    else:
+        id_log_event = 'openai.template'
+    (log_event, handler_log_event) = fl.log.event.logger(
+                                                    str_id = id_log_event,
+                                                    level  = level_log_event)
+
+    map_template  = dict()  # id_prompt -> dict with template.
+    list_request  = list()
+    list_to_api   = list()
+    list_from_api = list()
+
+    while True:
+
+        list_to_api.clear()
+        list_to_api = yield list_from_api
+        list_from_api.clear()
+
+        list_request.clear()
+        for item in list_to_api:
+
+            # Determine the type of the item.
+            #
+            try:
+                id_type = item['type']['id']
+            except KeyError:
+                msg = 'Badly formed prompt or parameter message. ' \
+                      'Could not find type id information.'
+                log_event.error(msg)
+                raise RuntimeError(msg)
+
+            # Build a request from prompt params.
+            #
+            if id_type == 'prompt_params':
+
+                try:
+                    uid_template = item['uid_template']
+                except KeyError:
+                    msg = 'Badly formed parameter message. ' \
+                          'Could not find template id information.'
+                    log_event.error(msg)
+                    raise RuntimeError(msg)
+
+                try:
+                    template = map_template[uid_template]
+                except KeyError:
+                    msg = 'Could not find template id: {id}.'.format(
+                                                        id = uid_template)
+                    log_event.error(msg)
+                    raise RuntimeError(msg)
+
+                list_request.append(_build_request(template = template,
+                                                   param    = item))
+
+            # Update map_map_template with new
+            # and updated templates. Any old
+            # templates with the same id_prompt
+            # get overwritten.
+            #
+            elif id_type == 'prompt_template':
+
+                try:
+                    uid_template = item['uid_template']
+                except KeyError:
+                    msg = 'Badly formed template message. ' \
+                          'Could not find template id information.'
+                    log_event.error(msg)
+                    raise RuntimeError(msg)
+                else:
+                    map_template[uid_template] = item
+
+            # id_type not in (prompt_params,
+            # prompt_template), logic error.
+            #
+            else:
+
+                msg = 'Did not recognize id_type: {id}. '.format(id = id_type)
+                log_event.error(msg)
+                raise RuntimeError(msg)
+
+        list_from_api = request_handler.send(list_request)
 
 
 # -----------------------------------------------------------------------------
@@ -477,6 +403,119 @@ def _build_request(template, param):
 
 
 # -----------------------------------------------------------------------------
+@fl.util.coroutine
+def coro_request_handler(cfg):
+    """
+    Yield results for requests sent to the OpenAI web API.
+
+    For each list of request items that are
+    sent to this coroutine, it will yield a
+    tuple containing a list of result items
+    followed by a list of errors encountered.
+
+    This coroutine is responsible
+    for inter process communication
+    with the OpenAI client daemon
+    process.
+
+    """
+
+    # Validate configuration data.
+    #
+    set_key_expected = set(('api_key',
+                            'secs_interval',
+                            'is_bit',
+                            'is_async',
+                            'default',
+                            'id_system',
+                            'id_node',
+                            'level_log'))
+    set_key_actual  = set(cfg.keys())
+    set_key_missing = set_key_expected - set_key_actual
+    if set_key_missing:
+        raise RuntimeError('Missing key(s): {missing}'.format(
+                                        missing = ', '.join(set_key_missing)))
+
+    # Configure logging for the request handling coroutine.
+    #
+    id_system       = cfg['id_system']
+    id_node         = cfg['id_node']
+    level_log_event = cfg['level_log']
+    if id_system and id_node:
+        id_log_event = '{sys}.{node}.request'.format(sys  = id_system,
+                                                     node = id_node)
+    else:
+        id_log_event = 'openai.request'
+    (log_event, handler_log_event) = fl.log.event.logger(
+                                                    str_id = id_log_event,
+                                                    level  = level_log_event)
+
+    # Configure queues and start the client in a
+    # separate process.
+    #
+    if cfg['is_async']:
+        queue_to_api          = multiprocessing.Queue()  # coro --> API daemon
+        queue_from_api        = multiprocessing.Queue()  # API daemon --> coro
+        cfg['queue_to_api']   = queue_to_api
+        cfg['queue_from_api'] = queue_from_api
+        daemon = multiprocessing.Process(target = _daemon_main,
+                                         args   = (cfg,),
+                                         name   = 'openai-client',
+                                         daemon = True)
+        daemon.start()
+
+    # Loop forever, sending data to and from the
+    # openai client daemon via the two
+    # multiprocessing queues.
+    #
+    # At each step, yield results and event log
+    # items back to the controlling context, and
+    # get any new inbound requests to send to the
+    # openai client daemon.
+    #
+    list_to_api   = list()
+    list_from_api = list()
+
+    while True:
+
+        list_to_api.clear()
+        list_to_api = yield (list_from_api)
+        list_from_api.clear()
+
+        # Enqueue any newly submitted requests to
+        # send to the daemon process, then dequeue
+        # any newly returned results and event log
+        # line items.
+        #
+        if cfg['is_async']:
+            for item in list_to_api:
+                try:
+                    queue_to_api.put(item, block = False)
+                except queue.Full as err:
+                    log_event.error('Item dropped: queue_to_api is full.')
+                    break
+
+            while True:
+                try:
+                    list_from_api.append(queue_from_api.get(block = False))
+                except queue.Empty:
+                    break
+
+        # Synchronously process one request at a
+        # time, filling list_from_api with results
+        # and event log line items as we go.
+        #
+        else:
+            for item_to_api in list_to_api:
+                item_from_api = _process_one_request(
+                                                request_raw = item_to_api,
+                                                default     = cfg['default'],
+                                                is_bit      = cfg['is_bit'],
+                                                log_event   = log_event)
+                list_from_api.append(item_from_api)
+
+
+# -----------------------------------------------------------------------------
 def _daemon_main(cfg):
     """
     Service the request queue, forwarding requests to the OpenAI API.
@@ -495,31 +534,68 @@ def _daemon_main(cfg):
     API.
 
     """
+
+    # Configure logging for the daemon process.
+    #
+    id_system       = cfg['id_system']
+    id_node         = cfg['id_node']
+    level_log_event = cfg['level_log']
+    if id_system and id_node:
+        id_log_event = '{id_sys}.{id_node}.daemon'.format(id_sys  = id_system,
+                                                          id_node = id_node)
+    else:
+        id_log_event = 'openai.daemon'
+
+    (log_event, handler_log_event) = fl.log.event.logger(
+                                                    str_id = id_log_event,
+                                                    level  = level_log_event)
+
     openai.api_key = cfg['api_key']
+    queue_from_api = cfg['queue_from_api']
+    queue_to_api   = cfg['queue_to_api']
 
     while True:
 
+        # Attempt to retrieve the next request
+        # from the system. If there are no
+        # available requests, sleep for a short
+        # period so we don't end up consuming too
+        # much CPU. If a request is found, forward
+        # it to OpenAI. If a response is received
+        # from OpenAI, add it to the queue to be
+        # sent back to the rest of the system.
+        #
         try:
-            request = cfg['queue_request'].get(block = False)
+            request = queue_to_api.get(block = False)
         except queue.Empty:
             time.sleep(cfg['secs_interval'])
-            continue
+        else:
+            result = _process_one_request(request_raw = request,
+                                          default     = cfg['default'],
+                                          is_bit      = cfg['is_bit'],
+                                          log_event   = log_event)
+            if result:
+                try:
+                    queue_from_api.put(result, block = False)
+                except queue.Full as error:
+                    log_event.exception('One or more log_metric messages ' \
+                                        'dropped. queue_from_api is full.')
 
-        result = _process_one_request(request_raw = request,
-                                      default     = cfg['default'],
-                                      is_bit      = cfg['is_bit'])
+        # Attempt to send any available event log
+        # line items to the rest of the system.
+        #
+        while handler_log_event.list_event:
+            try:
+                queue_from_api.put(
+                            handler_log_event.list_event.pop(0), block = False)
+            except queue.Full:
+                log_event.exception('One or more log_event messages ' \
+                                    'dropped. queue_from_api is full.')
 
-        if result['error'] is not None:
-            cfg['queue_error'].put(result['error'], block = False)
-
-        try:
-            cfg['queue_result'].put(result, block = False)
-        except queue.Full as error:
-            cfg['queue_error'].put(error, block = False)
 
 
 # -----------------------------------------------------------------------------
-def _process_one_request(request_raw, default, is_bit):
+def _process_one_request(request_raw, default, is_bit, log_event):
     """
     Process a single request dict, returning a result dict.
 
@@ -543,11 +619,11 @@ def _process_one_request(request_raw, default, is_bit):
                                                     request_raw = request_raw,
                                                     default     = default)
 
-    result  = dict(type     = 'openai_result',
-                   request  = request_full,
-                   response = None,
-                   error    = None,
-                   state    = state)
+    result = dict(type     = 'openai_result',
+                  request  = request_full,
+                  response = None,
+                  error    = None,
+                  state    = state)
 
     if is_bit:
         result['response'] = response_bit
@@ -556,7 +632,8 @@ def _process_one_request(request_raw, default, is_bit):
             result['response'] = fcn_endpoint(**request_full)
         except openai.OpenAIError as err:
             result['error'] = err.user_message
-
+            log_event.exception('Error calling OpenAI: ' \
+                                '{msg}.'.format(msg = err.user_message))
     return result
 
 
@@ -693,8 +770,9 @@ def _build_endpoint_specific_parameters(request_raw, default):
             continue
 
         if is_required_by_internal_api:
-            raise RuntimeError('{id} not in request_raw'.format(
-                                                            id = id_param))
+            msg = '{id} not in request_raw'.format(id = id_param)
+            log_event.error(msg)
+            raise RuntimeError(msg)
 
         # Try to get value from default.
         #
@@ -705,8 +783,9 @@ def _build_endpoint_specific_parameters(request_raw, default):
             continue
 
         if is_required_by_openai_api:
-            raise RuntimeError('{id} not in request_raw or default'.format(
-                                                            id = id_param))
+            msg = '{id} not in request_raw or default'.format(id = id_param)
+            log_event.error(msg)
+            raise RuntimeError(msg)
 
     state = request_raw.get('state', {})
 
@@ -724,13 +803,15 @@ def _check_type(id_param, param, tup_type):
     Raise an exception if param is not in the specified tup_type.
 
     """
-    if isinstance(param, tup_type):
-        return
-    raise RuntimeError(
-        'Type error for request["{id}"]: ({typename} != {required})'.format(
-                                                    id       = id_param,
-                                                    typename = type(param),
-                                                    required = repr(tup_type)))
+
+    if not isinstance(param, tup_type):
+        msg = 'Type error for request["{id}"]: ' \
+              '({typename} != {required})'.format(id       = id_param,
+                                                  typename = type(param),
+                                                  required = repr(tup_type))
+        log_event.error(msg)
+        raise RuntimeError(msg)
+
 
 # -----------------------------------------------------------------------------
 def built_in_test_response(id_endpoint, id_version = 'v1'):

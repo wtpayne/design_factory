@@ -12,7 +12,7 @@ host:
     dirpath_log:            ''
     launch_cmd:             ''
     environment:            'e003_discord'
-    log_level:              'TRACE'
+    log_level:              'INFO'
 
 
 ###############################################################################
@@ -86,7 +86,7 @@ node:
       filepath_env:         Null
       key_token:            TOKEN_DISCORD_HARMONICA_DEV
       secs_sleep:           0.2
-      log_level:            'TRACE'
+      log_level:            'INFO'
       msg:
       - type:               msg_dm
         id_user:            563330464220446726
@@ -137,6 +137,7 @@ node:
         presence_penalty:   0.0
         frequency_penalty:  0.0
         user:               ''
+      log_level:            'INFO'
 
   # ---------------------------------------------------------------------------
   # Logging.

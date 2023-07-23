@@ -1,0 +1,112 @@
+system:
+  id_system:                syntext
+
+
+###############################################################################
+host:
+  localhost:
+    hostname:               'localhost'
+    acct_run:               ''
+    acct_provision:         ''
+    port_range:             '8090-9000'
+    dirpath_log:            ''
+    launch_cmd:             ''
+    environment:            'e003_discord'
+    log_level:              'TRACE'
+
+
+###############################################################################
+process:
+  proc_main:
+    host:                   localhost
+
+
+###############################################################################
+node:
+
+  # ---------------------------------------------------------------------------
+  # System clock and state management for the entire system.
+  #
+  ctrl_sys:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.ctrl.sys.ic00_edict
+    state_type:             py_dict
+    config:
+      frequency_hz:         5
+
+  # ---------------------------------------------------------------------------
+  # State management for the main process.
+  #
+  ctrl_main:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.ctrl.proc.ic00_edict
+    state_type:             py_dict
+
+  # ---------------------------------------------------------------------------
+  # Main syntext engine.
+  #
+  engine:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            syntext.engine.ic00_edict
+    state_type:             py_dict
+
+  filewriter:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            syntext.filewriter.ic00_edict
+    state_type:             py_dict
+
+
+###############################################################################
+edge:
+
+# Control signals
+
+- owner: ctrl_sys
+  data:  py_dict
+  src:   ctrl_sys.outputs.ctrl_main
+  dst:   ctrl_main.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_engine
+  dst:   engine.inputs.ctrl
+
+- owner: engine
+  data:  py_dict
+  src:   engine.outputs.text
+  dst:   filewriter.inputs.text
+
+###############################################################################
+data:
+  py_list:  py_list
+  py_dict:  py_dict
+  py_str:   py_str
+
+
+###############################################################################
+req_host_cfg:
+  default_configuration:
+    role:
+      - default_role
+
+
+###############################################################################
+role:
+  default_role:
+    tasks:
+      - name: Update apt-get repo and cache
+        become:        yes
+        become_user:   root
+        become_method: sudo
+        apt:
+          update_cache:     yes
+          force_apt_get:    yes
+          cache_valid_time: 3600

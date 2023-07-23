@@ -100,13 +100,13 @@ def coro(cfg_bot):
         raise ValueError(
                 'cfg_bot["secs_sleep"] must be an integer or float value.')
 
-    if not isinstance(cfg_bot['id_system'], str):
+    if not isinstance(cfg_bot['id_system'], (str, type(None))):
         raise ValueError(
-                'cfg_bot["id_system"] must be a string.')
+                'cfg_bot["id_system"] must be a string or None.')
 
-    if not isinstance(cfg_bot['id_node'], str):
+    if not isinstance(cfg_bot['id_node'], (str, type(None))):
         raise ValueError(
-                'cfg_bot["id_node"] must be a string.')
+                'cfg_bot["id_node"] must be a string or None.')
 
     str_name_process = 'discord-bot'
     fcn_bot          = _discord_bot
@@ -145,6 +145,7 @@ def coro(cfg_bot):
                 list_from_bot.append(
                         dict(type    = 'log_event',
                              content = 'Item dropped: queue_to_bot is full.'))
+                break
 
         # Retrieve any user messages, command
         # invocations or log messages from the
@@ -200,7 +201,6 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
     # is set up here to handle logging in this
     # wrapper.
     #
-    list_log_event = list()
     map_log_metric = dict()
 
     id_system       = cfg_bot.get('id_system', None)
@@ -212,10 +212,10 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
                                                        id_node = id_node)
     else:
         id_log_event = 'discord.bot'
-    log_event         = logging.getLogger(id_log_event)
-    handler_log_event = fl.log.event.ListHandler(list_log_event)
-    log_event.addHandler(handler_log_event)
-    log_event.setLevel(level_log_event)
+
+    (log_event, handler_log_event) = fl.log.event.logger(
+                                                    str_id = id_log_event,
+                                                    level  = level_log_event)
 
     intents                 = discord.Intents.default()
     intents.guilds          = True
@@ -248,12 +248,16 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         log_event.info('Discord bot is ready.')
         task_msg = bot.loop.create_task(coro = _service_all_queues(
                                                             cfg_bot,
+                                                            handler_log_event,
                                                             queue_to_bot,
                                                             queue_from_bot))
 
 
     # -------------------------------------------------------------------------
-    async def _service_all_queues(cfg_bot, queue_to_bot, queue_from_bot):
+    async def _service_all_queues(cfg_bot,
+                                  handler_log_event,
+                                  queue_to_bot,
+                                  queue_from_bot):
         """
         Message queue servicing coroutine.
 
@@ -290,7 +294,9 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             # system.
             #
             _service_queue_from_bot(
-                            list_log_event, map_log_metric, queue_from_bot)
+                            handler_log_event,
+                            map_log_metric,
+                            queue_from_bot)
 
             # Service outbound messages from the
             # system to discord, then command
@@ -305,7 +311,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
 
     # -------------------------------------------------------------------------
-    def _service_queue_from_bot(list_log_event,
+    def _service_queue_from_bot(handler_log_event,
                                 map_log_metric,
                                 queue_from_bot):
         """
@@ -313,37 +319,24 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
 
         """
 
-        _send_event_log_to_system(  list_log_event, queue_from_bot )
-        _send_metric_log_to_system( map_log_metric, queue_from_bot )
+        _send_event_log_to_system(  handler_log_event, queue_from_bot )
+        _send_metric_log_to_system( map_log_metric,    queue_from_bot )
 
 
     # ---------------------------------`---------------------------------------
-    def _send_event_log_to_system(list_log_event, queue_from_bot):
+    def _send_event_log_to_system(handler_log_event, queue_from_bot):
         """
         Send event log data from the discord bot to the rest of the system.
 
         """
 
-        while list_log_event:
-            event   = list_log_event.pop(0)
-            message = dict(type         = 'log_event',
-                           name         = event.name,
-                           level        = event.levelname,
-                           pathname     = event.pathname,
-                           lineno       = event.lineno,
-                           msg          = event.msg,
-                           args         = event.args,
-                           exc_info     = event.exc_info,
-                           created      = event.created,
-                           thread       = event.thread,
-                           thread_name  = event.threadName,
-                           process      = event.process,
-                           process_name = event.processName)
+        while handler_log_event.list_event:
             try:
-                queue_from_bot.put(message, block = False)
+                queue_from_bot.put(handler_log_event.list_event.pop(0),
+                                   block = False)
             except queue.Full:
-                log_event.error('One or more log_event messages ' \
-                                'dropped. queue_from_bot is full.')
+                log_event.exception('One or more log_event messages ' \
+                                    'dropped. queue_from_bot is full.')
                 break
 
 
@@ -360,8 +353,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 queue_from_bot.put(message, block = False)
             except queue.Full:
-                log_event.error('One or more log_metric messages ' \
-                                'dropped. queue_from_bot is full.')
+                log_event.exception('One or more log_metric messages ' \
+                                    'dropped. queue_from_bot is full.')
             finally:
                 map_log_metric.clear()
 
@@ -415,7 +408,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 bot.add_command(obj_cmd)
             except discord.DiscordException as err:
-                log_event.error(
+                log_event.exception(
                         'Could not add message command: {err}'.format(
                                                                     err = err))
             else:
@@ -450,7 +443,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
             try:
                 bot.tree.add_command(cmd)
             except discord.DiscordException as err:
-                log_event.error(
+                log_event.exception(
                         'Could not add application command: {err}'.format(
                                                                     err = err))
             else:
@@ -571,7 +564,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log_event.error('Command input dropped: queue_from_bot is full.')
+            log_event.exception('Command input dropped: ' \
+                                'queue_from_bot is full.')
 
     # Update the global callback register so that
     # on_cmd can be called from generated code
@@ -612,7 +606,8 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         try:
             queue_from_bot.put(map_cmd, block = False)
         except queue.Full:
-            log_event.error('Command input dropped: queue_from_bot is full.')
+            log_event.exception('Command input dropped: ' \
+                                'queue_from_bot is full.')
         await interaction.followup.send('OK', ephemeral = True)
 
     # Update the global callback register so that
@@ -1092,17 +1087,16 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         except (discord.app_commands.MissingApplicationID,
                 discord.Forbidden,
                 discord.GatewayNotFound,
-                discord.InvalidArgument,
                 discord.InvalidData,
                 discord.LoginFailure,
                 discord.NotFound,
                 discord.PrivilegedIntentsRequired) as err:
             log_event.error('Fatal error: {err}'.format(err = str(err)))
-            _send_event_log_to_system(list_log_event, queue_from_bot)
+            _send_event_log_to_system(handler_log_event, queue_from_bot)
             break
 
         except Exception as err:
             log_event.error('Non-fatal error: {err}'.format(err = str(err)))
             log_event.warning('Restarting. ({idx}).'.format(idx = idx_retry))
-            _send_event_log_to_system(list_log_event, queue_from_bot)
+            _send_event_log_to_system(handler_log_event, queue_from_bot)
             continue
