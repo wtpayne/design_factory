@@ -108,6 +108,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if not inputs['ctrl']['ena']:
             continue
         timestamp.update(inputs['ctrl']['ts'])
+        unix_time = timestamp['unix_time']
 
         # Pass requests to the openai api.
         #
@@ -119,7 +120,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # openai API.
         #
         list_from_api.clear()
-        list_from_api[:] = request_handler.send(list_to_api)
+        list_from_api[:] = request_handler.send((list_to_api, unix_time))
         list_to_api.clear()
         if not list_from_api:
             continue

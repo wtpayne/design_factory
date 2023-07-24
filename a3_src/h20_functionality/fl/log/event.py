@@ -98,8 +98,8 @@ class ListHandler(logging.Handler):
                                     pathname     = record.pathname,
                                     lineno       = record.lineno,
                                     msg          = record.msg,
-                                    args         = record.args,
-                                    exc_info     = record.exc_info,
+                                    args         = repr(record.args),
+                                    exc_info     = repr(record.exc_info),
                                     thread       = record.thread,
                                     thread_name  = record.threadName,
                                     process      = record.process,
@@ -147,29 +147,29 @@ def writer(id_system, dirpath_log = None):
     cursor       = connection.cursor()
 
     cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS
-                    log_events (created      TIMESTAMP,
-                                name         TEXT,
-                                level        TEXT,
-                                pathname     TEXT,
-                                lineno       INTEGER,
-                                msg          TEXT,
-                                args         TEXT,
-                                exc_info     TEXT,
-                                thread       INTEGER,
-                                thread_name  TEXT,
-                                process      INTEGER,
-                                process_name TEXT);
-                """)
+            """
+            CREATE TABLE IF NOT EXISTS
+                log_event (created      TIMESTAMP,
+                           name         TEXT,
+                           level        TEXT,
+                           pathname     TEXT,
+                           lineno       INTEGER,
+                           msg          TEXT,
+                           args         TEXT,
+                           exc_info     TEXT,
+                           thread       INTEGER,
+                           thread_name  TEXT,
+                           process      INTEGER,
+                           process_name TEXT);
+            """)
 
     cursor.execute(
-                """
-                CREATE INDEX IF NOT EXISTS
-                    log_events_created_idx
-                ON
-                    log_events (created);
-                """)
+            """
+            CREATE INDEX IF NOT EXISTS
+                log_event_created_idx
+            ON
+                log_event (created);
+            """)
 
     connection.commit()
 
@@ -178,32 +178,32 @@ def writer(id_system, dirpath_log = None):
         (event) = yield (None)
 
         cursor.execute(
-                    """
-                    INSERT INTO log_events (created,
-                                            name,
-                                            level,
-                                            pathname,
-                                            lineno,
-                                            msg,
-                                            args,
-                                            exc_info,
-                                            thread,
-                                            thread_name,
-                                            process,
-                                            process_name)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (event['created'],
-                     event['name'],
-                     event['level'],
-                     event['pathname'],
-                     event['lineno'],
-                     event['msg'],
-                     repr(event['args']),
-                     repr(event['exc_info']),  # Convert exception info to string
-                     event['thread'],
-                     event['thread_name'],
-                     event['process'],
-                     event['process_name']))
+            """
+            INSERT INTO log_event (created,
+                                   name,
+                                   level,
+                                   pathname,
+                                   lineno,
+                                   msg,
+                                   args,
+                                   exc_info,
+                                   thread,
+                                   thread_name,
+                                   process,
+                                   process_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (event['created'],
+             event['name'],
+             event['level'],
+             event['pathname'],
+             event['lineno'],
+             event['msg'],
+             event['args'],
+             event['exc_info'],
+             event['thread'],
+             event['thread_name'],
+             event['process'],
+             event['process_name']))
 
         connection.commit()

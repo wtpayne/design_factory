@@ -157,7 +157,7 @@ node:
     req_host_cfg:           default_configuration
     functionality:
       py_module:            cl.util.noop.ic00_edict
-      # py_module:            cl.log.metric.ic00_edict
+      py_module:            cl.log.metric.ic00_edict
     state_type:             py_dict
     config:
       dirpath_log:          Null

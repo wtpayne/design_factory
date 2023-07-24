@@ -5,6 +5,7 @@ Functional specification for fl.net.openai.client
 """
 
 
+import copy
 import inspect
 import logging
 import time
@@ -98,7 +99,7 @@ def testvector_completions_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -176,7 +177,7 @@ def testvector_chat_completions_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -256,7 +257,7 @@ def testvector_edits_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -330,7 +331,7 @@ def testvector_images_generations_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -406,7 +407,7 @@ def testvector_images_edits_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -479,7 +480,7 @@ def testvector_images_variations_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -556,7 +557,7 @@ def testvector_embeddings_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -636,7 +637,7 @@ def testvector_audio_transcriptions_valid_bit():
     output_valid = [{
         'type':            'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -716,7 +717,7 @@ def testvector_audio_translations_valid_bit():
     output_valid = [{
         'type':             'openai_result',
         'error':            None,
-        'request':          request_valid,
+        'request':          copy.deepcopy(request_valid),
         'response':         fl.net.openai.client.built_in_test_response(
                                                                 id_endpoint),
         'state':            {}}]
@@ -746,7 +747,8 @@ def testrunner_coro_request_handler_singleshot():
 
         """
         import fl.net.openai.client
-        client = fl.net.openai.client.coro_request_handler(cfg = cfg)
+        unix_time = 0
+        client    = fl.net.openai.client.coro_request_handler(cfg = cfg)
 
         for _ in range(maxiter):
 
@@ -755,7 +757,7 @@ def testrunner_coro_request_handler_singleshot():
             else:
                 list_input = []
 
-            (list_output) = client.send(list_input)
+            (list_output) = client.send((list_input, unix_time))
             if len(list_output) > 0:
                 return list_output
 
@@ -783,7 +785,7 @@ def testrunner_coro_template_handler_singleshot():
 
         """
         import fl.net.openai.client
-
+        unix_time        = 0
         request_handler  = fl.net.openai.client.coro_request_handler(
                                             cfg              = cfg)
         template_handler = fl.net.openai.client.coro_template_handler(
@@ -797,7 +799,7 @@ def testrunner_coro_template_handler_singleshot():
             else:
                 list_input = []
 
-            list_output = template_handler.send(list_input)
+            list_output = template_handler.send((list_input, unix_time))
             if len(list_output) > 0:
                 return list_output
 
@@ -825,7 +827,7 @@ def testrunner_coro_workflow_handler_singleshot():
 
         """
         import fl.net.openai.client
-
+        unix_time        = 0
         request_handler  = fl.net.openai.client.coro_request_handler(
                                         cfg              = cfg)
         template_handler = fl.net.openai.client.coro_template_handler(
@@ -843,7 +845,7 @@ def testrunner_coro_workflow_handler_singleshot():
             else:
                 list_input = []
 
-            list_output = workflow_handler.send(list_input)
+            list_output = workflow_handler.send((list_input, unix_time))
             if len(list_output) > 0:
                 return list_output
 

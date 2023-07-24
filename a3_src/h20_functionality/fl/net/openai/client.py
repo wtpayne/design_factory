@@ -113,6 +113,7 @@ import logging
 import multiprocessing
 import queue
 import re
+import string
 import time
 
 import openai
@@ -149,7 +150,7 @@ def coro_workflow_handler(cfg, request_handler, template_handler):
     while True:
 
         list_to_api.clear()
-        list_to_api = yield list_from_api
+        (list_to_api, unix_time) = yield list_from_api
 
         # Update the workflow table.
         #
@@ -175,9 +176,16 @@ def coro_workflow_handler(cfg, request_handler, template_handler):
         for (uid_workflow, workflow) in map_workflow.items():
             list_filt = list(item for item in list_to_api
                                     if item['uid_workflow'] == uid_workflow)
-            list_from_api.extend(
-                            template_handler.send(
-                                        workflow['coroutine'].send(list_filt)))
+            list_from_api.extend(template_handler.send(
+                                        (workflow['coroutine'].send(list_filt),
+                                         unix_time)))
+
+        # Attempt to send any available event log
+        # line items to the rest of the system.
+        #
+        if handler_log_event.list_event:
+            list_from_api.extend(handler_log_event.list_event)
+            handler_log_event.list_event.clear()
 
 
 # -----------------------------------------------------------------------------
@@ -249,7 +257,7 @@ def coro_template_handler(cfg, request_handler):
     while True:
 
         list_to_api.clear()
-        list_to_api = yield list_from_api
+        (list_to_api, unix_time) = yield list_from_api
         list_from_api.clear()
 
         list_request.clear()
@@ -314,7 +322,15 @@ def coro_template_handler(cfg, request_handler):
                 log_event.error(msg)
                 raise RuntimeError(msg)
 
-        list_from_api = request_handler.send(list_request)
+        list_from_api = request_handler.send((list_request, unix_time))
+
+        # Attempt to send any available event log
+        # line items to the rest of the system.
+        #
+        if handler_log_event.list_event:
+            list_from_api.extend(handler_log_event.list_event)
+            handler_log_event.list_event.clear()
+
 
 
 # -----------------------------------------------------------------------------
@@ -479,7 +495,7 @@ def coro_request_handler(cfg):
     while True:
 
         list_to_api.clear()
-        list_to_api = yield (list_from_api)
+        (list_to_api, unix_time) = yield (list_from_api)
         list_from_api.clear()
 
         # Enqueue any newly submitted requests to
@@ -497,9 +513,12 @@ def coro_request_handler(cfg):
 
             while True:
                 try:
-                    list_from_api.append(queue_from_api.get(block = False))
+                    item_to_api = queue_from_api.get(block = False)
                 except queue.Empty:
                     break
+                else:
+                    item_to_api['unix_time'] = unix_time
+                    list_from_api.append(item_to_api)
 
         # Synchronously process one request at a
         # time, filling list_from_api with results
@@ -507,12 +526,19 @@ def coro_request_handler(cfg):
         #
         else:
             for item_to_api in list_to_api:
-                item_from_api = _process_one_request(
-                                                request_raw = item_to_api,
-                                                default     = cfg['default'],
-                                                is_bit      = cfg['is_bit'],
-                                                log_event   = log_event)
-                list_from_api.append(item_from_api)
+                item_to_api['unix_time'] = unix_time
+                list_from_api.extend(
+                            _process_one_request(request_raw = item_to_api,
+                                                 default     = cfg['default'],
+                                                 is_bit      = cfg['is_bit'],
+                                                 log_event   = log_event))
+
+        # Attempt to send any available event log
+        # line items to the rest of the system.
+        #
+        if handler_log_event.list_event:
+            list_from_api.extend(handler_log_event.list_event)
+            handler_log_event.list_event.clear()
 
 
 # -----------------------------------------------------------------------------
@@ -572,13 +598,13 @@ def _daemon_main(cfg):
         except queue.Empty:
             time.sleep(cfg['secs_interval'])
         else:
-            result = _process_one_request(request_raw = request,
-                                          default     = cfg['default'],
-                                          is_bit      = cfg['is_bit'],
-                                          log_event   = log_event)
-            if result:
+            list_msg = _process_one_request(request_raw = request,
+                                            default     = cfg['default'],
+                                            is_bit      = cfg['is_bit'],
+                                            log_event   = log_event)
+            for msg in list_msg:
                 try:
-                    queue_from_api.put(result, block = False)
+                    queue_from_api.put(msg, block = False)
                 except queue.Full as error:
                     log_event.exception('One or more log_metric messages ' \
                                         'dropped. queue_from_api is full.')
@@ -626,6 +652,7 @@ def _process_one_request(request_raw, default, is_bit, log_event):
                   response = None,
                   error    = None,
                   state    = state)
+    list_msg = [result]
 
     if is_bit:
         result['response'] = response_bit
@@ -640,14 +667,35 @@ def _process_one_request(request_raw, default, is_bit, log_event):
         else:
 
             try:
-                count_token = result['usage']['total_tokens']
+                count_token = result['response']['usage']['total_tokens']
+            except KeyError as err:
+                log_event.info(
+                        'Response recieved from the OpenAI API. ' \
+                        '(No token count).')
+            else:
                 log_event.info('Response recieved from the OpenAI API. ' \
                                '{num} tokens used in total.'.format(
                                                             num = count_token))
-            except KeyError as err:
-                log_event.info('Response recieved from the OpenAI API.')
+                unix_time  = request_raw.get(unix_time, 0)
+                pnct       = string.punctuation
+                id_model   = request_raw.get('model', '')
+                id_model   = ''.join((ch for ch in id_model if ch not in pnct))
+                map_state  = request_raw.get('state', dict())
+                id_prompt  = map_state.get('id_prompt',  '')
+                id_session = map_state.get('id_session', '')
+                id_metric  = 'tokens.total'
+                if id_model:
+                    id_metric += '.' + id_model
+                if id_prompt:
+                    id_metric += '.' + id_prompt
+                if id_session:
+                    id_metric += '.' + id_session
+                list_msg.append(dict(type    = 'log_metric',
+                                     created = unix_time,
+                                     id      = id_metric,
+                                     value   = count_token))
 
-    return result
+    return list_msg
 
 
 # -----------------------------------------------------------------------------
