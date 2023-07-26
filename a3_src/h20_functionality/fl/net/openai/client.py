@@ -676,7 +676,7 @@ def _process_one_request(request_raw, default, is_bit, log_event):
                 log_event.info('Response recieved from the OpenAI API. ' \
                                '{num} tokens used in total.'.format(
                                                             num = count_token))
-                unix_time  = request_raw.get(unix_time, 0)
+                unix_time  = request_raw.get('unix_time', 0)
                 pnct       = string.punctuation
                 id_model   = request_raw.get('model', '')
                 id_model   = ''.join((ch for ch in id_model if ch not in pnct))

@@ -98,8 +98,8 @@ def writer(id_system, dirpath_log = None):
                 """
                 CREATE TABLE IF NOT EXISTS
                     log_data (created TIMESTAMP,
-                                id      TEXT,
-                                value   TEXT);
+                              id      TEXT,
+                              value   TEXT);
                 """)
 
     cursor.execute(

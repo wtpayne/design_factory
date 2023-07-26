@@ -142,6 +142,28 @@ node:
   # ---------------------------------------------------------------------------
   # Logging.
   #
+  measure_inputs:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.log.data.measurement.ic00_edict
+    state_type:             py_dict
+
+  measure_outputs:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.log.data.measurement.ic00_edict
+    state_type:             py_dict
+
+  sense_localhost:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+      # py_module:            cl.log.metric.sensor.ic00_edict
+    state_type:             py_dict
+
   log_event:
     process:                proc_main
     req_host_cfg:           default_configuration
@@ -156,7 +178,6 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.util.noop.ic00_edict
       py_module:            cl.log.metric.ic00_edict
     state_type:             py_dict
     config:
@@ -166,8 +187,7 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.util.noop.ic00_edict
-      # py_module:            cl.log.data.ic00_edict
+      py_module:            cl.log.data.ic00_edict
     state_type:             py_dict
     config:
       dirpath_log:          Null
@@ -185,11 +205,6 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
-  src:   ctrl_main.outputs.ctrl_deliberation
-  dst:   deliberation.inputs.ctrl
-
-- owner: ctrl_main
-  data:  py_dict
   src:   ctrl_main.outputs.ctrl_discord
   dst:   discord.inputs.ctrl
 
@@ -197,6 +212,21 @@ edge:
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_openai
   dst:   openai.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_sense_localhost
+  dst:   sense_localhost.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_measure_inputs
+  dst:   measure_inputs.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_measure_outputs
+  dst:   measure_outputs.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -213,32 +243,58 @@ edge:
   src:   ctrl_main.outputs.ctrl_log_data
   dst:   log_data.inputs.ctrl
 
+# Deliberatioon integration
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   measure_inputs.outputs.ctrl
+  dst:   deliberation.inputs.ctrl
 
 # Discord integration
 
 - owner: deliberation
   data:  py_dict
   src:   deliberation.outputs.discord
+  dst:   measure_outputs.inputs.discord
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.discord
   dst:   discord.inputs.msg
 
 - owner: discord
   data:  py_dict
   src:   discord.outputs.msg
-  dst:   deliberation.inputs.discord
+  dst:   measure_inputs.inputs.discord
   dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.discord
+  dst:   deliberation.inputs.discord
 
 # OpenAI integration
 
 - owner: deliberation
   data:  py_dict
   src:   deliberation.outputs.openai
+  dst:   measure_outputs.inputs.openai
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.openai
   dst:   openai.inputs.request
 
 - owner: openai
   data:  py_dict
   src:   openai.outputs.result
-  dst:   deliberation.inputs.openai
+  dst:   measure_inputs.inputs.openai
   dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.openai
+  dst:   deliberation.inputs.openai
 
 # Event logging
 
@@ -259,6 +315,11 @@ edge:
 
 # Metric logging
 
+- owner: sense_localhost
+  data:  py_dict
+  src:   sense_localhost.outputs.log_metric
+  dst:   log_metric.inputs.sense_localhost
+
 - owner: discord
   data:  py_dict
   src:   discord.outputs.log_metric
@@ -276,6 +337,16 @@ edge:
 
 # Data logging
 
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.log_data
+  dst:   log_data.inputs.measure_inputs
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.log_data
+  dst:   log_data.inputs.measure_outputs
+
 - owner: discord
   data:  py_dict
   src:   discord.outputs.log_data
@@ -290,6 +361,7 @@ edge:
   data:  py_dict
   src:   deliberation.outputs.log_data
   dst:   log_data.inputs.deliberation
+
 
 ###############################################################################
 data:

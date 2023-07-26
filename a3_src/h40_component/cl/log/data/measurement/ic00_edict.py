@@ -3,13 +3,13 @@
 ---
 
 title:
-    "Placeholder no-op stableflow-edict component."
+    "Data logging measurement stableflow-edict component."
 
 description:
-    "Placeholder no-op component. Does nothing"
+    "Measurement component. Performs measurement for datalogging."
 
 id:
-    "1fa0f143-b6b7-42c7-8030-fef1886b2c1f"
+    "451f261a-63f7-4cf4-bcb7-ed5eff5bb35c"
 
 type:
     dt004_python_stableflow_edict_component
@@ -44,6 +44,8 @@ license:
 """
 
 
+import copy
+
 import fl.util.edict
 
 
@@ -53,7 +55,28 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Noop component coroutine.
 
     """
-    signal = fl.util.edict.init(outputs)
+
+    set_key_in         = set(inputs.keys())
+    set_key_out        = set(outputs.keys())
+    set_key_in_and_out = set_key_out & set_key_in
+    set_key_out_only   = set_key_out - set_key_in
+    tup_key_in_and_out = tuple(sorted(set_key_in_and_out))
+    tup_key_out_only   = tuple(sorted(set_key_out_only))
+    signal             = fl.util.edict.init(outputs)
+
     while True:
+
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
+
+        map_measurement = dict()
+        for id_key in tup_key_in_and_out:
+            item = copy.deepcopy(inputs[id_key])
+            outputs[id_key].update(item)
+            if item['ena']:
+                map_measurement[id_key] = item
+
+        if map_measurement:
+            for id_key in tup_key_out_only:
+                outputs[id_key]['ena']     = True
+                outputs[id_key]['list'][:] = [map_measurement]

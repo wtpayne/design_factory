@@ -43,6 +43,7 @@ license:
 ...
 """
 
+import pickle
 
 import fl.log.data
 import fl.util.edict
@@ -55,9 +56,9 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    set_key_all   = set(inputs.keys())
-    set_key_ctrl  = set(('ctrl', ))
-    set_key_event = set_key_all - set_key_ctrl
+    set_key_in          = set(inputs.keys())
+    set_key_ctrl        = set(('ctrl', ))
+    set_key_measurement = set_key_in - set_key_ctrl
 
     writer = fl.log.data.writer(id_system   = runtime['id']['id_system'],
                                 dirpath_log = cfg.get('dirpath_log', None))
@@ -73,12 +74,17 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
 
         timestamp = inputs['ctrl']['ts']
+        unix_time = timestamp.get('unix_time', 0)
 
-        for key in set_key_event:
-            packet = inputs[key]
-
+        for id_key in set_key_measurement:
+            packet = inputs[id_key]
             if not packet['ena']:
                 continue
+            for measurement in packet['list']:
+                for (key, value) in measurement.items():
+                    writer.send(dict(created = unix_time,
+                                     id      = key,
+                                     value   = pickle.dumps(value)))
 
-            for item in packet['list']:
-                writer.send(item)
+
+
