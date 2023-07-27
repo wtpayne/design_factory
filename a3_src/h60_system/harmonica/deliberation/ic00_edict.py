@@ -54,10 +54,8 @@ import key
 import fl.net.discord.bot
 
 
-NOTHING        = tuple()
-PREFIX_JOIN    = 'join_'
-PREFIX_SUBMIT  = 'submit_'
-PREFIX_SUMMARY = 'summary_'
+NOTHING     = tuple()
+PREFIX_JOIN = 'join_'
 
 
 # -----------------------------------------------------------------------------
@@ -73,10 +71,15 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     #   state['user']    is a map from id_user    -> info_user
     #   state['prompt']  is a map from id_prompt  -> str_prompt
     #
-    #   info_session is { 'admin':       id_admin,
-    #                     'topic':       str_topic,
-    #                     'participant': set(id_user),
-    #                     'contributor': set(id_user) }
+    #   info_session is { 'admin':        id_admin,
+    #                     'id_channel':   id_channel,
+    #                     'ts_tick_last': timestamp,   # time of last tick
+    #                     'ts_act_last':  timestamp,   # time of last action
+    #                     'ts_summ_last': timestamp,   # time of last summary
+    #                     'topic':        str_topic,
+    #                     'participant':  set(id_user),
+    #                     'contributor':  set(id_user),
+    #                      }
     #   info_user    is { 'name':       name_user,
     #                     'session':    id_session,
     #                     'transcript': list(content) }
@@ -97,7 +100,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp = inputs['ctrl']['ts']
 
-        list_msg_in = list()
+        tick_interval_secs = 5
+        list_msg_in = list(_gen_msg_tick(state, timestamp, tick_interval_secs))
         if inputs['discord']['ena']:
             list_msg_in.extend(inputs['discord']['list'])
         if inputs['openai']['ena']:
@@ -106,7 +110,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         list_to_discord = list()
         list_to_openai  = list()
         for msg in list_msg_in:
-            (part_discord, part_openai) = _update(state, msg)
+            (part_discord, part_openai) = _update(state, timestamp, msg)
             list_to_discord += part_discord
             list_to_openai  += part_openai
 
@@ -122,7 +126,33 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
 
 # -----------------------------------------------------------------------------
-def _update(state, msg):
+def _gen_msg_tick(state, timestamp, tick_interval_secs):
+    """
+    Yield all due tick messages.
+
+    """
+
+    MS_PER_SECOND      = 1000
+    US_PER_MS          = 1000
+    US_PER_SECOND      = MS_PER_SECOND * US_PER_MS
+    TICK_INTERVAL_US   = tick_interval_secs * US_PER_SECOND
+    ts_rel_us          = timestamp['ts_rel_us']
+
+    for (id_session, info_session) in state['session'].items():
+
+        ts_tick_last = info_session.get('ts_tick_last', 0)
+        ts_delta_us  = ts_rel_us - ts_tick_last
+        is_tick_due  = ts_delta_us > TICK_INTERVAL_US
+
+        if is_tick_due:
+            state['session'][id_session]['ts_tick_last'] = ts_rel_us
+            yield dict(type       = 'timer_tick',
+                       id_session = id_session,
+                       ts_tick    = ts_rel_us)
+
+
+# -----------------------------------------------------------------------------
+def _update(state, timestamp, msg):
     """
     Return an update corresponding to the specified msg.
 
@@ -131,31 +161,29 @@ def _update(state, msg):
     discord = list()
     openai  = list()
 
-    str_type  = msg['type']
-    is_btn    = str_type in { 'btn',                      }
-    is_dm     = str_type in { 'msg_dm',    'edit_dm'      }
-    is_guild  = str_type in { 'msg_guild', 'edit_guild'   }
-    is_appcmd = str_type in { 'appcmd_dm', 'appcmd_guild' }
-    is_msgcmd = str_type in { 'msgcmd_dm', 'msgcmd_guild' }
-    is_res    = str_type in { 'openai_result',            }
+    str_type      = msg['type']
+    is_appcmd     = str_type in { 'appcmd_dm', 'appcmd_guild' }
+    is_msgcmd     = str_type in { 'msgcmd_dm', 'msgcmd_guild' }
+    is_btn        = str_type in { 'btn',                      }
+    is_dm         = str_type in { 'msg_dm',    'edit_dm'      }
+    is_guild      = str_type in { 'msg_guild', 'edit_guild'   }
+    is_result     = str_type in { 'openai_result',            }
+    is_timer_tick = str_type in { 'timer_tick',               }
 
     if (is_appcmd and msg['name_command'] == 'ask'):
-        discord += _on_cmd_ask(state, msg)
+        discord += _on_cmd_ask(state, timestamp, msg)
 
     if (is_btn    and msg['id_btn'].startswith(PREFIX_JOIN)):
-        discord += _on_btn_join(state, msg)
+        discord += _on_btn_join(state, timestamp, msg)
 
     if (is_dm     and msg['id_author'] in state['user']):
-        discord += _on_msg_dm(state, msg)
+        discord += _on_msg_dm(state, timestamp, msg)
 
-    if (is_btn    and msg['id_btn'].startswith(PREFIX_SUBMIT)):
-        discord += _on_btn_submit(state, msg)
+    if (is_timer_tick):
+        openai  += _on_timer_tick(state, timestamp, msg)
 
-    if (is_btn    and msg['id_btn'].startswith(PREFIX_SUMMARY)):
-        openai  += _on_btn_summary(state, msg)
-
-    if (is_res    and msg['state']['id_prompt'] == 'summary'):
-        discord += _on_summary(state, msg)
+    if (is_result and msg['state']['id_prompt'] == 'summary'):
+        discord += _on_llm_summary(state, msg)
 
     if (is_appcmd and msg['name_command'] == 'dbg_transcript_show'):
         discord += _on_cmd_dbg_transcript_show(state, msg)
@@ -170,7 +198,7 @@ def _update(state, msg):
 
 
 # -----------------------------------------------------------------------------
-def _on_cmd_ask(state, msg):
+def _on_cmd_ask(state, timestamp, msg):
     """
     Respond to an ask command.
 
@@ -178,20 +206,27 @@ def _on_cmd_ask(state, msg):
 
     # Create a new session in the state.
     #
-    id_user    = msg['id_user']
-    str_topic  = ' '.join(msg['args'])
-    id_session = uuid.uuid4().hex[:6]
-    state['session'][id_session] = dict(admin       = id_user,
-                                        topic       = str_topic,
-                                        participant = set(),  # set(id_user)
-                                        contributor = set())  # set(id_user)
+    id_user      = msg['id_user']
+    id_channel   = msg.get('id_channel', None)
+    ts_rel_now   = timestamp['ts_rel_us']
+    str_topic    = ' '.join(msg['args'])
+    id_session   = uuid.uuid4().hex[:6]
+    state['session'][id_session] = dict(
+                                    admin        = id_user,
+                                    id_channel   = id_channel, # Maybe None
+                                    ts_tick_last = ts_rel_now,
+                                    ts_act_last  = ts_rel_now,
+                                    ts_summ_last = 0,
+                                    topic        = str_topic,
+                                    participant  = set(),  # set(id_user)
+                                    contributor  = set())  # set(id_user)
 
     # Configure a join button for the session.
     #
     str_invite = 'Join deliberation #{id}'.format(id = id_session)
     cfg_button = fl.net.discord.bot.ButtonData(
-                                label      = 'Join',
-                                id_btn     = _id_btn(PREFIX_JOIN, id_session))
+                                    label  = 'Join',
+                                    id_btn = _id_btn(PREFIX_JOIN, id_session))
 
     # Enqueue a message with the session join button.
     #
@@ -203,13 +238,13 @@ def _on_cmd_ask(state, msg):
                    button  = cfg_button)
     if msg_type == 'appcmd_guild':
         yield dict(type       = 'msg_guild',
-                   id_channel = msg['id_channel'],
+                   id_channel = id_channel,
                    content    = str_invite,
                    button     = cfg_button)
 
 
 # -----------------------------------------------------------------------------
-def _on_btn_join(state, msg):
+def _on_btn_join(state, timestamp, msg):
     """
     On "Join" button press.
 
@@ -219,24 +254,24 @@ def _on_btn_join(state, msg):
     #
     id_user = msg['id_user']
     if id_user in state['user']:
-        id_session_prev  = state['user'][id_user]['session']
-        map_session_prev = state['session'][id_session_prev]
+        id_session_prev   = state['user'][id_user]['session']
+        info_session_prev = state['session'][id_session_prev]
 
         try:
-            map_session_prev['participant'].remove(id_user)
+            info_session_prev['participant'].remove(id_user)
         except KeyError:
             pass
 
         try:
-            map_session_prev['contributor'].remove(id_user)
+            info_session_prev['contributor'].remove(id_user)
         except KeyError:
             pass
 
     # Add the user to the current session.
     #
     id_session      = msg['id_btn'][len(PREFIX_JOIN):]
-    map_session     = state['session'][id_session]
-    set_participant = map_session['participant']
+    info_session    = state['session'][id_session]
+    set_participant = info_session['participant']
     set_participant.add(id_user)
 
     # Create a new transcript for the user.
@@ -246,10 +281,15 @@ def _on_btn_join(state, msg):
                                   session    = id_session,
                                   transcript = list())
 
+    # Update last-action timestamp.
+    #
+    ts_rel_now = timestamp['ts_rel_us']
+    state['session'][id_session]['ts_act_last'] = ts_rel_now
+
     # Send a message to the admin.
     #
     yield dict(type    = 'msg_dm',
-               id_user = map_session['admin'],
+               id_user = info_session['admin'],
                content = '{name} joined session {session} ' \
                          'as participant #{num}.'.format(
                                                 name    = name_user,
@@ -260,103 +300,124 @@ def _on_btn_join(state, msg):
     #
     yield dict(type    = 'msg_dm',
                id_user = id_user,
-               content = map_session['topic'],
-               button  = fl.net.discord.bot.ButtonData(
-                                label  = 'Submit',
-                                id_btn = _id_btn(PREFIX_SUBMIT, id_session)))
+               content = info_session['topic'])
 
 
 # -----------------------------------------------------------------------------
-def _on_msg_dm(state, msg):
+def _on_msg_dm(state, timestamp, msg):
     """
     On message recieved.
 
     """
 
-    state['user'][msg['id_author']]['transcript'].append(msg['content'])
+    # Update transcript.
+    #
+    id_user = msg['id_author']
+    state['user'][id_user]['transcript'].append(msg['content'])
+
+    # Update last-action timestamp.
+    #
+    info_user  = state['user'][id_user]
+    id_session = info_user['session']
+    ts_rel_now = timestamp['ts_rel_us']
+    state['session'][id_session]['ts_act_last'] = ts_rel_now
+
     return NOTHING
 
 
 # -----------------------------------------------------------------------------
-def _on_btn_submit(state, msg):
+def _on_timer_tick(state, timestamp, msg):
     """
-    On "Submit" button press.
+    Request a new summary.
 
-    """
-
-    # Mark the user as having submitted a contribution.
-    #
-    id_user     = msg['id_user']
-    id_session  = msg['id_btn'][len(PREFIX_SUBMIT):]
-    map_session = state['session'][id_session]
-    map_session['contributor'].add(id_user)
-
-    # Send a message to the admin.
-    #
-    set_pending = map_session['participant'] - map_session['contributor']
-    yield dict(type    = 'msg_dm',
-               id_user = map_session['admin'],
-               content = 'User {name} submitted a contribution for ' \
-                         '{session}. ({count} pending)'.format(
-                                                name    = msg['name_user'],
-                                                session = id_session,
-                                                count   = len(set_pending)),
-               button  = fl.net.discord.bot.ButtonData(
-                                label  = 'Summary',
-                                id_btn = _id_btn(PREFIX_SUMMARY, id_session)))
-
-    # is_last_user = (len(set_pending) == 0)
-    # if is_last_user:
-    #     pass  # TODO: AUTOMATICALLY SUMMARIZE
-
-
-# -----------------------------------------------------------------------------
-def _on_btn_summary(state, msg):
-    """
-    On "Summary" button press.
+    This function is triggered when
 
     """
 
-    # Get all transcripts associated with the session.
-    #
-    id_session     = msg['id_btn'][len(PREFIX_SUMMARY):]
-    str_transcript = ''
-    for (id_user, state_user) in state['user'].items():
-        if state_user['session'] != id_session:
+    SUMMARY_WAIT_SECS = 20
+    MS_PER_SECOND     = 1000
+    US_PER_MS         = 1000
+    US_PER_SECOND     = MS_PER_SECOND * US_PER_MS
+    SUMMARY_WAIT_US   = SUMMARY_WAIT_SECS * US_PER_SECOND
+    ts_rel_now        = timestamp['ts_rel_us']
+
+    for (id_session, info_session) in state['session'].items():
+        ts_tick_last_us     = info_session['ts_tick_last']
+        ts_act_last_us      = info_session['ts_act_last']
+        ts_summ_last_us     = info_session['ts_summ_last']
+        is_summ_most_recent = ts_summ_last_us > ts_act_last_us
+        is_up_to_date       = is_summ_most_recent
+        if is_up_to_date:
+            print('SUMMARY IS UP TO DATE')
             continue
-        str_transcript += '\n\n{name}:\n'.format(name = state_user['name'])
-        for item in state_user['transcript']:
-            str_transcript += ' - {item}\n'.format(item = item)
 
-    id_prompt  = 'summary'
-    str_prompt = state['prompt'][id_prompt].format(
+        ts_delta_us    = ts_tick_last_us - ts_act_last_us
+        is_summary_due = ts_delta_us >= SUMMARY_WAIT_US
+        if not is_summary_due:
+            print('SUMMARY IS NOT YET DUE')
+            continue
+
+        # Get all transcripts associated with the session.
+        #
+        has_transcript = False
+        str_transcript = ''
+        for (id_user, state_user) in state['user'].items():
+            if state_user['session'] == id_session:
+                str_transcript += '\n\nA user in the session wrote: \n'
+                for item in state_user['transcript']:
+                    has_transcript = True
+                    str_transcript += ' - {item}\n'.format(item = item)
+
+        if not has_transcript:
+            continue
+
+        # Update the last-summary timestamp.
+        #
+        state['session'][id_session]['ts_summ_last'] = ts_rel_now
+        print('PRODUCING SUMMARY FOR SESSION: ' + str(id_session))
+
+        id_prompt  = 'summary'
+        str_prompt = state['prompt'][id_prompt].format(
                         str_topic      = state['session'][id_session]['topic'],
                         str_transcript = str_transcript)
 
-    yield dict(state    = dict(id_prompt  = id_prompt,
-                               id_session = id_session),
-               model    = 'gpt-3.5-turbo',
-               messages = [{'role': 'system', 'content': str_prompt}])
-
-
+        yield dict(state    = dict(id_prompt  = id_prompt,
+                                   id_session = id_session),
+                   model    = 'gpt-3.5-turbo',
+                   messages = [{'role': 'system', 'content': str_prompt}])
 
 
 # -----------------------------------------------------------------------------
-def _on_summary(state, msg):
+def _on_llm_summary(state, msg):
     """
-    On summary recieved.
+    Forward LLM summary information to session participants.
+
+    This function is triggered when we recieve
+    a resposne message with summary information
+    back from the language model.
 
     """
 
-    id_session  = msg['state']['id_session']
     str_summary = msg['response']['choices'][0]['message']['content']
-    for (id_user, state_user) in state['user'].items():
-        if state_user['session'] != id_session:
-            continue
+    id_session  = msg['state']['id_session']
 
-        yield dict(type    = 'msg_dm',
-                   id_user = id_user,
-                   content = str_summary)
+    # Send the summary to the channel
+    # in which the question was asked.
+    #
+    id_channel  = state['session'][id_session].get('id_channel', None)
+    if id_channel is not None:
+        yield dict(type       = 'msg_guild',
+                   id_channel = id_channel,
+                   content    = str_summary)
+
+    # Send the summary to each user
+    # in the session.
+    #
+    for (id_user, state_user) in state['user'].items():
+        if state_user['session'] == id_session:
+            yield dict(type       = 'msg_dm',
+                       id_user    = id_user,
+                       content    = str_summary)
 
 
 # -----------------------------------------------------------------------------

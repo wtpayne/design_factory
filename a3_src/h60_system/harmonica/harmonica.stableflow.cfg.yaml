@@ -58,17 +58,17 @@ node:
     config:
       prompt:
         summary:            |
-                            "Please provide a summary for the given
-                            transcript. The topic given to the
-                            participants was:
+                            "The topic given to the participants was:
 
                             '{str_topic}'
 
-                            Make sure that the summary highlights the
-                            main different points of view that have been
-                            expressed and the main arguments that have
-                            been put forward and suggests potential
-                            consensus solutions.
+                            The goal is to come quickly to a consensus, so
+                            use the below transcript to identify potential
+                            consensus positions or if that is not possible,
+                            respond with questions to all participants to
+                            help elicit more information and/or guide
+                            them towards a potential common consensus
+                            position.
 
                             '{str_transcript}'
                             "
