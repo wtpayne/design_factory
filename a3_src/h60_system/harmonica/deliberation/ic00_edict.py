@@ -348,7 +348,6 @@ def _on_timer_tick(state, timestamp, msg):
         is_summ_most_recent = ts_summ_last_us > ts_act_last_us
         is_up_to_date       = is_summ_most_recent
         if is_up_to_date:
-            print('SUMMARY IS UP TO DATE')
             continue
 
         ts_delta_us    = ts_tick_last_us - ts_act_last_us

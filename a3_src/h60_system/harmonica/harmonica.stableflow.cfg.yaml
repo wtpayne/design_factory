@@ -140,6 +140,19 @@ node:
       log_level:            'INFO'
 
   # ---------------------------------------------------------------------------
+  # ASGI server integration.
+  #
+  asgi:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+      # py_module:            cl.log.metric.sensor.ic00_edict
+    state_type:             py_dict
+    config:
+      filepath_env:         Null
+
+  # ---------------------------------------------------------------------------
   # Logging.
   #
   measure_inputs:
@@ -212,6 +225,11 @@ edge:
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_openai
   dst:   openai.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_asgi
+  dst:   asgi.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -295,6 +313,29 @@ edge:
   data:  py_dict
   src:   measure_inputs.outputs.openai
   dst:   deliberation.inputs.openai
+
+# ASGI integration
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.asgi
+  dst:   measure_outputs.inputs.asgi
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.asgi
+  dst:   asgi.inputs.resource
+
+- owner: asgi
+  data:  py_dict
+  src:   asgi.outputs.request
+  dst:   measure_inputs.inputs.asgi
+  dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.asgi
+  dst:   deliberation.inputs.asgi
 
 # Event logging
 

@@ -6,8 +6,9 @@ title:
     "OpenAI client stableflow-edict component."
 
 description:
-    "This component enables integration with
-    the OpenAI HTTP API."
+    "This stableflow component is designed to
+    support integration with the OpenAI HTTP
+    API."
 
 id:
     "f7d19f59-cb0f-4a51-9c08-3bc5e653765e"

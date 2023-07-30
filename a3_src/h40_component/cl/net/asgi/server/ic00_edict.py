@@ -3,15 +3,16 @@
 ---
 
 title:
-    "Discord bot stableflow-edict component."
+    "ASGI server stableflow-edict component."
 
 description:
     "This stableflow component is designed to
-    support integration with the Discord HTTP
-    API."
+    support the use of an embedded ASGI server
+    to serve web resources and provide simple
+    HTTP APIs."
 
 id:
-    "8747de1c-76ac-4f63-a88d-f67a60515571"
+    "d26eb7b1-6048-4dc7-9e45-306b2f5a9ce8"
 
 type:
     dt004_python_stableflow_edict_component
@@ -46,11 +47,9 @@ license:
 """
 
 
-import dotenv
-import os
 import logging
 
-import fl.net.discord.bot
+import fl.net.asgi.server
 import fl.util.edict
 import key
 
@@ -58,36 +57,11 @@ import key
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Discord client component coroutine.
+    ASGI server coroutine.
 
     """
 
-    fl.util.edict.validate(inputs = inputs,  must_contain = ('ctrl',))
-
-    str_token    = cfg.get('str_token',     None)
-    filepath_env = cfg.get('filepath_env',  None)
-    key_token    = cfg.get('key_token',     'TOKEN_DISCORD_DEFAULT')
-    secs_sleep   = cfg.get('secs_sleep',    0.5)
-    log_level    = cfg.get('log_level',     logging.WARNING)
-    list_cfg_msg = cfg.get('msg',           list())
-    map_id       = runtime.get('id',        dict())
-    id_system    = map_id.get('id_system',  None)
-    id_node      = map_id.get('id_node',    None)
-
-    if str_token is None:
-        str_token = key.load(id_value     = key_token,
-                             filepath_env = filepath_env)
-    bot = fl.net.discord.bot.coro(cfg_bot = dict(id_log_event = 'discord',
-                                                 str_token    = str_token,
-                                                 secs_sleep   = secs_sleep,
-                                                 id_system    = id_system,
-                                                 id_node      = id_node))
-
-    set_type_in = set((
-                'cfg_msgcmd',  # Configuration for message commands.
-                'cfg_appcmd',  # Configuration for application commands.
-                'msg_guild',   # Messages to a guild channel.
-                'msg_dm'))     # Messages to a DM channel.
+    # server = fl.net.asgi.server.coro(cfg)
 
     # If there are one or more outputs which are
     # named after a message type, then we will
@@ -95,27 +69,18 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     # corresponding output.
     #
     set_type_out = set((
-                'log_event',     # Error messages and log messages.
-                'log_metric',    # Quantitative metrics for KPIs etc...
-                'log_data',      # Raw data for resimulation.
-                'msgcmd_dm',     # Msg command invocations from DM channels.
-                'msgcmd_guild',  # Msg command invocations from guild channels.
-                'appcmd_dm',     # App command invocations from DM channels.
-                'appcmd_guild',  # App command invocations from guild channels.
-                'msg_dm',        # Messages from DM channels.
-                'msg_guild',     # Messages from guild channels.
-                'edit_dm',       # Message edits from DM channels.
-                'edit_guild',    # Message edits from guild channels.
-                'btn'))          # Button press events.
+                'log_event',  # Error messages and log messages.
+                'log_metric', # Quantitative metrics for KPIs etc...
+                'log_data',   # Raw data for resimulation.
+                'request'))   # Requests from frontend clients.
 
     tup_key_in       = tuple(inputs.keys())
     tup_key_out      = tuple(outputs.keys())
     tup_key_msg_in   = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
     tup_key_msg_out  = tuple((k for k in tup_key_out if k not in set_type_out))
     tup_key_type_out = tuple((k for k in tup_key_out if k in set_type_out))
-    list_to_bot      = list()
-    list_to_bot[:]   = list_cfg_msg
-    list_from_bot    = list()
+    list_to_api      = list()
+    list_from_api    = list()
     timestamp        = dict()
     signal           = fl.util.edict.init(outputs)
 
@@ -129,28 +94,27 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if not inputs['ctrl']['ena']:
             continue
         timestamp.update(inputs['ctrl']['ts'])
+        unix_time = timestamp['unix_time']
 
-        # Pass messages and command
-        # configuration to the discord
-        # bot.
+        # Pass resources to the ASGI server.
         #
         for str_key in tup_key_msg_in:
-            list_to_bot.extend(inputs[str_key]['list'])
+            list_to_api.extend(inputs[str_key]['list'])
 
-        # Recieve messages, command
-        # invocations and log items
-        # from the doscord bot.
+        # Recieve responses and
+        # log messages from the
+        # ASGI server.
         #
-        list_from_bot.clear()
-        list_from_bot[:] = bot.send(list_to_bot)
-        list_to_bot.clear()
-        if not list_from_bot:
+        list_from_api.clear()
+        # list_from_api[:] = server.send((list_to_api, unix_time))
+        list_to_api.clear()
+        if not list_from_api:
             continue
 
         # Route messages to type-specific
         # outputs.
         #
-        list_msg     = list_from_bot
+        list_msg     = list_from_api
         list_include = list()
         list_exclude = list()
         for key_type in tup_key_type_out:
