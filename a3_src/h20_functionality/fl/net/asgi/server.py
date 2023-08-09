@@ -56,15 +56,15 @@ import collections
 import copy
 import datetime
 import hashlib
+import logging
 import multiprocessing
 import queue
 import time
 import uuid
 
-from ariadne import QueryType, make_executable_schema
-from ariadne.asgi import GraphQL
 import dill
 import loguru
+import setproctitle
 import sse_starlette.sse
 import starlette.applications
 import starlette.background
@@ -76,6 +76,8 @@ import starlette.responses
 import starlette.routing
 import starlette.websockets
 import uvicorn
+
+import fl.util
 
 
 _DEFAULT_DOC = ('text/html',
@@ -96,71 +98,116 @@ _ID_COOKIE_USER    = 'xw_uid'
 
 
 # -----------------------------------------------------------------------------
-def coro():
+@fl.util.coroutine
+def coro(cfg):
     """
     """
 
+    # Create the queues that we will be
+    # using to communicate with the ASGI
+    # server process.
+    #
+    # Each of these has an associated
+    # feeder thread with it's own PID.
+    #
+    # At some point, it would be good
+    # to set an appropriate process title
+    # for these feeder threads, but we
+    # lack an easy way of doing this
+    # right now.
+    #
+    queue_resources  = multiprocessing.Queue()  # From system to server
+    queue_requests   = multiprocessing.Queue()  # From server to system
+    map_queues       = dict(queue_resources = queue_resources,
+                            queue_requests  = queue_requests)
+    iter_queue       = tuple(map_queues.values())
+    str_name_process = 'discord-bot'
+    process_server   = multiprocessing.Process(target = _asgi_server_process,
+                                               args   = (cfg, map_queues),
+                                               name   = str_name_process,
+                                               daemon = True)
+    process_server.start()
+    map_hashes    = dict()
+    list_from_api = list()
+
     while True:
+
+        list_from_api.clear()
+        while True:
+            try:
+                list_from_api.append(queue_requests.get(block = False))
+            except queue.Empty:
+                break
 
         (list_to_api, unix_time) = yield (list_from_api)
 
-# -----------------------------------------------------------------------------
-def reset(runtime, cfg, inputs, state, outputs):
-    """
-    Start the ASGI server and connect it to the xact network.``
+        accumulator = dict()
+        for map_res in list_from_api:
+            _remove_duplicates(map_res, map_hashes)
+            accumulator.update(map_res)
 
-    """
-    if 'requests' in outputs:
-        outputs['requests'].clear()
-        outputs['requests']['ena']  = False
-        outputs['requests']['list'] = list()
-
-    map_queues = dict(
-        queue_resources = multiprocessing.Queue(), # From xact to client
-        queue_requests  = multiprocessing.Queue(), # From client to xact
-    )
-    for (key, value) in map_queues.items():
-        state[key] = value
-
-    state['process_server'] = multiprocessing.Process(
-                                                target = _asgi_server_process,
-                                                args   = (cfg, map_queues),
-                                                name   = 'stableflow-asgi-server',
-                                                daemon = False)
-    state['process_server'].start()
-    state['map_hashes'] = dict()
-
-
-# -----------------------------------------------------------------------------
-def step(inputs, state, outputs):
-    """
-    Update the ASGI server and pass on any new requests from the client.
-
-    """
-    # Updated resources from xact-backend to ASGI-server.
-    for key in inputs.keys():
-        if inputs[key]['ena']:
-            accumulator = dict()
-            for map_res in inputs[key]['list']:
-                _remove_duplicates(map_res, state['map_hashes'])
-                accumulator.update(map_res)
             try:
-                state['queue_resources'].put(accumulator, block = False)
+                queue_resources.put(accumulator, block = False)
             except queue.Full:
                 pass # TODO: LOG SOME SORT OF ERROR?
 
-    # Client data from ASGI-server to xact-backend.
-    if 'requests' in outputs:
-        outputs['requests']['ena'] = False
-        outputs['requests']['list'].clear()
-    while True:
-        try:
-            map_requests = state['queue_requests'].get(block = False)
-            if 'requests' in outputs:
-                outputs['requests']['ena'] = True
-                outputs['requests']['list'].append(map_requests)
-        except queue.Empty:
-            break
+    # TODO:- Call uvicorn.stop on terminate
+
+# -----------------------------------------------------------------------------
+# def finalize(runtime, config, inputs, state, outputs):
+#     """
+#     Clean up resources.
+
+#     """
+#     if not state:
+#         return
+
+#     # Halt the ASGI server process
+#     # before doing anything to the
+#     # queues. Once this server process
+#     # is stopped, nothing will be
+#     # reading or writing from
+#     # the queues and we can safely
+#     # terminate them as well.
+#     #
+#     state['process_server'].terminate()
+
+#     # For some reason joining
+#     # the process server causes
+#     # a broken pipe error. I'm
+#     # not quite sure why.
+#     #
+#     # state['process_server'].join()
+
+#     # Each multiprocessing queue has
+#     # an associated feeder thread that
+#     # needs to be closed and joined.
+#     #
+#     # The call to join_thread will block
+#     # unless the queue is empty or unless
+#     # the cancel_join_thread() function
+#     # has been called.
+#     #
+#     for queue_ipc in state['iter_queue']:
+#         queue_ipc.cancel_join_thread()
+#         queue_ipc.close()
+#         _clear(queue_ipc)
+#         queue_ipc.join_thread()
+
+
+# -----------------------------------------------------------------------------
+def _clear(queue_ipc):
+    """
+    Clear all items from the specified queue.
+
+    """
+    try:
+        while True:
+            queue_ipc.get_nowait()
+    except queue.Empty:
+        pass
+    except ValueError:
+        pass
 
 
 # -----------------------------------------------------------------------------
@@ -233,7 +280,7 @@ def _asgi_server_process(cfg, map_queues):
             return None
 
         # HTTP request to a callback "resource".
-        if media_type == 'async':
+        if media_type == 'callback':
             callback = _load_callback(media_type, content)
             (media_type, content) = await callback(request)
 
@@ -345,7 +392,6 @@ def _asgi_server_process(cfg, map_queues):
 
         """
         for id_resource in set_id_resource_changed:
-            # print(datetime.datetime.now().isoformat() + ' - ' + id_resource)
             for id_topic in app.state.map_resource_to_topic[id_resource]:
                 for queue_subscriber in app.state.map_topic_to_queue[id_topic]:
                     queue_subscriber.put_nowait({
@@ -392,28 +438,37 @@ def _asgi_server_process(cfg, map_queues):
     #--------------------------------------------------------------------------
     async def _enqueue_requests(request, id_resource, id_session, id_user):
         """
-        Enqueue requests from the client for the rest of the xact system.
+        Enqueue requests from the client for the rest of the bowyer system.
 
         """
-        headers      = dict(request.headers)
-        request_data = dict(id_resource     = str(id_resource),
-                            id_session      = str(id_session),
-                            id_user         = str(id_user),
-                            client_ip       = request['client'][0],
-                            url             = str(request.url),
-                            accept          = headers['accept'],
-                            accept_encoding = headers['accept-encoding'],
-                            accept_language = headers['accept-language'],
-                            user_agent      = headers['user-agent'])
-
-        query_params = request.query_params
-        for key in query_params.keys():
-            request_data[key] = query_params.getlist(key)
+        headers = dict(request.headers)
 
         try:
-            app.state.queue_requests.put(request_data, block = False)
-        except queue.Full:
+            header_accept          = headers['accept']
+            header_accept_encoding = headers['accept-encoding']
+            header_accept_language = headers['accept-language']
+            header_user_agent      = headers['user-agent']
+        except KeyError:
             pass
+        else:
+            request_data = dict(id_resource     = str(id_resource),
+                                id_session      = str(id_session),
+                                id_user         = str(id_user),
+                                client_ip       = request['client'][0],
+                                url             = str(request.url),
+                                accept          = header_accept,
+                                accept_encoding = header_accept_encoding,
+                                accept_language = header_accept_language,
+                                user_agent      = header_user_agent)
+
+            query_params = request.query_params
+            for key in query_params.keys():
+                request_data[key] = query_params.getlist(key)
+
+            try:
+                app.state.queue_requests.put(request_data, block = False)
+            except queue.Full:
+                pass
 
     #--------------------------------------------------------------------------
     def _lookup_resource(id_resource):
@@ -528,6 +583,18 @@ def _asgi_server_process(cfg, map_queues):
                             httponly = True,
                             samesite = 'strict')
 
+    # Give the ASGI process a
+    # meaningful process title.
+    #
+    title_parent = setproctitle.getproctitle()
+    title_child  = '{prefix}.asgi_server'.format(prefix = title_parent)
+    setproctitle.setproctitle(title_child)
+
+    # Configure generic routes for
+    # serving resources that are
+    # generated upstream elsewhere
+    # in the system.
+    #
     WSock = starlette.routing.WebSocketRoute
     Route = starlette.routing.Route
     verbs = ['GET', 'POST']
@@ -541,7 +608,7 @@ def _asgi_server_process(cfg, map_queues):
 
     list_middleware = [starlette.middleware.Middleware(
                               starlette.middleware.sessions.SessionMiddleware,
-                              secret_key = cfg['session_key'])]
+                              secret_key = cfg['sessionsecret'])]
 
     app = starlette.applications.Starlette(debug              = True,
                                            routes             = list_routes,
@@ -565,9 +632,26 @@ def _asgi_server_process(cfg, map_queues):
     app.state.ts_last_update = 0.0
     app.state.default        = _DEFAULT_DOC
 
-    uvicorn.run(app, host      = cfg['host'],
-                     port      = cfg['port'],
-                     log_level = 'error',
-                     debug     = cfg['debug'])
+    host         = cfg.get('host',          '0.0.0.0')
+    port         = cfg.get('port',          '8080')
+    ssl_keyfile  = cfg.get('ssl_keyfile',   None)
+    ssl_certfile = cfg.get('ssl_certfile',  None)
+    log_level    = cfg.get('debug_level',   logging.WARNING)
+    debug        = cfg.get('debug',         False)
+    has_keyfile  = ssl_keyfile  is not None
+    has_certfile = ssl_certfile is not None
+    has_https    = has_keyfile and has_certfile
 
-
+    try:
+        if has_https:
+            uvicorn.run(app, host         = host,
+                             port         = port,
+                             ssl_keyfile  = ssl_keyfile,
+                             ssl_certfile = ssl_certfile,
+                             log_level    = log_level)
+        else:
+            uvicorn.run(app, host         = host,
+                             port         = port,
+                             log_level    = log_level)
+    except Exception as err:
+        raise

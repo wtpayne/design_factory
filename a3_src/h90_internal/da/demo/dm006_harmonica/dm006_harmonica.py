@@ -180,13 +180,15 @@ def _overrides(stage = 'PRD'):
                          PRD = 'TOKEN_DISCORD_HARMONICA_PRD')
 
     return ('system.id_system',                   map_id_system[stage],
-            'host.localhost.dirpath_log',         _dirpath_log(),
+            'host.main_host.dirpath_log',         _dirpath_log(),
+            'host.main_host.acct_run',            _username(),
+            'host.webapp_host.dirpath_log',       _dirpath_log(),
+            'host.webapp_host.acct_run',          _username(),
             'node.log_event.config.dirpath_log',  _dirpath_log(),
             'node.log_metric.config.dirpath_log', _dirpath_log(),
             'node.log_data.config.dirpath_log',   _dirpath_log(),
             'node.discord.config.filepath_env',   _filepath_env(),
-            'node.discord.config.key_token',      map_token[stage],
-            'host.localhost.acct_run',            _username())
+            'node.discord.config.key_token',      map_token[stage])
 
 
 # -----------------------------------------------------------------------------

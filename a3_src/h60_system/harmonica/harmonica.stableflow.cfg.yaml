@@ -4,21 +4,32 @@ system:
 
 ###############################################################################
 host:
-  localhost:
+  host_main:
     hostname:               'localhost'
     acct_run:               ''
     acct_provision:         ''
-    port_range:             '8090-9000'
+    port_range:             '8080-8199'
     dirpath_log:            ''
     launch_cmd:             ''
     environment:            'e003_discord'
+    log_level:              'INFO'
+  host_webapp:
+    hostname:               'localhost'
+    acct_run:               ''
+    acct_provision:         ''
+    port_range:             '8200-8299'
+    dirpath_log:            ''
+    launch_cmd:             ''
+    environment:            'e004_reflex'
     log_level:              'INFO'
 
 
 ###############################################################################
 process:
   proc_main:
-    host:                   localhost
+    host:                   host_main
+  proc_webapp:
+    host:                   host_webapp
 
 
 ###############################################################################
@@ -74,6 +85,19 @@ node:
                             "
 
   # ---------------------------------------------------------------------------
+  # File system monitor integration.
+  #
+  fs_monitor:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+      # py_module:            cl.log.metric.sensor.ic00_edict
+    state_type:             py_dict
+    config:
+      filepath_env:         Null
+
+  # ---------------------------------------------------------------------------
   # Discord bot integration.
   #
   discord:
@@ -124,7 +148,7 @@ node:
     state_type:             py_dict
     config:
       filepath_env:         Null
-      envvar_key:           APIKEY_OPENAI
+      envvar_key:           APIKEY_OPENAI   # TODO
       secs_interval:        0.1
       is_bit:               False
       is_async:             True
@@ -143,6 +167,26 @@ node:
   # ASGI server integration.
   #
   asgi:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.net.asgi.server.ic00_edict
+    state_type:             py_dict
+    config:
+      host:                 0.0.0.0
+      port:                 8080
+      filepath_env:         Null
+      key_sessionsecret:    HTTP_SESSION_SECRET
+      sessionsecret:        Null
+      debug:                True
+      log_level:            'INFO'
+      ssl_keyfile:          Null
+      ssl_certfile:         Null
+
+  # ---------------------------------------------------------------------------
+  # Process review integration.
+  #
+  process_review:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
@@ -218,6 +262,11 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
+  src:   ctrl_main.outputs.ctrl_fs_monitor
+  dst:   fs_monitor.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
   src:   ctrl_main.outputs.ctrl_discord
   dst:   discord.inputs.ctrl
 
@@ -230,6 +279,11 @@ edge:
   data:  py_dict
   src:   ctrl_main.outputs.ctrl_asgi
   dst:   asgi.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_process_review
+  dst:   process_review.inputs.ctrl
 
 - owner: ctrl_main
   data:  py_dict
@@ -261,12 +315,28 @@ edge:
   src:   ctrl_main.outputs.ctrl_log_data
   dst:   log_data.inputs.ctrl
 
+
+
+
 # Deliberatioon integration
 
 - owner: ctrl_main
   data:  py_dict
   src:   measure_inputs.outputs.ctrl
   dst:   deliberation.inputs.ctrl
+
+# File system monitor integration
+
+- owner: fs_monitor
+  data:  py_dict
+  src:   fs_monitor.outputs.fs_monitor
+  dst:   measure_inputs.inputs.fs_monitor
+  dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.fs_monitor
+  dst:   deliberation.inputs.fs_monitor
 
 # Discord integration
 
@@ -336,6 +406,29 @@ edge:
   data:  py_dict
   src:   measure_inputs.outputs.asgi
   dst:   deliberation.inputs.asgi
+
+# Process review integration.
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.minutes
+  dst:   measure_outputs.inputs.minutes
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.minutes
+  dst:   process_review.inputs.minutes
+
+- owner: process_review
+  data:  py_dict
+  src:   process_review.outputs.review
+  dst:   measure_inputs.inputs.review
+  dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.review
+  dst:   deliberation.inputs.review
 
 # Event logging
 

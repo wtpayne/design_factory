@@ -47,24 +47,11 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
-    "# Packages required by the harmonica system.",
+    "# Packages required for generating web components with reflex.",
     "#",
 
-    { "type": "pep508", "spec":    "appdirs==1.4.4"                           },
-    { "type": "pep508", "spec":    "python-dotenv==1.0.0"                    },
-    { "type": "pep508", "spec":    "discord.py==2.3.1"                        },
-    { "type": "pep508", "spec":    "openai==0.27.8"                           },
-
-    "",
-    "",
-    "# -----------------------------------------------------------------------",
-    "# Packages required for the ASGI server component.",
-    "#",
-
-    { "type": "pep508", "spec":    "itsdangerous==2.1.2"                      },
-    { "type": "pep508", "spec":    "sse_starlette==1.6.1"                     },
-    { "type": "pep508", "spec":    "starlette==0.31.0"                        },
-    { "type": "pep508", "spec":    "uvicorn==0.23.2"                          },
+    { "type": "pep508", "spec":    "dominate==2.8.0"                          },
+    { "type": "pep508", "spec":    "reflex==0.2.3"                            },
 
     "",
     "",
