@@ -102,18 +102,23 @@ def horizontal(map_cfg_denorm,
     #
     for (id_proc, cfg_proc) in map_cfg_denorm['process'].items():
 
-        idx_u  = cfg_proc['idx_u']
-        size_u = cfg_proc['size_u']
-        size_v = map_cfg_denorm['system']['count_tranche']
+        try:
 
-        cfg_proc['pos_x']  = diagram_border + longbus_u + (idx_u * node_size_x)
-        cfg_proc['pos_y']  = diagram_border
-        cfg_proc['size_x'] = (   node_margin_x
-                               + node_margin_x
-                               + (size_u * node_stride_x))
-        cfg_proc['size_v'] = (   node_margin_y
-                               + node_margin_y
-                               + (size_v * node_stride_y))
+            idx_u  = cfg_proc['idx_u']
+            size_u = cfg_proc['size_u']
+            size_v = map_cfg_denorm['system']['count_tranche']
+
+            cfg_proc['pos_x']  = diagram_border + longbus_u + (idx_u * node_size_x)
+            cfg_proc['pos_y']  = diagram_border
+            cfg_proc['size_x'] = (   node_margin_x
+                                   + node_margin_x
+                                   + (size_u * node_stride_x))
+            cfg_proc['size_v'] = (   node_margin_y
+                                   + node_margin_y
+                                   + (size_v * node_stride_y))
+
+        except KeyError:
+            continue
 
     # Layout edges.
     #

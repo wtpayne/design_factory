@@ -94,7 +94,10 @@
     "#",
 
     { "type": "pep508", "spec":    "streamlit==1.22.0"                        },
-    { "type": "pep508", "spec":    "gradio==3.28.1"                          },
+    { "type": "pep508", "spec":    "gradio==3.40.1"                           },
+    { "type": "pep508", "spec":    "fastapi==0.101.1"                         },
+    { "type": "pep508", "spec":    "fastai==2.7.12"                           },
+    { "type": "pep508", "spec":    "pydantic==2.2.1"                          },
 
     "",
     "",
@@ -111,7 +114,7 @@
     "# Packages intended for NLP work.",
     "#",
 
-    { "type": "pep508", "spec":    "spacy==3.5.3"                             },
+    { "type": "pep508", "spec":    "spacy==3.6.1"                             },
     { "type": "pep508", "spec":    "thefuzz==0.19.0"                          },
     { "type": "pep508", "spec":    "python-Levenshtein==0.21.0"               },
 
@@ -145,7 +148,7 @@
 
     { "type": "pep508", "spec":    "itsdangerous==2.1.2"                      },
     { "type": "pep508", "spec":    "sse_starlette==1.6.1"                     },
-    { "type": "pep508", "spec":    "starlette==0.31.0"                        },
+    { "type": "pep508", "spec":    "starlette==0.27.0"                        },
     { "type": "pep508", "spec":    "uvicorn==0.23.2"                          },
 
     "",

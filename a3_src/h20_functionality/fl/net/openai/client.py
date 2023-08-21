@@ -119,6 +119,7 @@ import time
 import openai
 
 import fl.util
+import fl.log.event
 
 
 # -----------------------------------------------------------------------------
