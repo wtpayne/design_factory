@@ -98,7 +98,7 @@ node:
       filepath_env:         Null
 
   # ---------------------------------------------------------------------------
-  # Discord bot integration.
+  # Chat bots integration.
   #
   discord:
     process:                proc_main
@@ -136,6 +136,21 @@ node:
         description:        "Create a deliberation session with a specific question."
         param:
           question:         str
+
+  telegram:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+    state_type:             py_dict
+
+  whatsapp:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.noop.ic00_edict
+    state_type:             py_dict
+
 
   # ---------------------------------------------------------------------------
   # OpenAI ChatGPT integration.
@@ -272,6 +287,16 @@ edge:
 
 - owner: ctrl_main
   data:  py_dict
+  src:   ctrl_main.outputs.ctrl_telegram
+  dst:   telegram.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
+  src:   ctrl_main.outputs.ctrl_whatsapp
+  dst:   whatsapp.inputs.ctrl
+
+- owner: ctrl_main
+  data:  py_dict
   src:   ctrl_main.outputs.ctrl_openai
   dst:   openai.inputs.ctrl
 
@@ -315,9 +340,6 @@ edge:
   src:   ctrl_main.outputs.ctrl_log_data
   dst:   log_data.inputs.ctrl
 
-
-
-
 # Deliberatioon integration
 
 - owner: ctrl_main
@@ -360,6 +382,52 @@ edge:
   data:  py_dict
   src:   measure_inputs.outputs.discord
   dst:   deliberation.inputs.discord
+
+# Telegram integration
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.telegram
+  dst:   measure_outputs.inputs.telegram
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.telegram
+  dst:   telegram.inputs.msg
+
+- owner: telegram
+  data:  py_dict
+  src:   telegram.outputs.msg
+  dst:   measure_inputs.inputs.telegram
+  dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.telegram
+  dst:   deliberation.inputs.telegram
+
+# Whatsapp integration
+
+- owner: deliberation
+  data:  py_dict
+  src:   deliberation.outputs.whatsapp
+  dst:   measure_outputs.inputs.whatsapp
+
+- owner: measure_outputs
+  data:  py_dict
+  src:   measure_outputs.outputs.whatsapp
+  dst:   whatsapp.inputs.msg
+
+- owner: whatsapp
+  data:  py_dict
+  src:   whatsapp.outputs.msg
+  dst:   measure_inputs.inputs.whatsapp
+  dirn:  feedback
+
+- owner: measure_inputs
+  data:  py_dict
+  src:   measure_inputs.outputs.whatsapp
+  dst:   deliberation.inputs.whatsapp
 
 # OpenAI integration
 
@@ -437,6 +505,16 @@ edge:
   src:   discord.outputs.log_event
   dst:   log_event.inputs.discord
 
+- owner: telegram
+  data:  py_dict
+  src:   telegram.outputs.log_event
+  dst:   log_event.inputs.telegram
+
+- owner: whatsapp
+  data:  py_dict
+  src:   whatsapp.outputs.log_event
+  dst:   log_event.inputs.whatsapp
+
 - owner: openai
   data:  py_dict
   src:   openai.outputs.log_event
@@ -458,6 +536,16 @@ edge:
   data:  py_dict
   src:   discord.outputs.log_metric
   dst:   log_metric.inputs.discord
+
+- owner: telegram
+  data:  py_dict
+  src:   telegram.outputs.log_metric
+  dst:   log_metric.inputs.telegram
+
+- owner: whatsapp
+  data:  py_dict
+  src:   whatsapp.outputs.log_metric
+  dst:   log_metric.inputs.whatsapp
 
 - owner: openai
   data:  py_dict
@@ -485,6 +573,16 @@ edge:
   data:  py_dict
   src:   discord.outputs.log_data
   dst:   log_data.inputs.discord
+
+- owner: telegram
+  data:  py_dict
+  src:   telegram.outputs.log_data
+  dst:   log_data.inputs.telegram
+
+- owner: whatsapp
+  data:  py_dict
+  src:   whatsapp.outputs.log_data
+  dst:   log_data.inputs.whatsapp
 
 - owner: openai
   data:  py_dict

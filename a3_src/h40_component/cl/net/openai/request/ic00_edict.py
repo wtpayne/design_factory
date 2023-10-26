@@ -60,6 +60,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
+    fl.util.edict.validate(inputs = inputs,  must_contain = ('ctrl',))
+
     default_args = dict(id_endpoint = 'chat_completions',
                         model       = 'gpt-3.5-turbo')
     map_id    = runtime.get('id',       dict())

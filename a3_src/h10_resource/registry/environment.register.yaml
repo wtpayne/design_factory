@@ -23,3 +23,18 @@ register:
     name: "general research"
     type: "virtualenv"
     desc: "Virtualenv for general purpose research and development work."
+
+  e003_discord:
+    name: "discord"
+    type: "virtualenv"
+    desc: "Virtualenv for discord bots with minimal other dependencies."
+
+  e004_reflex:
+    name: "reflex"
+    type: "virtualenv"
+    desc: "Virtualenv for reflex UIs with minimal other dependencies."
+
+  e005_unstructured:
+    name: "unstructured"
+    type: "virtualenv"
+    desc: "Virtualenv for unstructured ETL with minimal other dependencies."

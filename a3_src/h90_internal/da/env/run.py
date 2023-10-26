@@ -66,7 +66,10 @@ import da.env
 
 
 # -----------------------------------------------------------------------------
-def stableflow_start(path_cfg = None, map_cfg = None, tup_overrides = None):
+def stableflow_start(path_cfg      = None,
+                     map_cfg       = None,
+                     is_local      = False,
+                     tup_overrides = None):
     """
     Run a python module in the specified environment.
 
@@ -84,6 +87,7 @@ def stableflow_start(path_cfg = None, map_cfg = None, tup_overrides = None):
             else:
                 cfg = fl.stableflow.cfg.prepare(
                                         path_cfg      = path_cfg,
+                                        is_local      = is_local,
                                         tup_overrides = tup_overrides)
             _update_all_environments(cfg)
             _configure_all_launch_commands(cfg)

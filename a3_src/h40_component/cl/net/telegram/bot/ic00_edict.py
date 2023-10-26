@@ -3,17 +3,18 @@
 ---
 
 title:
-    "dm007_catalyst demo commands."
+    "Telegram bot stableflow-edict component."
 
 description:
-    "This module defines commands for the
-    dm007_catalyst demonstration."
+    "This stableflow component is designed to
+    support integration with the Telegram HTTP
+    API."
 
 id:
-    "a4ff5749-b1e9-496d-bb7a-9d292c731966"
+    "e039df08-73c1-4e68-be39-b9b8c5562903"
 
 type:
-    dt003_python_module
+    dt004_python_stableflow_edict_component
 
 validation_level:
     v00_minimum
@@ -41,30 +42,18 @@ license:
     permissions and limitations under the
     License."
 
-
+...
 """
 
 
-import getpass
-import os
-import sys
+import fl.net.telegram.bot
 
 
 # -----------------------------------------------------------------------------
-def foo():
+def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Do the foo.
-
-    """
-
-    print('Oh my!')
-
-
-# -----------------------------------------------------------------------------
-def bar():
-    """
-    Do the bar.
+    Telegram client component coroutine.
 
     """
 
-    print('NO NEVER!!!!!!!!!!!')
+    pass

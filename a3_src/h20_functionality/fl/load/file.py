@@ -3,12 +3,13 @@
 ---
 
 title:
-    "Filesystem watcher module."
+    "File watching and loading module."
 
 description:
-    "This component watches one or more
-    directory trees for changes and then
-    outputs the paths to any changed files."
+    "This module contains functionality for
+    watching one or more directory trees for
+    changes and then outputting the path and
+    content of any changed files."
 
 id:
     "e184defe-00c2-41b8-807c-4404803eca79"
@@ -59,7 +60,7 @@ import time
 import watchdog.events
 import watchdog.observers
 
-import cl.design.nonconformity
+# import cl.design.nonconformity
 
 
 # -----------------------------------------------------------------------------
@@ -129,7 +130,8 @@ def _load_as_text(fileinfo):
             bytes_buffer = file.read()
 
         except (IOError, OSError) as err:
-            id_nc = cl.design.nonconformity.nc000_file_not_readable
+            id_nc = 'file_not_readable'
+            # id_nc = cl.design.nonconformity.nc000_file_not_readable
             nonconformity = {'reporter': __name__,
                              'id_nc':    id_nc,
                              'str_msg':  str(err),
