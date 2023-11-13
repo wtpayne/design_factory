@@ -102,11 +102,26 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
-    "# Packages required by KIVY.",
+    "# Packages required for mobile development.",
     "#",
 
-    { "type": "pep508", "spec":    "kivy[base]==2.1.0"                        },
     { "type": "pep508", "spec":    "buildozer==1.5.0"                         },
+    { "type": "pep508", "spec":    "kivy[full]==2.2.1"                        },
+    { "type": "pep508", "spec":    "plyer==2.1.0"                             },
+    { "type": "pep508", "spec":    "pyjnius==1.6.0"                           },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages intended for speech recognition.",
+    "#",
+
+    { "type": "pep508", "spec":    "plyer==2.1.0"                             },
+    { "type": "pep508", "spec":    "vosk==0.3.45"                             },
+    { "type": "pep508", "spec":    "openai-whisper==20230918"                 },
+    { "type": "pep508", "spec":    "SpeechRecognition==3.10.0"                },
+
+
 
     "",
     "",

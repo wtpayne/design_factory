@@ -316,6 +316,7 @@ def _python(option,
 # -----------------------------------------------------------------------------
 def shell_command(command,
                   id_env,
+                  working_dir = None,
                   id_env_boot = None,
                   acct        = None,
                   host        = None):
@@ -337,6 +338,9 @@ def shell_command(command,
         str_fmt = "{ssh} {acct}@{host} '. {activ} && {cmd}'"
     else:
         str_fmt = ". {activ} && {cmd}"
+
+    if working_dir is not None:
+        os.chdir(working_dir)
 
     return _run(str_fmt = str_fmt,
                 ssh     = 'ssh -X',

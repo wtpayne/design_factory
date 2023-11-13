@@ -170,6 +170,15 @@
 *.pyc
 *__pycache__*
 
+# Build outputs for android apps
+#
+*.aar
+*.ap_
+*.apk
+*.dex
+*.jar
+*.so
+
 # Python build and test output.
 #
 *.egg-info/
@@ -184,10 +193,16 @@
 .project/
 .emacs
 .emacs.d/
-.gradle/
 .idea/
+*.iml
+local.properties
 .vs/
 .vscode/
 .xcodeproj/
 .xcworkspace/
 .xcuserstate
+
+# Build system metadata
+#
+.gradle/
+.buildozer/
