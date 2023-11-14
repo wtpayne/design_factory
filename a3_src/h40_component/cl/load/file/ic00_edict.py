@@ -43,8 +43,10 @@ license:
 ...
 """
 
-import fl.util.edict
+
 import fl.load.file
+import fl.util.edict
+import pl.stableflow.signal
 
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,11 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if not inputs['ctrl']['ena']:
             continue
 
-        timestamp     = inputs['ctrl']['ts']
-        list_fileinfo = next(gen_list_fileinfo)
+        timestamp = inputs['ctrl']['ts']
+        try:
+            list_fileinfo = next(gen_list_fileinfo)
+        except StopIteration:
+            signal = (pl.stableflow.signal.exit_ok_controlled,)
 
         if list_fileinfo:
             for id_out in outputs.keys():
