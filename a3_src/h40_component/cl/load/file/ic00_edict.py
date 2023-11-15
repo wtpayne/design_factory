@@ -81,6 +81,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
 
         timestamp = inputs['ctrl']['ts']
+        list_fileinfo = list()
         try:
             list_fileinfo = next(gen_list_fileinfo)
         except StopIteration:

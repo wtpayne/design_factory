@@ -186,7 +186,7 @@ def _load_as_binary(fileinfo):
 
 
 # --------------------------------------------------------------------------
-def _combine_regex(iter_regex, op = '|'):
+def _combine_regex(iter_regex = None, op = '|'):
     """
     Return a regular expression compiled from an iterable of strings.
 
@@ -208,14 +208,14 @@ def _combine_regex(iter_regex, op = '|'):
 
 # -----------------------------------------------------------------------------
 def _gen_list_filepath(iter_dirpath_root,
-                       iter_pathincl,
-                       iter_pathexcl,
-                       iter_direxcl,
-                       size_batch,
-                       do_output_all,
-                       do_repeat_all,
-                       do_output_modified,
-                       do_terminate_when_done):
+                       iter_pathincl          = None,
+                       iter_pathexcl          = None,
+                       iter_direxcl           = None,
+                       size_batch             = 10,
+                       do_output_all          = False,
+                       do_repeat_all          = False,
+                       do_output_modified     = False,
+                       do_terminate_when_done = False):
     """
     Yield a sequence of filepath lists matching the specified criteria.
 
@@ -260,20 +260,36 @@ def _gen_list_filepath(iter_dirpath_root,
                                         iter_direxcl      = iter_direxcl)
 
     do_terminate = False
-    while not do_terminate:
+    while True:
+
+        if do_terminate_when_done and do_terminate:
+            break
 
         list_filepath = list()
 
         # Try to fill list_filepath with as
         # many modified files as possible.
         #
-        for filepath in gen_filepath_mod:
-            is_done = filepath is None
+        while True:
+
             is_full = len(list_filepath) >= size_batch
-            if (not is_done) and (not is_full):
+            if is_full:
+                break
+
+            try:
+                filepath        = next(gen_filepath_mod)
+                is_done_for_now = filepath is None
+            except StopIteration:
+                is_done_for_now = True
+
+            if not is_done_for_now:
                 list_filepath.append(filepath)
                 continue
-            break
+            else:
+                # Do NOT set do_terminate as we
+                # may still see changed files
+                # in future.
+                break
 
         # Try to fill any empty space
         # remaining in list_filepath
@@ -283,15 +299,24 @@ def _gen_list_filepath(iter_dirpath_root,
         # apply the termination
         # criterion.
         #
-        for filepath in gen_filepath_all:
-            is_done = filepath is None
+        while True:
+
             is_full = len(list_filepath) >= size_batch
-            if (not is_done) and (not is_full):
+            if is_full:
+                break
+
+            try:
+                filepath = next(gen_filepath_all)
+                is_done  = filepath is None
+            except StopIteration:
+                is_done = True
+
+            if not is_done:
                 list_filepath.append(filepath)
                 continue
-            if is_done and do_terminate_when_done:
+            else:
                 do_terminate = True
-            break
+                break
 
         yield list_filepath
 
@@ -300,9 +325,9 @@ def _gen_list_filepath(iter_dirpath_root,
 def _generate_filepath_all(do_output_all,
                            do_repeat_all,
                            iter_dirpath_root,
-                           iter_pathincl,
-                           iter_pathexcl,
-                           iter_direxcl):
+                           iter_pathincl = None,
+                           iter_pathexcl = None,
+                           iter_direxcl  = None):
     """
     Yield paths of matching files from the list of roots, repeating if needed.
 
@@ -348,9 +373,9 @@ def _generate_filepath_all(do_output_all,
 
 # --------------------------------------------------------------------------
 def _generate_filepath_all_once(iter_dirpath_root,
-                                iter_pathincl,
-                                iter_pathexcl,
-                                iter_direxcl):
+                                iter_pathincl = None,
+                                iter_pathexcl = None,
+                                iter_direxcl  = None):
     """
     Yield paths of matching files from the list of roots, stopping when done.
 
@@ -368,9 +393,9 @@ def _generate_filepath_all_once(iter_dirpath_root,
 
 # --------------------------------------------------------------------------
 def _filtered_filepath_generator(dirpath_root,
-                                 iter_pathincl,
-                                 iter_pathexcl,
-                                 iter_direxcl):
+                                 iter_pathincl = None,
+                                 iter_pathexcl = None,
+                                 iter_direxcl  = None):
 
     """
     Yield each matching file in the directory tree under dirpath_src.
@@ -413,9 +438,9 @@ def _filtered_filepath_generator(dirpath_root,
 # -----------------------------------------------------------------------------
 def _generate_filepath_modified(do_output_modified,
                                 iter_dirpath_root,
-                                iter_pathincl,
-                                iter_pathexcl,
-                                iter_direxcl):
+                                iter_pathincl = None,
+                                iter_pathexcl = None,
+                                iter_direxcl  = None):
     """
     Yield filepaths of recently modified matching files.
 
