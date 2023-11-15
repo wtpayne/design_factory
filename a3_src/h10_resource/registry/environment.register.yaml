@@ -34,7 +34,7 @@ register:
     type: "virtualenv"
     desc: "Virtualenv for reflex UIs with minimal other dependencies."
 
-  e005_unstructured:
-    name: "unstructured"
+  e005_pdf:
+    name: "pdf"
     type: "virtualenv"
-    desc: "Virtualenv for unstructured ETL with minimal other dependencies."
+    desc: "Virtualenv for PDF processing with minimal other dependencies."

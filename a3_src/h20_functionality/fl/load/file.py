@@ -278,9 +278,10 @@ def _gen_list_filepath(iter_dirpath_root,
 
             try:
                 filepath        = next(gen_filepath_mod)
-                is_done_for_now = filepath is None
             except StopIteration:
                 is_done_for_now = True
+            else:
+                is_done_for_now = filepath is None
 
             if not is_done_for_now:
                 list_filepath.append(filepath)
@@ -307,9 +308,10 @@ def _gen_list_filepath(iter_dirpath_root,
 
             try:
                 filepath = next(gen_filepath_all)
-                is_done  = filepath is None
             except StopIteration:
                 is_done = True
+            else:
+                is_done = filepath is None
 
             if not is_done:
                 list_filepath.append(filepath)

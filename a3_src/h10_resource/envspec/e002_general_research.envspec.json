@@ -7,9 +7,9 @@
     "# Packages required by the 'da' command line interface.",
     "#",
 
-    { "type": "pep508", "spec":    "click==8.1.3"                             },
-    { "type": "pep508", "spec":    "loguru==0.5.3"                            },
-    { "type": "pep508", "spec":    "pudb==2022.1.3"                           },
+    { "phase": 1, "type": "pep508", "spec": "click==8.1.3"                    },
+    { "phase": 1, "type": "pep508", "spec": "loguru==0.5.3"                   },
+    { "phase": 1, "type": "pep508", "spec": "pudb==2022.1.3"                  },
 
     "",
     "",
@@ -17,13 +17,13 @@
     "# Packages required by stableflow systems.",
     "#",
 
-    { "type": "pep508", "spec":    "Cython==0.29.33"                          },
-    { "type": "pep508", "spec":    "dill==0.3.6"                              },
-    { "type": "pep508", "spec":    "jsonschema==4.17.3"                       },
-    { "type": "pep508", "spec":    "numpy==1.24.2"                            },
-    { "type": "pep508", "spec":    "psutil==5.9.4"                            },
-    { "type": "pep508", "spec":    "pyzmq==25.0.2"                            },
-    { "type": "pep508", "spec":    "setproctitle==1.3.2"                      },
+    { "phase": 1, "type": "pep508", "spec": "Cython==0.29.33"                 },
+    { "phase": 1, "type": "pep508", "spec": "dill==0.3.6"                     },
+    { "phase": 1, "type": "pep508", "spec": "jsonschema==4.17.3"              },
+    { "phase": 1, "type": "pep508", "spec": "numpy==1.24.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "psutil==5.9.4"                   },
+    { "phase": 1, "type": "pep508", "spec": "pyzmq==25.0.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "setproctitle==1.3.2"             },
 
     "",
     "",
@@ -31,10 +31,10 @@
     "# Packages required for serialization/deserialization.",
     "#",
 
-    { "type": "pep508", "spec":    "PyYAML==6.0"                              },
-    { "type": "pep508", "spec":    "ruamel.yaml==0.17.26"                     },
-    { "type": "pep508", "spec":    "toml==0.10.2"                             },
-    { "type": "pep508", "spec":    "xmltodict==0.13.0"                        },
+    { "phase": 1, "type": "pep508", "spec": "PyYAML==6.0"                     },
+    { "phase": 1, "type": "pep508", "spec": "ruamel.yaml==0.17.26"            },
+    { "phase": 1, "type": "pep508", "spec": "toml==0.10.2"                    },
+    { "phase": 1, "type": "pep508", "spec": "xmltodict==0.13.0"               },
 
     "",
     "",
@@ -42,7 +42,7 @@
     "# Packages required for testing.",
     "#",
 
-    { "type": "pep508", "spec":    "pytest==7.3.1"                            },
+    { "phase": 1, "type": "pep508", "spec": "pytest==7.3.1"                   },
 
     "",
     "",
@@ -50,8 +50,8 @@
     "# Packages required by the 'da interact bpy' command.",
     "#",
 
-    { "type": "pep508", "spec":    "prompt-toolkit==3.0.38"                   },
-    { "type": "pep508", "spec":    "bpython==0.24"                            },
+    { "phase": 1, "type": "pep508", "spec": "prompt-toolkit==3.0.38"          },
+    { "phase": 1, "type": "pep508", "spec": "bpython==0.24"                   },
 
     "",
     "",
@@ -59,7 +59,7 @@
     "# Packages required by the 'da interact ptpy' command.",
     "#",
 
-    { "type": "pep508", "spec":    "ptpython==3.0.23"                         },
+    { "phase": 1, "type": "pep508", "spec": "ptpython==3.0.23"                },
 
     "",
     "",
@@ -67,7 +67,7 @@
     "# Packages required by the 'da interact ipy' command.",
     "#",
 
-    { "type": "pep508", "spec":    "ipython==8.11.0"                          },
+    { "phase": 1, "type": "pep508", "spec": "ipython==8.11.0"                 },
 
     "",
     "",
@@ -75,9 +75,9 @@
     "# Packages required for numeric computing, analysis and visualisation.",
     "#",
 
-    { "type": "pep508", "spec":    "pandas==2.0.2"                            },
-    { "type": "pep508", "spec":    "polars==0.18.2"                           },
-    { "type": "pep508", "spec":    "matplotlib==3.7.1"                        },
+    { "phase": 1, "type": "pep508", "spec": "pandas==2.0.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "polars==0.18.2"                  },
+    { "phase": 1, "type": "pep508", "spec": "matplotlib==3.7.1"               },
 
     "",
     "",
@@ -85,7 +85,7 @@
     "# Packages required by pybullet.",
     "#",
 
-    { "type": "pep508", "spec":    "pybullet==3.2.5"                          },
+    { "phase": 1, "type": "pep508", "spec": "pybullet==3.2.5"                 },
 
     "",
     "",
@@ -93,11 +93,11 @@
     "# Packages required for web UI experiments - StreamLit and Gradio.",
     "#",
 
-    { "type": "pep508", "spec":    "streamlit==1.22.0"                        },
-    { "type": "pep508", "spec":    "gradio==3.40.1"                           },
-    { "type": "pep508", "spec":    "fastapi==0.101.1"                         },
-    { "type": "pep508", "spec":    "fastai==2.7.12"                           },
-    { "type": "pep508", "spec":    "pydantic==2.2.1"                          },
+    { "phase": 1, "type": "pep508", "spec": "streamlit==1.22.0"               },
+    { "phase": 1, "type": "pep508", "spec": "gradio==3.40.1"                  },
+    { "phase": 1, "type": "pep508", "spec": "fastapi==0.101.1"                },
+    { "phase": 1, "type": "pep508", "spec": "fastai==2.7.12"                  },
+    { "phase": 1, "type": "pep508", "spec": "pydantic==2.2.1"                 },
 
     "",
     "",
@@ -105,10 +105,10 @@
     "# Packages required for mobile development.",
     "#",
 
-    { "type": "pep508", "spec":    "buildozer==1.5.0"                         },
-    { "type": "pep508", "spec":    "kivy[full]==2.2.1"                        },
-    { "type": "pep508", "spec":    "plyer==2.1.0"                             },
-    { "type": "pep508", "spec":    "pyjnius==1.6.0"                           },
+    { "phase": 1, "type": "pep508", "spec": "buildozer==1.5.0"                },
+    { "phase": 1, "type": "pep508", "spec": "kivy[full]==2.2.1"               },
+    { "phase": 1, "type": "pep508", "spec": "plyer==2.1.0"                    },
+    { "phase": 1, "type": "pep508", "spec": "pyjnius==1.6.0"                  },
 
     "",
     "",
@@ -116,10 +116,10 @@
     "# Packages intended for speech recognition.",
     "#",
 
-    { "type": "pep508", "spec":    "plyer==2.1.0"                             },
-    { "type": "pep508", "spec":    "vosk==0.3.45"                             },
-    { "type": "pep508", "spec":    "openai-whisper==20230918"                 },
-    { "type": "pep508", "spec":    "SpeechRecognition==3.10.0"                },
+    { "phase": 1, "type": "pep508", "spec": "plyer==2.1.0"                    },
+    { "phase": 1, "type": "pep508", "spec": "vosk==0.3.45"                    },
+    { "phase": 1, "type": "pep508", "spec": "openai-whisper==20230918"        },
+    { "phase": 1, "type": "pep508", "spec": "SpeechRecognition==3.10.0"       },
 
 
 
@@ -129,9 +129,9 @@
     "# Packages intended for NLP work.",
     "#",
 
-    { "type": "pep508", "spec":    "spacy==3.6.1"                             },
-    { "type": "pep508", "spec":    "thefuzz==0.19.0"                          },
-    { "type": "pep508", "spec":    "python-Levenshtein==0.21.0"               },
+    { "phase": 1, "type": "pep508", "spec": "spacy==3.6.1"                    },
+    { "phase": 1, "type": "pep508", "spec": "thefuzz==0.19.0"                 },
+    { "phase": 1, "type": "pep508", "spec": "python-Levenshtein==0.21.0"      },
 
     "",
     "",
@@ -139,12 +139,12 @@
     "# Packages required by stableview.",
     "#",
 
-    { "type": "pep508", "spec":    "appdirs==1.4.4"                           },
-    { "type": "pep508", "spec":    "CairoSVG==2.7.0"                          },
-    { "type": "pep508", "spec":    "dearpygui==1.9.0"                         },
-    { "type": "pep508", "spec":    "imgui==2.0.0"                             },
-    { "type": "pep508", "spec":    "Pillow==9.5.0"                            },
-    { "type": "pep508", "spec":    "rich==13.4.1"                             },
+    { "phase": 1, "type": "pep508", "spec": "appdirs==1.4.4"                  },
+    { "phase": 1, "type": "pep508", "spec": "CairoSVG==2.7.0"                 },
+    { "phase": 1, "type": "pep508", "spec": "dearpygui==1.9.0"                },
+    { "phase": 1, "type": "pep508", "spec": "imgui==2.0.0"                    },
+    { "phase": 1, "type": "pep508", "spec": "Pillow==9.5.0"                   },
+    { "phase": 1, "type": "pep508", "spec": "rich==13.4.1"                    },
 
     "",
     "",
@@ -152,8 +152,8 @@
     "# Experimental stableview packages.",
     "#",
 
-    { "type": "pep508", "spec":    "reactivex==4.0.4"                         },
-    { "type": "pep508", "spec":    "sqlitedict==2.1.0"                        },
+    { "phase": 1, "type": "pep508", "spec": "reactivex==4.0.4"                },
+    { "phase": 1, "type": "pep508", "spec": "sqlitedict==2.1.0"               },
 
     "",
     "",
@@ -161,10 +161,10 @@
     "# Packages required for the ASGI server component.",
     "#",
 
-    { "type": "pep508", "spec":    "itsdangerous==2.1.2"                      },
-    { "type": "pep508", "spec":    "sse_starlette==1.6.1"                     },
-    { "type": "pep508", "spec":    "starlette==0.27.0"                        },
-    { "type": "pep508", "spec":    "uvicorn==0.23.2"                          },
+    { "phase": 1, "type": "pep508", "spec": "itsdangerous==2.1.2"             },
+    { "phase": 1, "type": "pep508", "spec": "sse_starlette==1.6.1"            },
+    { "phase": 1, "type": "pep508", "spec": "starlette==0.27.0"               },
+    { "phase": 1, "type": "pep508", "spec": "uvicorn==0.23.2"                 },
 
     "",
     "",
@@ -172,9 +172,9 @@
     "# Packages required by forever backend.",
     "#",
 
-    { "type": "pep508", "spec":    "dominate==2.8.0"                          },
-    { "type": "pep508", "spec":    "openai==0.27.4"                           },
-    { "type": "pep508", "spec":    "python-dotenv==1.0.0"                     },
+    { "phase": 1, "type": "pep508", "spec": "dominate==2.8.0"                 },
+    { "phase": 1, "type": "pep508", "spec": "openai==0.27.4"                  },
+    { "phase": 1, "type": "pep508", "spec": "python-dotenv==1.0.0"            },
 
     "",
     "",
@@ -182,7 +182,7 @@
     "# Packages required by discord based apps.",
     "#",
 
-    { "type": "pep508", "spec":    "discord.py==2.2.3"                        },
+    { "phase": 1, "type": "pep508", "spec": "discord.py==2.2.3"               },
 
     "",
     "",
@@ -190,14 +190,14 @@
     "# Local workspace directories - editable install.",
     "#",
 
-    { "type": "local",  "relpath": "a3_src/h10_resource"                      },
-    { "type": "local",  "relpath": "a3_src/h20_functionality"                 },
-    { "type": "local",  "relpath": "a3_src/h30_platform"                      },
-    { "type": "local",  "relpath": "a3_src/h40_component"                     },
-    { "type": "local",  "relpath": "a3_src/h50_subsystem"                     },
-    { "type": "local",  "relpath": "a3_src/h60_system"                        },
-    { "type": "local",  "relpath": "a3_src/h70_bespoke"                       },
-    { "type": "local",  "relpath": "a3_src/h80_research"                      },
-    { "type": "local",  "relpath": "a3_src/h90_internal"                      }
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h10_resource"          },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h20_functionality"     },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h30_platform"          },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h40_component"         },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h50_subsystem"         },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h60_system"            },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h70_bespoke"           },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h80_research"          },
+    { "phase": 1, "type": "local",  "relpath": "a3_src/h90_internal"          }
   ]
 }

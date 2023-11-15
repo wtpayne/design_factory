@@ -11,7 +11,7 @@ host:
     port_range:             '8080-8199'
     dirpath_log:            ''
     launch_cmd:             ''
-    environment:            'e004_reflex'
+    environment:            'e005_pdf'
     log_level:              'INFO'
 
 
@@ -57,7 +57,8 @@ node:
     state_type:             py_dict
     config:
       dirpath_root:
-        - /media/wtp/Data1/ref/00_intray/01_by_year/2013/
+        - /media/wtp/Data1/ref/60_refman/test/
+        # - /media/wtp/Data1/ref/00_intray/01_by_year/2013/
         # - /media/wtp/Data1/ref/00_intray/00_triage/
       pathincl:
         - !regex '^.*\.pdf$'

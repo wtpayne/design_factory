@@ -43,6 +43,11 @@ license:
 ...
 """
 
+import io
+
+
+import pdf2image.exceptions
+import pdf2image
 
 import fl.util.edict
 
@@ -54,6 +59,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
+    print('')
+
     signal = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
@@ -62,5 +69,45 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if inputs['fileinfo']['ena']:
             length = len(inputs['fileinfo']['list'])
             for item in inputs['fileinfo']['list']:
-                print(item['filepath'])
+                filepath    = item['filepath']
+                buffer      = item['bytes']
+
+                try:
+                    list_images = pdf2image.convert_from_path(filepath)
+                    # list_images = pdf2image.convert_from_bytes(buffer)
+                except pdf2image.exceptions.PDFInfoNotInstalledError as err:
+                    print('PDFInfoNotInstalledError')
+                    continue
+                except pdf2image.exceptions.PDFPageCountError as err:
+                    print('PDFPageCountError')
+                    continue
+                except pdf2image.exceptions.PDFSyntaxError as err:
+                    print('PDFSyntaxError')
+                    continue
+                else:
+                    print(len(list_images))
+                    for (idx, image) in enumerate(list_images):
+                        image_path = f"/media/wtp/Data1/tmp//page_{idx}.jpg"
+                        image.save(image_path, 'JPEG')
+
+
+                # try:
+                #     elements = unstructured.partition.pdf.partition_pdf(
+                #                             file                  = buffer,
+                #                             include_page_breaks   = True,
+                #                             strategy              = 'ocr_only',
+                #                             infer_table_structure = False,
+                #                             ocr_language          = 'eng',
+                #                             max_partition         = None,
+                #                             include_metadata      = True,
+                #                             metadata_filename     = filepath)
+                # except pdfminer.psparser.PSEOF:
+                #     continue
+
+                # print(filepath)
+                # for item in elements:
+                #     print('-' * 80)
+                #     print('')
+                #     print(item)
+                #     print('')
 

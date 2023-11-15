@@ -57,6 +57,7 @@ license:
 # seek to stick to python3 builtin libraries
 # and unix coreutils only.
 #
+import collections
 import datetime
 import json
 import os.path
@@ -250,25 +251,22 @@ def do_update(dirpath_root, id_env):
                                 dirpath_root = dirpath_root,
                                 id_env       = id_env)
 
-    filepath_reqs    = _create_requirements_file(
+    map_filepath_reqs = _create_all_requirements_files(
                                 dirpath_root = dirpath_root,
                                 id_env       = id_env,
                                 envspec      = _load_envspec(filepath_envspec))
 
-    _touch(
-        filepath   = filepath_envspec,
-        delta_secs = -1) # Set mtime to one second in the past.
+    _touch(filepath   = filepath_envspec,
+           delta_secs = -1) # Set mtime to one second in the past.
 
-    _install_requirements(
-        dirpath_root  = dirpath_root,
-        id_env        = id_env,
-        filepath_reqs = filepath_reqs)
+    # Install requirements items one phase at
+    # a time, in order of ascending id_phase.
+    #
+    for (id_phase, filepath_reqs) in sorted(map_filepath_reqs.items()):
+        _install_requirements(dirpath_root  = dirpath_root,
+                              id_env        = id_env,
+                              filepath_reqs = filepath_reqs)
 
-    # dirpath_env      = _dirpath_env(dirpath_root, id_env)
-    # dirpath_venv_pkg = _dirpath_venv_pkg(dirpath_env)
-    # dirpath_venv_whl = _dirpath_venv_whl(dirpath_env)
-    # _touch(filepath  = dirpath_venv_pkg)
-    # _touch(filepath  = dirpath_venv_whl)
 
 # -----------------------------------------------------------------------------
 def _dirpath_env(dirpath_root, id_env):
@@ -362,33 +360,106 @@ def _filepath_envspec(dirpath_root, id_env):
 
 
 # -----------------------------------------------------------------------------
-def _create_requirements_file(dirpath_root, id_env, envspec):
+def _create_all_requirements_files(dirpath_root, id_env, envspec):
     """
     Return temporary requirements.txt filepath after writing envspec data to it.
 
     """
 
-    filepath = _filepath_requirements(dirpath_root, id_env)
-    dirpath  = os.path.dirname(filepath)
+    # Create a directory to hold all
+    # of the requirements_xx.txt files
+    # for this environment.
+    #
+    dirpath = _dirpath_requirements(dirpath_root, id_env)
     if not os.path.exists(dirpath):
-       os.makedirs(dirpath)
+        os.makedirs(dirpath)
 
-    with open(filepath, 'wt') as file_reqs:
-        _write = lambda msg: print(msg, file = file_reqs)
-        for item in envspec['list_item']:
-            _process_requirement_item(dirpath_root, item, _write)
-        _write('')
+    # Work out the set of installation
+    # phases we need to manage.
+    #
+    set_id_phase = set()
+    for item in envspec['list_item']:
+        if isinstance(item, str):
+            continue
+        if 'phase' in item:
+            set_id_phase.add(item['phase'])
 
-    return filepath
+    # Get a default phase id for
+    # items without an explicitly
+    # specified phase id.
+    #
+    if set_id_phase:
+        id_phase_default = max(set_id_phase) + 1
+    else:
+        id_phase_default = 1
+    set_id_phase.add(id_phase_default)
 
+    # Create a map from id_phase -> list_item
+    #
+    map_list_item = dict()
+    for id_phase in sorted(set_id_phase):
+        map_list_item[id_phase] = list()
+
+    # Collate individual requirement items by
+    # phase id.
+    #
+    set_id_phase_utilised = set()
+    for item in envspec['list_item']:
+
+        # Comments are represented by string
+        # items, so the most sensible thing
+        # seems to be to make sure that a copy
+        # gets written to every requirements
+        # file that we generate.
+        #
+        if isinstance(item, str):
+            for list_item in map_list_item.values():
+                list_item.append(item)
+            continue
+
+        # If a non-comment item doesn't have an
+        # explicitly declared phase, then we
+        # stick it in the default phase.
+        #
+        elif 'phase' in item:
+            id_phase = item['phase']
+        else:
+            id_phase = id_phase_default
+        set_id_phase_utilised.add(id_phase)
+        map_list_item[id_phase].append(item)
+
+
+    # Create a requirements_xx.txt file
+    # for each phase id.
+    #
+    map_filepath = dict()
+    for id_phase in sorted(set_id_phase_utilised):
+
+        filename  = 'requirements_{id:02d}.txt'.format(id = id_phase)
+        filepath  = os.path.join(dirpath, filename)
+        map_filepath[id_phase] = filepath
+
+        with open(filepath, 'wt') as file:
+            _write = lambda msg: print(msg, file = file)
+            for item in map_list_item[id_phase]:
+
+                # This also downloads remote
+                # dependencies so that they
+                # are ready to install.
+                #
+                _process_requirement_item(dirpath_root, item, _write)
+
+            _write('')
+
+    return map_filepath
 
 # -----------------------------------------------------------------------------
-def _filepath_requirements(dirpath_root, id_env):
+def _dirpath_requirements(dirpath_root, id_env):
     """
     Return the path of the temporary requirements file for the specified env.
 
     """
-    return os.path.join(dirpath_root, 'a4_tmp', id_env, 'requirements.txt')
+    return os.path.join(dirpath_root, 'a4_tmp', id_env)
 
 
 # -----------------------------------------------------------------------------
