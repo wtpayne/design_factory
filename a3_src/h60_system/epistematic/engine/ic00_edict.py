@@ -58,6 +58,7 @@ import torch
 import torchvision.transforms
 
 import fl.util.edict
+import fl.util
 
 
 # -----------------------------------------------------------------------------
@@ -67,12 +68,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    checkpoint = nougat.utils.checkpoint.get_checkpoint()
-    model      = nougat.NougatModel.from_pretrained(checkpoint)
-    model      = nougat.utils.device.move_to_device(model,
-                                                    bf16 = True,
-                                                    cuda = True)
-    model.eval()
+    ocr = _coro_ocr_nougat()
 
     signal = fl.util.edict.init(outputs)
     while True:
@@ -82,14 +78,30 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if inputs['fileinfo']['ena']:
             length = len(inputs['fileinfo']['list'])
             for fileinfo in inputs['fileinfo']['list']:
+                fileinfo['page'] = ocr.send(fileinfo['bytes'])
 
-                bytes_pdf = fileinfo['bytes']
-                list_page = [page for page in _gen_page_prediction(
-                                                        model     = model,
-                                                        bytes_pdf = bytes_pdf)]
 
-                for page in list_page:
-                    print(page['predictions'][0])
+# -----------------------------------------------------------------------------
+@fl.util.coroutine
+def _coro_ocr_nougat():
+    """
+    Coroutine for performing OCR with the FAIR Nougat model.
+
+    """
+
+    checkpoint = nougat.utils.checkpoint.get_checkpoint()
+    model      = nougat.utils.device.move_to_device(
+                        model = nougat.NougatModel.from_pretrained(checkpoint),
+                        bf16  = True,
+                        cuda  = True)
+    model.eval()
+
+    list_pageinfo = list()
+    while True:
+        bytes_pdf = yield list_pageinfo
+        list_pageinfo.clear()
+        list_pageinfo.extend(_gen_page_prediction(model     = model,
+                                                  bytes_pdf = bytes_pdf))
 
 
 # -----------------------------------------------------------------------------
