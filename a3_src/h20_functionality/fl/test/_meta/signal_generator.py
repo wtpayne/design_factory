@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Xact component for test vector generation.
+Stableflow component for test vector generation.
 
 """
 

@@ -23,9 +23,9 @@ def as_dict():
 
     The table is indexed using a string.
 
-    Xact is intended to be used to manage and
-    distribute compute bound workloads, and to
-    support interoperability between Python and
+    Stableflow is intended to be used to manage
+    and distribute compute bound workloads, and
+    to support interoperability between Python and
     C.
 
     We use Numpy as a lingua franca to communicate
