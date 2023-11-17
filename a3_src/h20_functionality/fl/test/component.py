@@ -88,6 +88,7 @@ def pipeline_test_cfg(list_pipeline_modules,
     Return configuration for a pipeline test.
 
     """
+
     num_pipeline_nodes  = len(list_pipeline_modules)
     num_pipeline_config = len(list_pipeline_node_config)
     assert num_pipeline_nodes == num_pipeline_config
@@ -158,6 +159,7 @@ def _baseline_configuration():
     Return skeleton configuration for a component level test.
 
     """
+
     cfg = fl.stableflow.cfg.builder.get_skeleton_config()
 
     fl.stableflow.cfg.builder.set_system_id(
@@ -194,6 +196,7 @@ def _add_controller(cfg, subordinate_nodes, idx_max):
     Add a controller to the specified config.
 
     """
+
     fl.stableflow.cfg.builder.add_node(
                     cfg          = cfg,
                     id_node      = 'ctrl_sys',
@@ -235,6 +238,7 @@ def _num_samples(test_vectors, key):
   Return the number of samples in the specified test vector.
 
   """
+
   tup_num_samples = tuple(len(channel[key]) for channel in test_vectors)
   assert _is_all_equal(tup_num_samples)
   num_samples = tup_num_samples[0]
@@ -247,6 +251,7 @@ def _is_all_equal(itable):
     Return true if all items in the supplied iterable are equal.
 
     """
+
     iter_items = iter(itable)
     item_first  = next(iter_items)
     return all(item == item_first for item in iter_items)

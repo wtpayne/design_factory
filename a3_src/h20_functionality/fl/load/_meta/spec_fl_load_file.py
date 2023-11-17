@@ -17,11 +17,13 @@ def _get_rootpath_testdata():
     Return the fully qualified path to the test data directory.
 
     """
+
     relfilepath_self  = __file__ if __file__ else sys.argv[0]
     filepath_self     = os.path.realpath(relfilepath_self)
     dirpath_self      = os.path.dirname(filepath_self)
     dirname_testdata  = 'testdata'
     rootpath_testdata = os.path.join(dirpath_self, dirname_testdata)
+
     return rootpath_testdata
 
 
@@ -31,7 +33,9 @@ def _get_map_dirpath_testdata():
     Return a mapping of test data directory paths.
 
     """
+
     rootpath_testdata    = _get_rootpath_testdata()
+
     map_dirpath_testdata = {
         'zero_files':  os.path.join(rootpath_testdata, '00_zero_files'),
         'one_file':    os.path.join(rootpath_testdata, '01_one_file'),
@@ -39,6 +43,7 @@ def _get_map_dirpath_testdata():
         'three_files': os.path.join(rootpath_testdata, '03_three_files'),
         'four_files':  os.path.join(rootpath_testdata, '04_four_files')
     }
+
     return map_dirpath_testdata
 
 

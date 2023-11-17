@@ -53,7 +53,9 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Noop component coroutine.
 
     """
+
     signal = fl.util.edict.init(outputs)
+
     while True:
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)

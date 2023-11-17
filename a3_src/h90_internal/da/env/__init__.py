@@ -73,6 +73,7 @@ def tup_control_tier():
     Return a tuple with all control tiers in it.
 
     """
+
     return ('h00_thirdparty',
             'h10_resource',
             'h20_functionality',
@@ -84,12 +85,14 @@ def tup_control_tier():
             'h80_research',
             'h90_internal')
 
+
 # -----------------------------------------------------------------------------
 def iter_id_env():
     """
     Yield all known id_env in the current workspace.
 
     """
+
     str_ext = '.envspec.json'
     num_ext = len(str_ext)
 
@@ -107,6 +110,7 @@ def iter_cfg_env():
     Yield all known env config in the current workspace.
 
     """
+
     str_ext = '.envspec.json'
     num_ext = len(str_ext)
     dirpath = path(process_area = 'a3_src',
@@ -138,6 +142,7 @@ def path(process_area = 'a3_src',
     Return an absolute file or directory path in the current workspace.
 
     """
+
     dirpath_root = rootpath()
 
     # Ensure we have a valid process area.
@@ -185,6 +190,7 @@ def rootpath():
     Return an absolute directory path to the root of the current workspace.
 
     """
+
     dirpath_self = os.path.dirname(os.path.realpath(__file__))
     relpath_root = '../../../..'
     dirpath_root = os.path.normpath(os.path.join(dirpath_self, relpath_root))
@@ -200,6 +206,7 @@ def do_ensure_updated(dirpath_root, id_env):
     factory to update environments as needed.
 
     """
+
     dirpath_env = _dirpath_env(dirpath_root, id_env)
 
     # Ensure the virtual environment exists,
@@ -247,6 +254,7 @@ def do_update(dirpath_root, id_env):
     issues easier.
 
     """
+
     filepath_envspec = _filepath_envspec(
                                 dirpath_root = dirpath_root,
                                 id_env       = id_env)
@@ -274,6 +282,7 @@ def _dirpath_env(dirpath_root, id_env):
     Return the directory path of the specified environment.
 
     """
+
     return os.path.join(dirpath_root, "a0_env", "venv", id_env)
 
 
@@ -283,6 +292,7 @@ def _delete_env_if_corrupted(dirpath_env):
     Delete the specified environment if corruption is detected.
 
     """
+
     filepath_activate = os.path.join(dirpath_env, "bin", "activate")
     if os.path.isdir(dirpath_env) and not os.path.isfile(filepath_activate):
         shutil.rmtree(dirpath_env)
@@ -297,6 +307,7 @@ def _create_env_if_not_exists(dirpath_env):
     environment if it does not already exist.
 
     """
+
     if os.path.isdir(dirpath_env):
         is_new_env = False
     else:
@@ -311,6 +322,7 @@ def _is_up_to_date(dirpath_root, id_env, dirpath_env):
     Return true if the specified environment is up to date, false otherwise.
 
     """
+
     mtime_envspec  = os.path.getmtime(_filepath_envspec(dirpath_root, id_env))
     mtime_venv_pkg = os.path.getmtime(_dirpath_venv_pkg(dirpath_env))
     is_updated_pkg = mtime_venv_pkg > mtime_envspec
@@ -331,6 +343,7 @@ def _dirpath_venv_pkg(dirpath_env):
     Return the path of the virtual environment site packages directory.
 
     """
+
     version_python = '.'.join(sys.version.split('.')[0:2])
     dirname_python = 'python{version}'.format(version = version_python)
     return os.path.join(dirpath_env, 'lib', dirname_python, 'site-packages')
@@ -342,6 +355,7 @@ def _dirpath_venv_whl(dirpath_env):
     Return the path of the virtual environment python wheels directory.
 
     """
+
     return os.path.join(dirpath_env, 'share', 'python-wheels')
 
 
@@ -351,6 +365,7 @@ def _filepath_envspec(dirpath_root, id_env):
     Return the filepath of the envspec file for the specified environment.
 
     """
+
     filename = '{id_env}.envspec.json'.format(id_env = id_env)
     return os.path.join(dirpath_root,
                         'a3_src',
@@ -453,13 +468,15 @@ def _create_all_requirements_files(dirpath_root, id_env, envspec):
 
     return map_filepath
 
+
 # -----------------------------------------------------------------------------
 def _dirpath_requirements(dirpath_root, id_env):
     """
     Return the path of the temporary requirements file for the specified env.
 
     """
-    return os.path.join(dirpath_root, 'a4_tmp', id_env)
+
+    return os.path.join(dirpath_root, 'a4_tmp', 'env', id_env)
 
 
 # -----------------------------------------------------------------------------
@@ -468,6 +485,7 @@ def _process_requirement_item(dirpath_root, item, _write):
     Write a single lines to the requirements file.
 
     """
+
     if isinstance(item, str):
 
         _write(item)
@@ -497,10 +515,11 @@ def _ensure_cloned_fron_github(url_remote, tag, dirpath_root):
     Ensure that specified github repository is cloned to local storage.
 
     """
+
     (_, user_and_path) = url_remote.split(':')
     (user, repo_path)  = user_and_path.split('/', maxsplit = 1)
     (repo_name, _)     = repo_path.rsplit('.', maxsplit = 1)
-    dirpath_env        = os.path.join(dirpath_root, 'a0_env/src')
+    dirpath_env        = os.path.join(dirpath_root, 'a0_env', 'src')
     dirpath_dep        = os.path.join(dirpath_env, user, repo_name)
     is_already_cloned  = os.path.exists(dirpath_dep)
 
@@ -519,6 +538,7 @@ def _load_envspec(filepath_envspec):
     Return the envspec data for the specified environment id.
 
     """
+
     with open(filepath_envspec, 'rt') as file:
         return json.load(file)
 
@@ -529,10 +549,11 @@ def _touch(filepath, delta_secs = 0):
     Set last-accessed and last-modified times of filepath.
 
     """
-    timestamp_now  = time.time()
-    datetime_now   = datetime.datetime.fromtimestamp(timestamp_now)
-    datetime_mod   = datetime_now + datetime.timedelta(seconds = delta_secs)
-    timestamp_mod  = datetime_mod.timestamp()
+
+    timestamp_now = time.time()
+    datetime_now  = datetime.datetime.fromtimestamp(timestamp_now)
+    datetime_mod  = datetime_now + datetime.timedelta(seconds = delta_secs)
+    timestamp_mod = datetime_mod.timestamp()
     os.utime(filepath, (timestamp_mod, timestamp_mod))
 
 
@@ -547,6 +568,7 @@ def _install_requirements(dirpath_root, id_env, filepath_reqs):
     installed.
 
     """
+
     dirpath_env        = _dirpath_env(dirpath_root, id_env)
     filepath_activate  = os.path.join(dirpath_env, 'bin', 'activate')
     filepath_pip       = os.path.join(dirpath_env, 'bin', 'pip3')

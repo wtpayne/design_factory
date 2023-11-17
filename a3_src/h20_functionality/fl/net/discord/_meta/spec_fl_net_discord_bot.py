@@ -26,6 +26,7 @@ class SpecifyFlNetDiscordBot:
         fl.net.discord.bot can be imported.
 
         """
+
         import fl.net.discord.bot
 
 
@@ -63,6 +64,7 @@ class SpecifyFlNetDiscordBotCoro:
             proc_child_after = psutil.Process().children()
             if proc_child_after != proc_child_before:
                 break
+
         assert proc_child_after != proc_child_before
 
         # Sending nothing gets nothing back.

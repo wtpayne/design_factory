@@ -201,6 +201,7 @@ def _clear(queue_ipc):
     Clear all items from the specified queue.
 
     """
+
     try:
         while True:
             queue_ipc.get_nowait()
@@ -216,6 +217,7 @@ def _remove_duplicates(map_res, map_hashes):
     Modify map_res to remove duplicates that we have seen before.
 
     """
+
     tup_route = tuple(map_res.keys())
     for route in tup_route:
 
@@ -249,6 +251,7 @@ def _asgi_server_process(cfg, map_queues):
         Return a response for the specified id_resource param.
 
         """
+
         tasks = _ensure_continuously_updated()
 
         (id_session, id_user) = _get_cookies(request)
@@ -297,6 +300,7 @@ def _asgi_server_process(cfg, map_queues):
         Update app state and ensure that background update tasks are running.
 
         """
+
         _update_and_notify()
         tasks = starlette.background.BackgroundTasks()
         tasks.add_task(_update_and_notify_background_task)
@@ -308,6 +312,7 @@ def _asgi_server_process(cfg, map_queues):
         Update resources and topics then notify listeners of changes.
 
         """
+
         (set_id_resource_changed, set_id_topic_changed) = _update_resources()
         _update_topics(set_id_topic_changed)
         _notify_listeners(set_id_resource_changed)
@@ -318,6 +323,7 @@ def _asgi_server_process(cfg, map_queues):
         Bring the resource table up to date with the latest changes.
 
         """
+
         set_id_topic_changed    = set()
         set_id_resource_changed = set()
         while True:
@@ -365,6 +371,7 @@ def _asgi_server_process(cfg, map_queues):
         update the maps as required.
 
         """
+
         for id_topic in set_id_topic_changed:
             set_id_resource_old = app.state.map_topic_to_resource[id_topic]
             bytes_topic         = app.state.map_resources[id_topic][1]
@@ -391,6 +398,7 @@ def _asgi_server_process(cfg, map_queues):
         the relevant subscribed queues.
 
         """
+
         for id_resource in set_id_resource_changed:
             for id_topic in app.state.map_resource_to_topic[id_resource]:
                 for queue_subscriber in app.state.map_topic_to_queue[id_topic]:
@@ -409,6 +417,7 @@ def _asgi_server_process(cfg, map_queues):
         the state was last updated.
 
         """
+
         polling_interval   = 0.1 # seconds
         staleout_duration  = 3 * polling_interval
         staleout_time      = app.state.ts_last_update + staleout_duration
@@ -441,6 +450,7 @@ def _asgi_server_process(cfg, map_queues):
         Enqueue requests from the client for the rest of the bowyer system.
 
         """
+
         headers = dict(request.headers)
 
         try:
@@ -476,6 +486,7 @@ def _asgi_server_process(cfg, map_queues):
         Return the resource corresponding to the specified id_resource.
 
         """
+
         if id_resource == 'ena':
             if app.state.default is not None:
                 return app.state.default
@@ -501,6 +512,7 @@ def _asgi_server_process(cfg, map_queues):
         Return an SSE EventSourceaResponse for the specified pub sub topic.
 
         """
+
         queue_notify = asyncio.Queue()
         app.state.map_topic_to_queue[id_topic].add(queue_notify)
         response = sse_starlette.sse.EventSourceResponse(
@@ -518,6 +530,7 @@ def _asgi_server_process(cfg, map_queues):
         Until request is disconnected.
 
         """
+
         while True:
 
             if (await request.is_disconnected()):
@@ -536,6 +549,7 @@ def _asgi_server_process(cfg, map_queues):
         Handle websocket communications using the specified callback.
 
         """
+
         await websocket.accept()
         while True:
             message = await websocket.receive_text()
@@ -549,6 +563,7 @@ def _asgi_server_process(cfg, map_queues):
         Load the specified callback function.
 
         """
+
         return dill.loads(content)
 
     #--------------------------------------------------------------------------
@@ -557,6 +572,7 @@ def _asgi_server_process(cfg, map_queues):
         Get cookies from the specified request.
 
         """
+
         if request is None:
             id_session = uuid.uuid4()
             id_user    = uuid.uuid4()
@@ -572,11 +588,13 @@ def _asgi_server_process(cfg, map_queues):
         Set cookies on the specified response.
 
         """
+
         response.set_cookie(_ID_COOKIE_SESSION, id_session,
                             max_age  = 43000,    # About 12 hours
                             secure   = False,    # TODO: FIX HTTPS
                             httponly = True,
                             samesite = 'strict')
+
         response.set_cookie(_ID_COOKIE_USER, id_user,
                             max_age  = 32000000, # About a year.
                             secure   = False,    # TODO: FIX HTTPS

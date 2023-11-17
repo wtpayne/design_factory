@@ -30,6 +30,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
         cl.net.openai.template.ic00_edict can be imported.
 
         """
+
         import cl.net.openai.template.ic00_edict
 
     # -------------------------------------------------------------------------
@@ -40,13 +41,16 @@ class SpecifyClNetOpenAiClientIc00_edict:
         cl.net.openai.template.ic00_edict:coro() can be created.
 
         """
+
         import cl.net.openai.template.ic00_edict
+
         component = cl.net.openai.template.ic00_edict.coro(
                                     runtime = None,
                                     cfg     = {},
                                     inputs  = dict(),
                                     state   = dict(),
                                     outputs = dict())
+
         assert inspect.isgenerator(component)
 
     # -------------------------------------------------------------------------
@@ -57,6 +61,7 @@ class SpecifyClNetOpenAiClientIc00_edict:
         cl.net.openai.template.ic00_edict:coro() rybs.
 
         """
+
         id_endpoint    = 'chat_completions'
         uid_workflow   = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
         uid_template   = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -142,4 +147,5 @@ class SpecifyClNetOpenAiClientIc00_edict:
 
         exit_code = pl.stableflow.sys.prep_and_start(map_cfg  = cfg_sys,
                                                      is_local = True)
+
         assert exit_code == 0

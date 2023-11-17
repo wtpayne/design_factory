@@ -177,6 +177,7 @@ class Bureau(collections.abc.MutableMapping):
         Update the Bureau instance state to match the provided dictionary.
 
         """
+
         self._bureau_path_delimiter = state['_bureau_path_delimiter']
         self._bureau_path           = state['_bureau_path']
         self._bureau_engine         = state['_bureau_engine']
@@ -202,6 +203,7 @@ class Bureau(collections.abc.MutableMapping):
         tree.
 
         """
+
         if engine is None:
             self._bureau_engine = BureauEngine(bureau = self)
         else:
@@ -234,6 +236,7 @@ class Bureau(collections.abc.MutableMapping):
         Update Bureau from a key-value tuple.
 
         """
+
         if path_root:
             tup_path_root = tuple(_iter_path(
                                         path  = path_root,
@@ -288,6 +291,7 @@ class Bureau(collections.abc.MutableMapping):
         Load Bureau from a nested dict.
 
         """
+
         return self.from_tuple(path_root = path_root,
                                tup_kv    = fl.util.alg.walk(
                                                     obj            = map_item,
@@ -325,6 +329,7 @@ class Bureau(collections.abc.MutableMapping):
         Pretty print the bureau.
 
         """
+
         pprint.pprint(self.to_dict())
 
     # -------------------------------------------------------------------------
@@ -363,6 +368,7 @@ class Bureau(collections.abc.MutableMapping):
         Delete the specified key.
 
         """
+
         self._bureau_engine.del_item(path = self._tup_full_path(key))
 
         return None
@@ -373,6 +379,7 @@ class Bureau(collections.abc.MutableMapping):
         Delete the specified key.
 
         """
+
         self._bureau_engine.del_item(path = self._tup_full_path(key))
 
         return None
@@ -424,6 +431,7 @@ class Bureau(collections.abc.MutableMapping):
         Return a string representation of the Bureau.
 
         """
+
         list_kv = list()
         for (key, value) in self._bureau_data.items():
 
@@ -1230,9 +1238,12 @@ def _set_path_referent_as_list(tup_path_val):
           sparsely distributed.
 
     """
+
     set_path_maybe_list = set()
     set_path_never_list = set()
+
     for (tup_path, _) in tup_path_val:
+
         for (idx, name) in enumerate(tup_path):
 
             is_integer_key = True
@@ -1247,6 +1258,7 @@ def _set_path_referent_as_list(tup_path_val):
                 set_path_never_list.add(tup_path[0:idx])
 
     set_path_referent_as_list = set_path_maybe_list - set_path_never_list
+
     return set_path_referent_as_list
 
 
@@ -1384,6 +1396,7 @@ def coroutine(fun):
         Wrapper for coroutines that 'primes' it by sending the first message.
 
         """
+
         coro = fun(*args, **kwargs)
         coro.send(None)
         return coro

@@ -26,6 +26,7 @@ def denormalize(cfg):
     expanded/denormalised and flattened.
 
     """
+
     cfg_data   = cfg['data']
     parameters = dict()
     subs       = fl.stableflow.cfg.util.SubstitutionTable(parameters)
@@ -99,6 +100,7 @@ def _init_stack(map):
     Sort to ensure top level items are processed in a deterministic order.
 
     """
+
     stack      = collections.deque()
     tup_items  = ({key: value} for (key, value) in map.items())
     list_items = sorted(
@@ -125,6 +127,7 @@ def _iter_depth_first(stack):
     Yield nodes from a depth-first traversal of the specified stack.
 
     """
+
     while True:  # Loop until stack empty. (Throws IndexError).
 
         try:
@@ -188,6 +191,7 @@ def _expand_node(node, subs, typeinfo, idx):
     node provided, not any children.
 
     """
+
     spec = node.spec
     node_info = dict()
     node_info['category']   = node.category.name
@@ -234,6 +238,7 @@ def _iter_expanded(expanded_def):
     Yield nodes from a depth-first traversal of expanded_type_definition.
 
     """
+
     root_node   = expanded_def
     root_path   = list()
     stack_frame = (root_node, root_path)

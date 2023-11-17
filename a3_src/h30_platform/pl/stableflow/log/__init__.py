@@ -23,6 +23,7 @@ def setup(cfg_host   = None,
     Configure the module level logger object.
 
     """
+
     log_level   = 'WARNING'
     dirpath_log = None
 

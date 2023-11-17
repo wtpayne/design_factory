@@ -782,6 +782,7 @@ def _discord_bot(cfg_bot, queue_to_bot, queue_from_bot):
         Handle errors in commands.
 
         """
+
         log_event.error('on_command_error: "{err}"'.format(err = str(error)))
 
         # We make some specififc errors visible

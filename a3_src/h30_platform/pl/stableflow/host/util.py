@@ -18,6 +18,7 @@ def stop(id_system):
     Stop the specified system.
 
     """
+
     # Does not seem to be killing processes
     # reliably. Do we need to repeat this
     # several times?
@@ -34,6 +35,7 @@ def pause(id_system):
     Pause or unpause the specified system.
 
     """
+
     return _signal_process_by_prefix(
                         prefix      = id_system,
                         iter_signal = (pl.stableflow.signal.control_pause,))
@@ -45,6 +47,7 @@ def step(id_system):
     Single step the specified system.
 
     """
+
     return _signal_process_by_prefix(
                         prefix      = id_system,
                         iter_signal = (pl.stableflow.signal.control_step,))
@@ -56,6 +59,7 @@ def print_process_summary(id_system, id_host):
     Print the process summary for the specified system.
 
     """
+
     list_proc_name = list()
     for proc in psutil.process_iter(['name', 'pid']):
         proc_name = proc.info['name']
@@ -88,6 +92,7 @@ def _signal_process_by_prefix(prefix, iter_signal):
     Send the specified signal to the process with the specified name prefix.
 
     """
+
     for signal in iter_signal:
 
         set_pid   = _pid_from_prefix(prefix)
@@ -113,6 +118,7 @@ def _pid_from_prefix(prefix):
     Return a list of process ids that correspond to the specified names.
 
     """
+
     set_pids  = set()
     for proc in psutil.process_iter(['name', 'pid']):
         if proc.info['name'].startswith(prefix):
@@ -131,6 +137,7 @@ def _signal_process_tree(iter_pid, signal):
     all of their subprocesses (recursively).
 
     """
+
     for pid in iter_pid:
 
         assert pid != os.getpid(), \

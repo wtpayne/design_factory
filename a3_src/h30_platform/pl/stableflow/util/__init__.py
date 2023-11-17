@@ -29,6 +29,7 @@ class PathDict(collections.UserDict):  # pylint: disable=R0901
         Return a PathDict instance.
 
         """
+
         self.delim = '.'
         super().__init__(*args, **kwargs)
 
@@ -38,6 +39,7 @@ class PathDict(collections.UserDict):  # pylint: disable=R0901
         Return a reference to the specified item in data.
 
         """
+
         reference = self.data
         for name in _ensure_list(key, delim = self.delim):
             reference = reference[name]
@@ -49,6 +51,7 @@ class PathDict(collections.UserDict):  # pylint: disable=R0901
         Return a reference to the specified item in data.
 
         """
+
         reference = self.data
 
         # If we want to disable string
@@ -78,6 +81,7 @@ def clear_outputs(outputs,
 `   Clear the specified fields in the specified outputs.
 
     """
+
     if iter_name_output is None:
         iter_name_output = tuple(outputs.keys())
 
@@ -140,6 +144,7 @@ def format_all_strings(map_data):
     of formatting operations.
 
     """
+
     map_dst = collections.defaultdict(set)  # id_field -> {path_to_dst}
     map_src = dict()                        # id_field -> path_to_src
     for (tup_path, leaf) in fl.util.alg.walk(map_data,
@@ -184,6 +189,7 @@ def is_format_string(maybe_fmt):
     Return true if the supplied string is a format string.
 
     """
+
     if not is_string(maybe_fmt):
         return False
     iter_fields   = iter_format_string_fields(maybe_fmt)
@@ -197,6 +203,7 @@ def is_string(obj):
     Return true if obj is a string. Works in Python 2 and Python 3.
 
     """
+
     return isinstance(obj, string_types())
 
 
@@ -206,6 +213,7 @@ def string_types():
     Return the string types for the current Python version.
 
     """
+
     is_python_2 = str is bytes
     if is_python_2:  # pylint: disable=R1705
         return (str, unicode)  # pylint: disable=E0602
@@ -219,6 +227,7 @@ def iter_format_string_fields(fmt_string):
     Return an iterable over the field names in the specified format string.
 
     """
+
     return (tup[1] for tup in string.Formatter().parse(fmt_string)
                                                         if tup[1] is not None)
 
@@ -229,6 +238,7 @@ def _ensure_list(key, delim):
     Ensure that key is represented as a list of names.
 
     """
+
     if isinstance(key, str):
         list_str  = key.split(delim)
         list_name = []
@@ -248,6 +258,7 @@ def first(iterable):
     Return the first item in the specified iterable.
 
     """
+
     return next(iter(iterable))
 
 
@@ -257,6 +268,7 @@ def gen_path_value_pairs_depth_first(map):
     Yield (path, value) pairs taken from map in depth first order.
 
     """
+
     stack = collections.deque(_reversed_key_value_pairs(map))
 
     while True:
@@ -286,6 +298,7 @@ def _reversed_key_value_pairs(value):
     Input value must be a dict or a list.
 
     """
+
     if isinstance(value, dict):
         iter_key_value_pairs = value.items()
 
@@ -309,6 +322,7 @@ def is_container(value):
     type for these.
 
     """
+
     is_map   = isinstance(value, collections.abc.Mapping)
     is_set   = isinstance(value, collections.abc.Set)
     is_list  = isinstance(value, list)
@@ -324,6 +338,7 @@ def function_from_source(string_source):
     This calls exec on the supplied string.
 
     """
+
     list_functions = list()
     fcn_locals     = dict()
     exec(string_source, dict(), fcn_locals)  # pylint: disable=W0122
@@ -340,6 +355,7 @@ def function_from_dill(pickled_function):
     Return the function found in the specified pickle.
 
     """
+
     return dill.loads(pickled_function)
 
 
@@ -380,6 +396,7 @@ class RestrictedWriteDict(collections.UserDict):  # pylint: disable=R0901
         directly by the step function.
 
         """
+
         super().__setitem__(key, value)
 
     # -------------------------------------------------------------------------
@@ -388,6 +405,7 @@ class RestrictedWriteDict(collections.UserDict):  # pylint: disable=R0901
         Raise RuntimeError to prevent inadvertent overwrite of edge containers.
 
         """
+
         raise RuntimeError('Ensure you are updating output (or input) '
                            'container content rather than changing the '
                            'identity of the containers themselves.')

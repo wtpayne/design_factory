@@ -55,6 +55,7 @@ def run():
     Run an interactive bash shell in a pseudoterminal.
 
     """
+
     import prompt_toolkit.application
     import prompt_toolkit.layout
     import ptterm
@@ -65,6 +66,7 @@ def run():
         Exit the application when the terminal emulator is done.
 
         """
+
         application.exit()
 
     # -----------------------------------------------------------------------------
@@ -73,6 +75,7 @@ def run():
         Setup environment variables.
 
         """
+
         pass
 
     relfilepath_self = __file__ if __file__ else argv[0]

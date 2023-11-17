@@ -21,5 +21,5 @@ class SpecifyClCtrlProcIc00_edict:
         cl.ctrl.proc.ic00_edict can be imported.
 
         """
-        import cl.ctrl.proc.ic00_edict
 
+        import cl.ctrl.proc.ic00_edict

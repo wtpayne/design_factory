@@ -26,7 +26,9 @@ class SpecifyFlUtilIo:
         fl.util.alg can be imported with no errors.
 
         """
+
         import fl.util.alg
+
 
 # =============================================================================
 class SpecifyFlUtilIsLeaf:
@@ -42,6 +44,7 @@ class SpecifyFlUtilIsLeaf:
         fl.util.alg.is_leaf detects simple data typees as leaf elements.
 
         """
+
         import fl.util.alg
 
         # Test with simple data types
@@ -58,6 +61,7 @@ class SpecifyFlUtilIsLeaf:
         fl.util.alg.is_leaf detects coroutines and generators as non-leaf elements.
 
         """
+
         import fl.util.alg
 
         # Test with generator
@@ -78,6 +82,7 @@ class SpecifyFlUtilIsLeaf:
         fl.util.alg.is_leaf detects containers as non-leaf elements.
 
         """
+
         import fl.util.alg
 
         # Test with mapping
@@ -95,6 +100,7 @@ class SpecifyFlUtilIsLeaf:
         fl.util.alg.is_leaf detects lists of simple data types as fat leaves.
 
         """
+
         import fl.util.alg
 
         # Test with 'fat leaves' option
@@ -110,6 +116,7 @@ class SpecifyFlUtilIsLeaf:
         fl.util.alg.is_leaf detects lists of complex data types as non fat leaves.
 
         """
+
         import fl.util.alg
 
         # Test with 'fat leaves' option

@@ -14,6 +14,7 @@ def apply(cfg, tup_overrides = None, delim_cfg_addr = '.'):
     Apply all specified configuration field overrides.
 
     """
+
     if tup_overrides is None:
         return cfg
 

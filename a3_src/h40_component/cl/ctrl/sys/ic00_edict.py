@@ -111,6 +111,7 @@ def step(inputs, state, outputs):
     controllers.
 
     """
+
     (time_us, load_rel) = _execution_rate_control(inputs, state)
     (do_halt, retval)   = _halt_signal_control(inputs, state, time_us)
     tup_time            = _time_codes()
@@ -168,7 +169,7 @@ def _execution_rate_control(inputs, state):
         tuple:  A tuple containing the current time in microseconds
                 (int) and the relative load (float) of the system.
 
-     """
+    """
 
     load_rel = 1.0
     is_rate_limited = state['period_us'] is not None
@@ -259,6 +260,7 @@ def _time_codes():
     Return temporal aggregation codes.
 
     """
+
     gmt       = time.gmtime()
     unix_time = calendar.timegm(gmt)
     weekday   = gmt.tm_wday
@@ -267,6 +269,7 @@ def _time_codes():
     id_hour   = (id_day  *  100) + gmt.tm_hour  # pylint: disable=E222
     id_min    = (id_hour *  100) + gmt.tm_min   # pylint: disable=E222
     id_sec    = (id_min  *  100) + gmt.tm_sec   # pylint: disable=E222
+
     return (id_year, id_day, id_hour, id_min, id_sec, unix_time, weekday)
 
 
@@ -276,6 +279,7 @@ def _time_target_us(state, is_fixed_rate):
     Return the target execution time in us.
 
     """
+
     if is_fixed_rate:
         return state['time_start_us'] + (state['idx'] * state['period_us'])
     else:
@@ -288,6 +292,7 @@ def _time_us():
     Return the current time in milliseconds.
 
     """
+
     time_secs = time.monotonic()
     time_us   = _int_microseconds(time_secs)
 
@@ -300,6 +305,7 @@ def _float_seconds(num_us):
     Convert integer microseconds to floating point seconds.
 
     """
+
     us_per_second = 1000000
     num_secs      = float(num_us) / float(us_per_second)
 
@@ -312,6 +318,7 @@ def _int_microseconds(num_secs):
     Convert floating point seconds to integer microseconds.
 
     """
+
     us_per_second = 1000000
     num_us        = int(num_secs * us_per_second)
 

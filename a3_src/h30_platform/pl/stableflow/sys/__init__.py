@@ -28,6 +28,7 @@ def prep_and_start(map_cfg, is_local):
     Prepare configuration and start the system.
 
     """
+
     return start(fl.stableflow.cfg.prepare(map_cfg  = map_cfg,
                                            is_local = is_local))
 
@@ -38,6 +39,7 @@ def start(cfg):
     Start the system.
 
     """
+
     cfg['runtime']['id']['id_run'] = uuid.uuid4().hex[0:8]
     cfg['runtime']['id']['ts_run'] = time.strftime('%Y%m%d%H%M%S',
                                                    time.gmtime())
@@ -61,6 +63,7 @@ def stop(cfg):
     Stop the system.
 
     """
+
     for id_host in _list_id_host(cfg):
         _command(cfg, id_host, 'stop-host')
 
@@ -73,6 +76,7 @@ def pause(cfg):
     Pause the system.
 
     """
+
     if cfg['runtime']['opt']['is_local']:
         raise RuntimeError('Not implemented.')
 
@@ -88,6 +92,7 @@ def step(cfg):
     Single step the system.
 
     """
+
     if cfg['runtime']['opt']['is_local']:
         raise RuntimeError('Not implemented.')
 
@@ -103,6 +108,7 @@ def print_process_status(cfg):
     Print the process status for the specified system.
 
     """
+
     if cfg['runtime']['opt']['is_local']:
         raise RuntimeError('Not implemented.')
 
@@ -118,6 +124,7 @@ def _list_id_host(cfg):
     Return a sorted list of unique id_host.
 
     """
+
     iter_cfg_proc = cfg['process'].values()
     set_id_host   = set(cfg_proc['host'] for cfg_proc in iter_cfg_proc)
     list_id_host  = sorted(set_id_host)
@@ -130,6 +137,7 @@ def _command(cfg, id_host, command):
     Give the specified host a command.
 
     """
+
     cfg_copy        = copy.deepcopy(cfg)
     cfg_copy['runtime']['id']['id_host'] = id_host
 
@@ -178,6 +186,7 @@ def _run_locally(cfg):
     and diagnosing errors.
 
     """
+
     import pl.stableflow.proc  # pylint: disable=C0415,W0621
 
     id_host_local    = 'localhost'

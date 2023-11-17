@@ -59,6 +59,7 @@ def urlsafe_uid(prefix = 'r', num_chars = None):
     Return a new unique url-safe (base16 encoded) GUID.
 
     """
+
     uid = prefix + base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
     if num_chars is not None:
         uid = uid[:num_chars]
@@ -78,6 +79,7 @@ class ResMap(collections.abc.MutableMapping):
         Initialize the ResourceMap class.
 
         """
+
         self._map = dict()
 
     # -------------------------------------------------------------------------
@@ -86,6 +88,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of HTML resources.
 
         """
+
         self.add(media_type = 'text/html',
                  default    = default,
                  **kwargs)
@@ -96,6 +99,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of CSS resources.
 
         """
+
         map_routes = dict()
         for (key, value) in kwargs.items():
             if isinstance(value, dict):
@@ -113,6 +117,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of Javascript resources.
 
         """
+
         self.add(media_type = 'text/javascript',
                  default    = default,
                  **kwargs)
@@ -123,6 +128,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of JSON resources.
 
         """
+
         self.add(media_type = 'application/json',
                  default    = default,
                  **kwargs)
@@ -133,6 +139,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of SVG resources.
 
         """
+
         self.add(media_type = 'text/svg',
                  default    = default,
                  **kwargs)
@@ -143,6 +150,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of MS windows, OS/2 bitmap image resources.
 
         """
+
         self.add(media_type = 'image/bmp',
                  default    = default,
                  **kwargs)
@@ -153,6 +161,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of device independent bitmap image resources.
 
         """
+
         self.add(media_type = 'image/dib',
                  default    = default,
                  **kwargs)
@@ -163,6 +172,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of JPEG image resources.
 
         """
+
         self.add(media_type = 'image/jpeg',
                  default    = default,
                  **kwargs)
@@ -173,6 +183,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of JPEG 2000 image resources.
 
         """
+
         self.add(media_type = 'image/jpm',
                  default    = default,
                  **kwargs)
@@ -183,6 +194,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of portable network graphics format image resources.
 
         """
+
         self.add(media_type = 'image/png',
                  default    = default,
                  **kwargs)
@@ -193,6 +205,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of WebP image resources.
 
         """
+
         self.add(media_type = 'image/webp',
                  default    = default,
                  **kwargs)
@@ -203,6 +216,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of portable bit map image resources.
 
         """
+
         self.add(media_type = 'image/x-ortable-bitmap',
                  default    = default,
                  **kwargs)
@@ -213,6 +227,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of tagged image file format image resources.
 
         """
+
         self.add(media_type = 'image/tiff',
                  default    = default,
                  **kwargs)
@@ -223,6 +238,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of HDR image resources.
 
         """
+
         self.add(media_type = 'image/vnd.radiance',
                  default    = default,
                  **kwargs)
@@ -233,6 +249,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of woff font resources.
 
         """
+
         self.add(media_type = 'font/woff',
                  default    = default,
                  **kwargs)
@@ -243,6 +260,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of woff2 font resources.
 
         """
+
         self.add(media_type = 'font/woff2',
                  default    = default,
                  **kwargs)
@@ -253,6 +271,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of ttf font resources.
 
         """
+
         self.add(media_type = 'application/octet-stream',
                  default    = default,
                  **kwargs)
@@ -263,6 +282,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of asynchronous callbacks that return resources.
 
         """
+
         self.add(media_type = 'callback',
                  default    = default,
                  **kwargs)
@@ -273,6 +293,7 @@ class ResMap(collections.abc.MutableMapping):
         Add an SSE topic.
 
         """
+
         self.sse(default, **kwargs)
 
     # -------------------------------------------------------------------------
@@ -281,6 +302,7 @@ class ResMap(collections.abc.MutableMapping):
         Add an SSE topic.
 
         """
+
         map_routes = dict()
         for (key, value) in kwargs.items():
             map_routes[key] = ' '.join(value)
@@ -295,6 +317,7 @@ class ResMap(collections.abc.MutableMapping):
         Add a set of routes with the specified media_type.
 
         """
+
         if default is not None and 'default' not in kwargs:
             kwargs['default'] = default
 
@@ -317,6 +340,7 @@ class ResMap(collections.abc.MutableMapping):
         Yield (key, content) for each route in the map.
 
         """
+
         for (route, (media_type, obj)) in self._map.items():
 
             if isinstance(obj, dominate.dom_tag.dom_tag):
@@ -324,15 +348,14 @@ class ResMap(collections.abc.MutableMapping):
 
             yield (route, (media_type, obj))
 
-
     # -------------------------------------------------------------------------
     def __bool__(self):
         """
         Return true iff there are items in the map.
 
         """
-        return len(self._map) > 0
 
+        return len(self._map) > 0
 
     # -------------------------------------------------------------------------
     def keys(self):
@@ -340,6 +363,7 @@ class ResMap(collections.abc.MutableMapping):
         Return all the route keys in the map.
 
         """
+
         return self._map.keys()
 
     # -------------------------------------------------------------------------
@@ -348,6 +372,7 @@ class ResMap(collections.abc.MutableMapping):
         Return the number of routes in the map.
 
         """
+
         return len(self._map)
 
     # -------------------------------------------------------------------------
@@ -356,9 +381,12 @@ class ResMap(collections.abc.MutableMapping):
         Return the content corresponding to the specified route key.
 
         """
+
         (media_type, obj) = self._map[key]
+
         if isinstance(obj, dominate.dom_tag.dom_tag):
             obj = obj.render()
+
         return (media_type, obj)
 
     # -------------------------------------------------------------------------
@@ -367,6 +395,7 @@ class ResMap(collections.abc.MutableMapping):
         Set the content corresponding to the specified route key.
 
         """
+
         self._map[key] = value
 
     # -------------------------------------------------------------------------
@@ -375,6 +404,7 @@ class ResMap(collections.abc.MutableMapping):
         Delete the content corresponding to the specified route key.
 
         """
+
         del self._map[key]
 
 
@@ -384,6 +414,7 @@ class ResMap(collections.abc.MutableMapping):
         Update the ResMap from the specified other ResMap
 
         """
+
         self._map.update(other._map)
 
 
@@ -393,6 +424,7 @@ def cla(*args):
     Return a dict suitable for setting tailwind classes.
 
     """
+
     return {'_class': ' '.join(args)}
 
 
@@ -409,7 +441,9 @@ class CSS():
         Return an instantiated css.Renderer object.
 
         """
+
         self._list_rules = []
+
         if map_ruleset is not None:
             self.add(map_ruleset)
 
@@ -419,6 +453,7 @@ class CSS():
         Add a collection of rulesets to the css.
 
         """
+
         for (selector, declaration) in map_ruleset.items():
             self.add_ruleset(selector, declaration)
 
@@ -428,6 +463,7 @@ class CSS():
         Add a ruleset to the css.
 
         """
+
         self._list_rules.append((selector, declaration))
 
     # -------------------------------------------------------------------------
@@ -436,6 +472,7 @@ class CSS():
         Render the CSS document.
 
         """
+
         text = ''
         for rule in self._list_rules:
 
@@ -472,6 +509,7 @@ def _load_txt(relpath_file):
     Return the content of the specified text file.
 
     """
+
     return _load_static(relpath_file, is_binary = False)
 
 
@@ -481,6 +519,7 @@ def _load_bin(relpath_file):
     Return the content of the specified binary file.
 
     """
+
     return _load_static(relpath_file, is_binary = True)
 
 
@@ -490,6 +529,7 @@ def _load_static(relpath_file, is_binary = False):
     Return the content of the specified file.
 
     """
+
     relpath_self   = __file__ if __file__ else sys.argv[0]
     dirpath_self   = os.path.dirname(os.path.realpath(relpath_self))
     dirpath_static = os.path.join(dirpath_self, 'static')

@@ -33,6 +33,7 @@ def start(cfg, id_process, id_process_host, map_queues):
     Start the main loop in the local process and process host.
 
     """
+
     if setproctitle is not None:
         setproctitle.setproctitle(fully_qualified_name(cfg, id_process))
     id_system = cfg['system']['id_system']
@@ -86,6 +87,7 @@ def fully_qualified_name(cfg, id_process):
     Return the fully qualified process name.
 
     """
+
     return '{sys}.{host}.{proc}'.format(
                                     sys  = cfg['system']['id_system'],
                                     host = cfg['runtime']['id']['id_host'],
@@ -98,6 +100,7 @@ def ensure_imported(spec_module):
     Import the specified module or throw a NonRecoverableError
 
     """
+
     module = None
     with pl.stableflow.log.logger.catch():
         module = importlib.import_module(spec_module)
@@ -118,6 +121,7 @@ def _configure(id_process,
     Configure the process and return the list of nodes to be executed.
 
     """
+
     map_alloc = pl.stableflow.gen.python.map_allocator(map_cfg_data)
     map_node  = _instantiate_nodes(id_process,
                                    map_cfg_node,
@@ -143,6 +147,7 @@ def _instantiate_nodes(id_process, map_cfg_node, map_alloc, runtime):
     Return a map from id_node to an instantiated node object.
 
     """
+
     map_node  = dict()
     for (id_node, cfg_node) in map_cfg_node.items():
         if cfg_node['process'] == id_process:
@@ -162,6 +167,7 @@ def _configure_edges(id_process,
     Configure the edges in the data flow graph.
 
     """
+
     for cfg_edge in iter_cfg_edge:
 
         if id_process not in cfg_edge['list_id_process']:
@@ -202,6 +208,7 @@ def _point(node, path, memory):
     Make the specified node and path point to the specified memory.
 
     """
+
     ref = node.__dict__
     for name in path[:-1]:
         ref = ref[name]
@@ -221,6 +228,7 @@ def _get_list_node_in_runorder(id_process,
     Return a list of node objects sorted by order of execution.
 
     """
+
     return list(map_node[id_node] for id_node in
                             _get_list_id_node_in_runorder(
                                     id_process, map_cfg_node, iter_cfg_edge))
@@ -248,6 +256,7 @@ def _get_list_id_node_in_runorder(id_process, map_cfg_node, iter_cfg_edge):
     manner.
 
     """
+
     (map_forward, map_backward) = local_acyclic_data_flow(
                                             iter_cfg_edge = iter_cfg_edge,
                                             id_process    = id_process)
@@ -274,6 +283,7 @@ def local_acyclic_data_flow(iter_cfg_edge, id_process):
     downstream nodes to upstream nodes.
 
     """
+
     map_forward  = collections.defaultdict(set)
     map_backward = collections.defaultdict(set)
 
@@ -305,6 +315,7 @@ def _specify_detailed_execution_order(list_tranches):
     execution ordering.
 
     """
+
     for tranche in list_tranches:
         for id_node in sorted(tranche):
             yield id_node
@@ -316,7 +327,8 @@ def _get_list_id_node_unscheduled(map_cfg_node, list_id_node, id_process):
     Retirm a list of unscheduled node ids in the specified process.
 
     """
-    set_id_node              = set(list_id_node)
+
+    set_id_node = set(list_id_node)
     list_id_node_unscheduled = list()
     for (id_node, cfg_node) in map_cfg_node.items():
         is_in_process = id_process == cfg_node['process']

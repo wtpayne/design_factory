@@ -112,6 +112,7 @@ def _proc_ui_main(cfg):
         Put inputs onto the queue.
 
         """
+
         try:
             str_user_input = txt_user_input
             cfg['queue_from_ui'].put(str_user_input, block = False)
@@ -125,6 +126,7 @@ def _proc_ui_main(cfg):
         Callback function for the periodic timer.
 
         """
+
         nonlocal str_generated_output
         try:
             str_generated_output = cfg['queue_to_ui'].get(block = False)

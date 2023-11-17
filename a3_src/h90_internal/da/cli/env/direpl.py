@@ -58,6 +58,7 @@ def _dirpath_self():
     Return the directory path to the current module.
 
     """
+
     return os.path.dirname(os.path.realpath(__file__))
 
 
@@ -67,6 +68,7 @@ def _dirpath_df():
     Return the path of the root directory of the design factory filesystem.
 
     """
+
     return os.path.normpath(os.path.join(_dirpath_self(), '../../../../..'))
 
 

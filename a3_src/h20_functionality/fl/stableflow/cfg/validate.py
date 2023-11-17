@@ -21,6 +21,7 @@ def normalized(cfg):
     any denormalization and/or expansion.
 
     """
+
     return _validate_with_schema(cfg, _normalized_cfg_schema())
 
 
@@ -33,6 +34,7 @@ def denormalized(cfg):
     to make implicit information explicit.
 
     """
+
     return _validate_with_schema(cfg, _denormalized_cfg_schema())
 
 
@@ -42,6 +44,7 @@ def _validate_with_schema(cfg, schema):
     Validate config using the specified schema.
 
     """
+
     try:
         jsonschema.validate(cfg, schema)
     except jsonschema.exceptions.ValidationError as err:
@@ -57,6 +60,7 @@ def _normalized_cfg_schema():
     Return a schema for normalized config data.
 
     """
+
     schema = {
         '$schema': 'http://json-schema.org/draft-07/schema#',
         '$id': 'http://xplain.systems/schemas/cfg_norm_v1.json',
@@ -279,12 +283,15 @@ def _denormalized_cfg_schema():
     Return a schema for denormalized config data.
 
     """
+
     schema        = copy.deepcopy(_normalized_cfg_schema())
     schema['$id'] = 'http://xplain.systems/schemas/cfg_denorm_v1.json'
+
     _denormalize_host_section(schema)
     _denormalize_node_section(schema)
     _denormalize_edge_section(schema)
     schema['required'].append('queue')
+
     return schema
 
 
@@ -294,6 +301,7 @@ def _denormalize_host_section(schema):
     Modify schema to add denormalized fields in the host config section.
 
     """
+
     host_schema = schema['properties']['host']['additionalProperties']
     host_schema['properties']['is_inter_host_edge_owner'] = {'type': 'boolean'}
     host_schema['required'].append('is_inter_host_edge_owner')
@@ -305,6 +313,7 @@ def _denormalize_node_section(schema):
     Modify schema to add denormalized fields in the node config section.
 
     """
+
     node_schema = schema['properties']['node']['additionalProperties']
     node_schema['properties']['host'] = {'type': 'string'}
     node_schema['required'].append('host')
@@ -316,6 +325,7 @@ def _denormalize_edge_section(schema):
     Modify schema to add denormalized fields in the edge config section.
 
     """
+
     edge_schema = schema['properties']['edge']['items']
     edge_props  = edge_schema['properties']
 
@@ -358,6 +368,7 @@ def _check_consistency(cfg):
     Raise an exception if cfg is inconsistent.
 
     """
+
     _check_process_consistency(cfg)
     _check_node_consistency(cfg)
     _check_edge_consistency(cfg)
@@ -371,6 +382,7 @@ def _check_process_consistency(cfg):
     Raise an exception if process configuration is inconsistent.
 
     """
+
     set_id_host = set(cfg['host'].keys())
     for cfg_process in cfg['process'].values():
         _check(item      = cfg_process['host'],
@@ -384,6 +396,7 @@ def _check_node_consistency(cfg):
     Raise an exception if node configuration is inconsistent.
 
     """
+
     set_id_process      = set(cfg['process'].keys())
     set_id_data         = set(cfg['data'].keys())
     set_id_req_host_cfg = set(cfg['req_host_cfg'].keys()) if \
@@ -410,6 +423,7 @@ def _check_edge_consistency(cfg):
     Raise an exception if edge configuration is inconsistent.
 
     """
+
     set_id_node = set(cfg['node'].keys())
     set_id_data = set(cfg['data'].keys())
     for cfg_edge in cfg['edge']:
@@ -445,6 +459,7 @@ def _check_edge_end_uniqueness(cfg):
     Raise an exception if edge sources or destinations are duplicated.
 
     """
+
     set_edge_path = set()
     for cfg_edge in cfg['edge']:
         if cfg_edge['src'] in set_edge_path:
@@ -465,6 +480,7 @@ def _check_required_host_configuration(cfg):
     Raise an exception if req_host_cfg roles are inconsistent.
 
     """
+
     set_id_role = set(cfg['role'].keys()) if 'role' in cfg else set()
     if 'req_host_cfg' in cfg:
         for cfg_req_host_cfg in cfg['req_host_cfg'].values():
@@ -482,5 +498,6 @@ def _check(item, set_valid, msg):
     Raise an exception if item is not in the specified collection.
 
     """
+
     if item not in set_valid:
         raise fl.stableflow.cfg.exception.CfgError(msg.format(id = item))

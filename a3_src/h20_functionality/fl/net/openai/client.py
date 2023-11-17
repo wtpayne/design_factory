@@ -195,6 +195,7 @@ def _ensure_init_workflow(cfg, workflow):
     Ensure that the specified workflow is imported and primed.
 
     """
+
     if workflow['coroutine'] is not None:
         return workflow
 
@@ -333,7 +334,6 @@ def coro_template_handler(cfg, request_handler):
             handler_log_event.list_event.clear()
 
 
-
 # -----------------------------------------------------------------------------
 def _build_request(template, param):
     """
@@ -357,6 +357,7 @@ def _build_request(template, param):
     for each OpenAI request type.
 
     """
+
     id_endpoint = template['id_endpoint']
     request = dict(**template['kwargs_req'])
     request.update(**param['kwargs_req'])
@@ -641,6 +642,7 @@ def _process_one_request(request_raw, default, is_bit, log_event):
     flag is set.
 
     """
+
     (fcn_endpoint,
      request_full,
      state,
@@ -909,6 +911,7 @@ def built_in_test_response(id_endpoint, id_version = 'v1'):
     {'id': 'cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7', 'object': 'text_completion', ...}
 
     """
+
     map_bit_endpoint = {
         ('v1', 'completions'): {
             'id':       'cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7',

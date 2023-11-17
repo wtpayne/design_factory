@@ -38,6 +38,7 @@ def run_with_retry(tup_node, list_signal):
     is returned.
 
     """
+
     # cdef object iter_sig_reset
     # cdef object iter_sig_step
     # cdef object iter_sig_pause
@@ -128,6 +129,7 @@ def _pause_loop(tup_node, list_signal):
     Handle pause and single step states.
 
     """
+
     # We will be paused when we enter this function
     # so loop until we are unpaused, handling any
     # single-stepping until then.
@@ -175,6 +177,7 @@ def _has_pause_signal(list_signal):
     Return true iff iter_sig contains a pause signal.
 
     """
+
     is_paused = pl.stableflow.signal.control_pause in list_signal
     return is_paused
 
@@ -185,6 +188,7 @@ def _has_reset_signal(iter_sig):
     Return true if iter_sig contains a reset signal.
 
     """
+
     is_reset = pl.stableflow.signal.control_reset in iter_sig
     return is_reset
 
@@ -195,6 +199,7 @@ def _has_exit_signal(iter_sig):
     Return true if iter_sig contains an exit signal.
 
     """
+
     for sig_exit in pl.stableflow.signal.exit:
         if sig_exit in iter_sig:
             return True
@@ -207,6 +212,7 @@ def _get_exit_signal(iter_sig):
     Return the first exit signal from iter_sig.
 
     """
+
     for sig_exit in pl.stableflow.signal.exit:
         if sig_exit in iter_sig:
             return sig_exit
@@ -220,6 +226,7 @@ def _call(function, tup_node):
     Call the specified function once on each node.
 
     """
+
     # cdef object accumulator = list()
     # cdef object iter_signal
     accumulator = list()

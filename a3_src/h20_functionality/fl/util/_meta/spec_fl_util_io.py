@@ -26,6 +26,7 @@ class SpecifyFlUtilIo:
         fl.util.io can be imported with no errors.
 
         """
+
         import fl.util.io
 
 
@@ -43,7 +44,9 @@ class SpecifyFlUtilIoSerialize:
         fl.util.io.serialize can serialize a dict to pickle
 
         """
+
         import fl.util
+
         map_input = dict(a = 1, b = 2)
         (bytes_output, map_error) = fl.util.io.serialize(map_input, 'pickle')
 
@@ -58,7 +61,9 @@ class SpecifyFlUtilIoSerialize:
         fl.util.io.serialize can serialize a dict to xml
 
         """
+
         import fl.util
+
         map_input  = dict(a = dict(b = 1, c = 2, d = 3))
         (str_output, map_error) = fl.util.io.serialize(map_input, 'xml')
 
@@ -80,7 +85,9 @@ class SpecifyFlUtilIoSerialize:
         fl.util.io.serialize can serialize a dict to json
 
         """
+
         import fl.util
+
         map_input  = dict(a = dict(b = 1, c = 2, d = 3))
         (str_output, map_error) = fl.util.io.serialize(map_input, 'json')
 
@@ -102,7 +109,9 @@ class SpecifyFlUtilIoSerialize:
         fl.util.io.serialize can serialize a dict to toml
 
         """
+
         import fl.util
+
         map_input  = dict(a = dict(b = 1, c = 2, d = 3))
         (str_output, map_error) = fl.util.io.serialize(map_input, 'toml')
 
@@ -121,7 +130,9 @@ class SpecifyFlUtilIoSerialize:
         fl.util.io.serialize can serialize a dict to yaml
 
         """
+
         import fl.util
+
         map_input  = dict(a_key = dict(a_long_key = 1, short = 2, tiny = 3))
         (str_output, map_error) = fl.util.io.serialize(map_input, 'yaml')
 
@@ -156,9 +167,12 @@ class SpecifyFlUtilIoDeserialize:
         xml.
 
         """
+
         import fl.util
+
         bytes_input = b'\x80\x04\x95\x11\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x01a\x94K\x01\x8c\x01b\x94K\x02u.'
         (map_output, map_error) = fl.util.io.deserialize(bytes_input, 'pickle')
+
         assert map_error is None
         assert map_output == dict(a = 1, b = 2)
 
@@ -177,7 +191,9 @@ class SpecifyFlUtilIoDeserialize:
         xml.
 
         """
+
         import fl.util
+
         str_input = textwrap.dedent(
                                 """
                                 <?xml version="1.0" encoding="utf-8"?>
@@ -191,6 +207,7 @@ class SpecifyFlUtilIoDeserialize:
                                 </root>
                                 """).strip()
         (map_output, map_error) = fl.util.io.deserialize(str_input, 'xml')
+
         assert map_error is None
         assert map_output == dict(a = 1,
                                   b = 2.0,
@@ -205,7 +222,9 @@ class SpecifyFlUtilIoDeserialize:
         fl.util.io.deserialize can deserialize a dict from json
 
         """
+
         import fl.util
+
         str_input = textwrap.dedent(
                                 """
                                 {
@@ -218,6 +237,7 @@ class SpecifyFlUtilIoDeserialize:
                                 }
                                 """).strip()
         (map_output, map_error) = fl.util.io.deserialize(str_input, 'json')
+
         assert map_error is None
         assert map_output == dict(a = 1,
                                   b = 2.0,
@@ -231,7 +251,9 @@ class SpecifyFlUtilIoDeserialize:
         fl.util.io.deserialize can deserialize a dict from toml
 
         """
+
         import fl.util
+
         str_input = textwrap.dedent(
                                 """
                                 [a]
@@ -240,6 +262,7 @@ class SpecifyFlUtilIoDeserialize:
                                 d = 3
                                 """).strip()
         (map_output, map_error) = fl.util.io.deserialize(str_input, 'toml')
+
         assert map_error is None
         assert map_output == dict(a = dict(b = 1, c = 2, d = 3))
 
@@ -251,7 +274,9 @@ class SpecifyFlUtilIoDeserialize:
         fl.util.io.deserialize can deserialize a dict from yaml
 
         """
+
         import fl.util
+
         str_input = textwrap.dedent(
                                 """
                                 a: 1
@@ -261,6 +286,7 @@ class SpecifyFlUtilIoDeserialize:
                                   e: 345
                                 """).strip()
         (map_output, map_error) = fl.util.io.deserialize(str_input, 'yaml')
+
         assert map_error is None
         assert map_output == dict(a = 1,
                                   b = 2.0,

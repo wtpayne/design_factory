@@ -57,6 +57,7 @@ def main():
     Ensure the specified environment is up to date with the latest envspec.
 
     """
+
     da.env.do_ensure_updated(dirpath_root = sys.argv[1],
                              id_env       = sys.argv[2])
 

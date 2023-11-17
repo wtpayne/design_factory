@@ -22,6 +22,7 @@ class GapTable():
         Construct a new GapTable instance.
 
         """
+
         ddict       = collections.defaultdict
         self._table = ddict(lambda: ddict(list))
 
@@ -35,6 +36,7 @@ class GapTable():
         Append new gap information to the relevant gap table entry.
 
         """
+
         self._table[incomplete_type][missing_type].append(
                                                 (gap_parent_path, gap_field))
 
@@ -70,6 +72,7 @@ class GapTable():
         set on the next iteration.
 
         """
+
         sanity_limit = 16
         for _ in range(sanity_limit):
 
@@ -94,6 +97,7 @@ class GapTable():
         Return true if all gaps have been filled.
 
         """
+
         return len(self._table) == 0
 
     # -------------------------------------------------------------------------
@@ -105,6 +109,7 @@ class GapTable():
         ready to be inserted (not in the incomplete set).
 
         """
+
         return self._missing_set() - self._incomplete_set()
 
     # -------------------------------------------------------------------------
@@ -113,6 +118,7 @@ class GapTable():
         Return the set of data types missing from at least one incomplete type.
 
         """
+
         return set((
                 key for item in self._table.values() for key in item.keys()))
 
@@ -122,6 +128,7 @@ class GapTable():
         Return the set of all data types which are incomplete.
 
         """
+
         return set(self._table.keys())
 
     # -------------------------------------------------------------------------
@@ -130,6 +137,7 @@ class GapTable():
         Use all available ready_type to fill gaps in incomplete_type.
 
         """
+
         incomplete_set = self._incomplete_set()
         for ready_type in ready_set:
             for incomplete_type in incomplete_set:
@@ -141,6 +149,7 @@ class GapTable():
         Fill any missing gaps of type 'ready_type' gaps in 'incomplete_type'.
 
         """
+
         for gap_tuple in self._table[incomplete_type][ready_type]:
             (parent_path, field)       = gap_tuple
             ready_path                 = (ready_type,)

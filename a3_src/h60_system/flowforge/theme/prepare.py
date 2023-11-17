@@ -60,6 +60,7 @@ def all_assets(rootpath_theme, rootpath_font, rootpath_icon):
     Prepare all assets.
 
     """
+
     with fl.util.debug.rich_exception_printing_context():
 
         for (id_theme, cfg_theme) in _map_cfg_theme(rootpath_theme).items():

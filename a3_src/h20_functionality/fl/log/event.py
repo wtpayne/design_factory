@@ -53,13 +53,13 @@ import sqlite3
 import fl.util
 
 
-
 # -----------------------------------------------------------------------------
 def logger(str_id, level):
     """
     Return logging components.
 
     """
+
     list_event = list()
     handler    = ListHandler(list_event)
     logger     = logging.getLogger(str_id)
@@ -82,6 +82,7 @@ class ListHandler(logging.Handler):
         Return an instance of the EventListHandler.
 
         """
+
         self.list_event = list_event
         super().__init__()
 
@@ -91,6 +92,7 @@ class ListHandler(logging.Handler):
         Append the specified logging record to the list.
 
         """
+
         self.list_event.append(dict(type         = 'log_event',
                                     created      = record.created,
                                     name         = record.name,

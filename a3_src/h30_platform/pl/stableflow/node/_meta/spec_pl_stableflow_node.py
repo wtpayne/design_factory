@@ -20,4 +20,5 @@ class SpecifyStableflowNode:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.node

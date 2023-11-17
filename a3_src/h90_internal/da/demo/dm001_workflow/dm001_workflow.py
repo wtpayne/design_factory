@@ -207,11 +207,12 @@ def start():
 
     """
 
+    import da.env.run
+
     tup_overrides = ('host.localhost.dirpath_log',   _dirpath_log(),
                      'node.ace.config.filepath_env', _filepath_dotenv(),
                      'host.localhost.acct_run',      _username())
 
-    import da.env.run
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
                                          tup_overrides = tup_overrides))
 
@@ -224,6 +225,7 @@ def stop():
     """
 
     import da.env.run
+
     sys.exit(da.env.run.stableflow_stop(path_cfg = _filepath_cfg()))
 
 
@@ -235,6 +237,7 @@ def _dirpath_log():
     """
 
     import da.env
+
     return da.env.path(process_area = 'a4_tmp',
                        control_tier = 'h80_research',
                        relpath      = 'workflow_engine')
@@ -248,6 +251,7 @@ def _filepath_dotenv():
     """
 
     import da.env
+
     return da.env.path(
                 process_area = 'a3_src',
                 control_tier = 'h10_resource',

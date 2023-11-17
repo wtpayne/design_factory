@@ -57,6 +57,7 @@ def reset(runtime, cfg, inputs, state, outputs):
     Reset the process controller state.
 
     """
+
     # Grab a reference to the list of application-level signals.
     #
     state['list_signal'] = runtime['proc']['list_signal']
@@ -108,6 +109,7 @@ def step(inputs, state, outputs):
     entire system may be set as appropriate.
 
     """
+
     # Reset control and feedback outputs.
     #
     for key_ctrl_out in state['tup_key_ctrl_out']:

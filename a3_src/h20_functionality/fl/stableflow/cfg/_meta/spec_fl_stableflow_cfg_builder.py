@@ -22,6 +22,7 @@ class SpecifySetSystemId:
         Check builder.set_system_id returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.set_system_id(
@@ -44,6 +45,7 @@ class SpecifyAddHost:
         Check builder.add_host returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_host(
@@ -66,6 +68,7 @@ class SpecifyRemoveHost:
         Check builder.remove_host returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_host(
@@ -91,6 +94,7 @@ class SpecifyAddProcess:
         Check builder.add_process returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_process(
@@ -114,6 +118,7 @@ class SpecifyRemoveProcess:
         Check builder.remove_process returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_process(
@@ -140,6 +145,7 @@ class SpecifyAddNode:
         Check builder.add_node returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_node(
@@ -166,6 +172,7 @@ class SpecifyRemoveNode:
         Check builder.remove_node returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_node(
@@ -193,6 +200,7 @@ class SpecifyAddEdge:
         Check builder.add_edge returns valid configuration.
 
         """
+
         import fl.stableflow.cfg.builder   # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         fl.stableflow.cfg.builder.add_edge(

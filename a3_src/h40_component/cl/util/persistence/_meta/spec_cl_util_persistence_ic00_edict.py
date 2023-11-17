@@ -28,6 +28,7 @@ class SpecifyClUtilPersistenceIc00_edict:
         The module can be imported.
 
         """
+
         import cl.util.persistence.ic00_edict
 
 

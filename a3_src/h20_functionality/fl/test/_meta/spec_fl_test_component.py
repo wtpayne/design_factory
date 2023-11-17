@@ -22,6 +22,7 @@ class SpecifyFlTestComponent:
         fl.test.component can be imported with no errors.
 
         """
+
         import fl.test.component
 
 
@@ -39,7 +40,9 @@ class SpecifyFlTestComponent_baselineConfiguration:
         _baseline_configuration generates the expected configuration data.
 
         """
+
         import fl.test.component
+
         assert fl.test.component._baseline_configuration() == {
             'data':         { 'python_dict': 'py_dict' },
             'edge':         [],
@@ -67,7 +70,9 @@ class SpecifyFlTestComponent_pipelineConfiguration:
         pipeline_test_cfg generates the expected configuration data.
 
         """
+
         import fl.test.component
+
         ctrl_sys             = 'cl.ctrl.sys.ic00_edict'
         ctrl_proc            = 'cl.ctrl.proc.ic00_edict'
         signal_generator     = 'fl.test._meta.signal_generator'
@@ -181,7 +186,9 @@ class SpecifyFlTestComponent_pipelineConfiguration:
         functional_configuration generates the expected configuration data.
 
         """
+
         import fl.test.component
+
         ctrl_sys             = 'cl.ctrl.sys.ic00_edict'
         ctrl_proc            = 'cl.ctrl.proc.ic00_edict'
         signal_generator     = 'fl.test._meta.signal_generator'

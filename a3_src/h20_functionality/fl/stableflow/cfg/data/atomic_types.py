@@ -35,6 +35,7 @@ def as_dict():
     Python applications.
 
     """
+
     map_typeinfo = dict()
     for typeinfo in _as_tuple():
         map_typeinfo[typeinfo.id] = dict(typeinfo._asdict())
@@ -50,6 +51,7 @@ def _as_tuple():
     map between data types in different languages.
 
     """
+
     TypeInfo = collections.namedtuple('TypeInfo',
                     ['id',     # type id.
                      'py_eq',  # True if python type is binary-compatible.

@@ -21,6 +21,7 @@ class Queue:
         Return an instance of a Queue object.
 
         """
+
         self.owner     = cfg_edge['owner']
         self.direction = cfg_edge['dirn']
         cfg_host       = cfg['host'][id_host]
@@ -39,6 +40,7 @@ class Queue:
         Return the next item from the FIFO queue, waiting if necessary.
 
         """
+
         return self._socket.recv_pyobj()
 
     # -------------------------------------------------------------------------
@@ -47,6 +49,7 @@ class Queue:
         Write to the end of the FIFO queue, raising an exception if full.
 
         """
+
         self._socket.send_pyobj(item)
 
     # -------------------------------------------------------------------------
@@ -55,6 +58,7 @@ class Queue:
         Return the approximate size of the queue.
 
         """
+
         return None
 
 
@@ -64,10 +68,12 @@ def _port_number(cfg_host, cfg_edge):
     Return the port number for the specified edge.
 
     """
-    port_range    = cfg_host['port_range'].split('-')
-    port_lo       = int(port_range[0])
-    port_hi       = int(port_range[1])
-    port          = port_lo + cfg_edge['idx_edge']
+
+    port_range = cfg_host['port_range'].split('-')
+    port_lo    = int(port_range[0])
+    port_hi    = int(port_range[1])
+    port       = port_lo + cfg_edge['idx_edge']
     if port > port_hi:
         raise RuntimeError('Insufficient port numbers available for graph')
+
     return port

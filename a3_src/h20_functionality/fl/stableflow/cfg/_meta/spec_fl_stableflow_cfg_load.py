@@ -23,9 +23,10 @@ class SpecifyFromPath:
     @pytest.mark.e002_general_research
     def it_returns_a_python_dict(self, filepath_cfg_yaml):
         """
-        Xact.cfg.from_path returns a dict.
+        fl.stableflow.cfg.from_path returns a dict.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         assert isinstance(fl.stableflow.cfg.load.from_path(filepath_cfg_yaml),
@@ -35,9 +36,10 @@ class SpecifyFromPath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_yaml_file(self, dict_of_strings, filepath_cfg_yaml):
         """
-        Xact.cfg.from_path can load configuration from a single YAML file.
+        fl.stableflow.cfg.from_path can load configuration from a YAML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(filepath_cfg_yaml),
@@ -47,9 +49,10 @@ class SpecifyFromPath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_json_file(self, dict_of_strings, filepath_cfg_json):
         """
-        Xact.cfg.from_path can load configuration from a single JSON file.
+        fl.stableflow.cfg.from_path can load configuration from a JSON file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(filepath_cfg_json),
@@ -59,9 +62,10 @@ class SpecifyFromPath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_xml_file(self, dict_of_strings, filepath_cfg_xml):
         """
-        Xact.cfg.from_path can load configuration from a single XML file.
+        fl.stableflow.cfg.from_path can load configuration from an XML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(filepath_cfg_xml),
@@ -72,9 +76,10 @@ class SpecifyFromPath:
     def it_loads_a_directory_of_yaml_files(
                                     self, dict_of_strings, dirpath_cfg_yaml):
         """
-        Xact.cfg.from_path can load configuration from a single YAML file.
+        fl.stableflow.cfg.from_path can load configuration from a YAML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(dirpath_cfg_yaml),
@@ -85,9 +90,10 @@ class SpecifyFromPath:
     def it_loads_a_directory_of_json_files(
                                     self, dict_of_strings, dirpath_cfg_json):
         """
-        Xact.cfg.from_path can load configuration from a single JSON file.
+        fl.stableflow.cfg.from_path can load configuration from a JSON file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(dirpath_cfg_json),
@@ -98,9 +104,10 @@ class SpecifyFromPath:
     def it_loads_a_directory_of_xml_files(
                                     self, dict_of_strings, dirpath_cfg_xml):
         """
-        Xact.cfg.from_path can load configuration from a single XML file.
+        fl.stableflow.cfg.from_path can load configuration from an XML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_path(dirpath_cfg_xml),
@@ -118,9 +125,10 @@ class SpecifyFromFilePath:
     @pytest.mark.e002_general_research
     def it_returns_a_python_dict(self, filepath_cfg_yaml):
         """
-        Xact.cfg.load.from_filepath returns a dict.
+        fl.stableflow.cfg.load.from_filepath returns a dict.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         assert isinstance(fl.stableflow.cfg.load.from_filepath(filepath_cfg_yaml),
@@ -130,9 +138,10 @@ class SpecifyFromFilePath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_yaml_file(self, dict_of_strings, filepath_cfg_yaml):
         """
-        Xact.cfg.load.from_filepath can load config. from a single YAML file.
+        fl.stableflow.cfg.load.from_filepath can load config. from a YAML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_filepath(filepath_cfg_yaml),
@@ -142,9 +151,10 @@ class SpecifyFromFilePath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_json_file(self, dict_of_strings, filepath_cfg_json):
         """
-        Xact.cfg.load.from_filepath can load config. from a single JSON file.
+        fl.stableflow.cfg.load.from_filepath can load config. from a JSON file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_filepath(filepath_cfg_json),
@@ -154,9 +164,10 @@ class SpecifyFromFilePath:
     @pytest.mark.e002_general_research
     def it_loads_a_single_xml_file(self, dict_of_strings, filepath_cfg_xml):
         """
-        Xact.cfg.load.from_filepath can load config. from a single XML file.
+        fl.stableflow.cfg.load.from_filepath can load config. from an XML file.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_filepath(filepath_cfg_xml),
@@ -174,9 +185,10 @@ class SpecifyLoad:
     @pytest.mark.e002_general_research
     def it_returns_a_python_dict(self, dirpath_cfg_yaml):
         """
-        Xact.cfg.load returns a dict.
+        fl.stableflow.cfg.load returns a dict.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         assert isinstance(fl.stableflow.cfg.load.from_dirpath(dirpath_cfg_yaml),
@@ -187,9 +199,10 @@ class SpecifyLoad:
     def it_loads_a_directory_of_yaml_files(
                                     self, dict_of_strings, dirpath_cfg_yaml):
         """
-        Xact.cfg.load loads a directory of yaml files.
+        fl.stableflow.cfg.load loads a directory of YAML files.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_dirpath(dirpath_cfg_yaml),
@@ -200,9 +213,10 @@ class SpecifyLoad:
     def it_loads_a_directory_of_json_files(
                                     self, dict_of_strings, dirpath_cfg_json):
         """
-        Xact.cfg.load loads a directory of json files.
+        fl.stableflow.cfg.load loads a directory of JSON files.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_dirpath(dirpath_cfg_json),
@@ -213,9 +227,10 @@ class SpecifyLoad:
     def it_loads_a_directory_of_xml_files(
                                     self, dict_of_strings, dirpath_cfg_xml):
         """
-        Xact.cfg.load loads a directory of xml files.
+        fl.stableflow.cfg.load loads a directory of XML files.
 
         """
+
         import fl.stableflow.cfg.load  # pylint: disable=C0415
 
         check_match(fl.stableflow.cfg.load.from_dirpath(dirpath_cfg_xml),
@@ -228,6 +243,7 @@ def check_match(loaded, true):
     Yield leaf values taken pairwise from the two specified nested maps.
 
     """
+
     for pair in itertools.zip_longest(_iter_leaves(loaded),
                                       _iter_leaves(true)):
 
@@ -246,6 +262,7 @@ def _iter_leaves(data_structure):
     Yield al the leaf values in the specified data_structure.
 
     """
+
     for pv_pair in pl.stableflow.util.gen_path_value_pairs_depth_first(
                                                             data_structure):
         (_, value) = pv_pair

@@ -18,6 +18,7 @@ class SpecifyAsDict:
         Check as_dict returns a dict.
 
         """
+
         import fl.stableflow.cfg.data.atomic_types  # pylint: disable=C0415
         lookup_table = fl.stableflow.cfg.data.atomic_types.as_dict()
         assert isinstance(lookup_table, dict)
@@ -36,6 +37,7 @@ class Specify_AsTuple:
         Check as_dict returns a dict.
 
         """
+
         import fl.stableflow.cfg.data.atomic_types  # pylint: disable=C0415
         lookup_table = fl.stableflow.cfg.data.atomic_types._as_tuple()
         assert isinstance(lookup_table, tuple)

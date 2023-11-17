@@ -43,6 +43,7 @@ license:
 ...
 """
 
+
 import pickle
 
 import fl.log.data
@@ -85,6 +86,3 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                     writer.send(dict(created = unix_time,
                                      id      = key,
                                      value   = pickle.dumps(value)))
-
-
-

@@ -18,6 +18,7 @@ def hexdigest(data):
     Return a string hash of the specified data.
 
     """
+
     if isinstance(data, bytes):
         bytes_buffer = data
     elif isinstance(data, str):
@@ -37,6 +38,7 @@ def serialize(data):
           3. Check the integrity of the configuration data.
 
     """
+
     string_yaml_encoded = yaml.dump(data)
     bytes_yaml_encoded  = string_yaml_encoded.encode('utf-8')
     bytes_zipped        = zlib.compress(bytes_yaml_encoded, 9)
@@ -51,6 +53,7 @@ def deserialize(codestring):
     Return config data from the specified string.
 
     """
+
     bytes_zipped        = base64.b64decode(codestring)
     bytes_yaml_encoded  = zlib.decompress(bytes_zipped)
     string_yaml_encoded = bytes_yaml_encoded.decode('utf-8')

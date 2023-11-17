@@ -46,6 +46,9 @@ license:
 ...
 """
 
+
 import setuptools
+
+
 setuptools.setup(name       = 'h30_platform',
                  py_modules = [])

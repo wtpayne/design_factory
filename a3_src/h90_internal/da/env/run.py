@@ -74,6 +74,7 @@ def stableflow_start(path_cfg      = None,
     Run a python module in the specified environment.
 
     """
+
     import fl.stableflow.cfg
     import fl.stableflow.cfg.exception
     import pl.stableflow.log
@@ -117,6 +118,7 @@ def stableflow_stop(path_cfg, tup_overrides = None):
     Run a python module in the specified environment.
 
     """
+
     import fl.stableflow.cfg
     import fl.stableflow.cfg.exception
     import pl.stableflow.log
@@ -158,6 +160,7 @@ def _update_all_environments(cfg):
           setup of remote environments.
 
     """
+
     for cfg_host in cfg['host'].values():
         _update_env(id_env = cfg_host.get('environment', None),
                     acct   = cfg_host.get('acct_run',    None),
@@ -170,6 +173,7 @@ def _configure_all_launch_commands(cfg):
     Set each launch command as required for each host environment.
 
     """
+
     dirpath_root = da.env.rootpath()
     for cfg_host in cfg['host'].values():
         id_env = cfg_host.get('environment', None)
@@ -190,6 +194,7 @@ def python_interpreter(id_env,
     Run a python interpreter in the specified environment.
 
     """
+
     _python(option      = '',
             parameter   = '',
             id_env      = id_env,
@@ -208,6 +213,7 @@ def python_source(source,
     Run a python source string in the specified environment.
 
     """
+
     _python(option      = '-c',
             parameter   = "'{source}'".format(source = source),
             id_env      = id_env,
@@ -228,6 +234,7 @@ def python_function(spec,
     Run a python module in the specified environment.
 
     """
+
     (name_module, name_function) = spec.rsplit('.', 1)
 
     str_args = ''
@@ -276,6 +283,7 @@ def python_module(module,
     Run a python module in the specified environment.
 
     """
+
     _python(option      = '-m',
             parameter   = module,
             id_env      = id_env,
@@ -295,6 +303,7 @@ def _python(option,
     Run a python module or source string in the specified environment.
 
     """
+
     import da.env
     filepath_python = da.env.path(process_area = 'a0_env',
                                   id_env       = id_env,
@@ -324,6 +333,7 @@ def shell_command(command,
     Run a shell command in the specified environment.
 
     """
+
     (id_env_boot, acct, host) = _apply_defaults(id_env_boot, acct, host)
 
     _update_env(
@@ -363,6 +373,7 @@ def _update_env(id_env,
     A specific bootstrap environment can also be specified.
 
     """
+
     (id_env_boot, acct, host) = _apply_defaults(id_env_boot, acct, host)
 
     bootenv = da.env.path(process_area = 'a0_env',
@@ -393,6 +404,7 @@ def _apply_defaults(id_env_boot, acct, host):
     Apply default values for any missing parameters.
 
     """
+
     if id_env_boot is None:
         id_env_boot = 'e000_design_automation_core'
 
@@ -416,6 +428,7 @@ def _run(str_fmt, debug_print = False, **kwargs):
     diagnostic and debugging purposes.
 
     """
+
     str_command = str_fmt.format(**kwargs)
     if debug_print:
         print(str_command)

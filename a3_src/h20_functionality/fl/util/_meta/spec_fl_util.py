@@ -26,6 +26,7 @@ class SpecifyFlUtil:
         fl.util can be imported with no errors.
 
         """
+
         import fl.util
 
 
@@ -43,8 +44,11 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can be instantiated with no errors.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
+
         assert isinstance(soi, fl.util.Bureau)
 
     # -------------------------------------------------------------------------
@@ -54,11 +58,14 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can use integer keys.
 
         """
+
         import fl.util
+
         soi      = fl.util.Bureau()
         key      = 10203040
         value    = 1234
         soi[key] = value
+
         assert soi[key] == value
 
     # -------------------------------------------------------------------------
@@ -68,10 +75,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can use string keys.
 
         """
+
         import fl.util
+
         soi          = fl.util.Bureau()
         value        = 1234
         soi['field'] = value
+
         assert soi['field'] == value
 
     # -------------------------------------------------------------------------
@@ -81,10 +91,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve integer values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = 1234
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -94,10 +107,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve floating point values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = 1.234
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -107,10 +123,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve string values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = 'test_value'
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -120,10 +139,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve arrays of integer values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = [1, 2, 3, 4]
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -133,10 +155,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve tuples of integer values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = (1, 2, 3, 4)
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -146,10 +171,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve sets of integer values.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value     = {1, 2, 3, 4}
         soi.field = value
+
         assert soi.field == value
 
     # -------------------------------------------------------------------------
@@ -159,7 +187,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can store and retrieve arrays of integer values.
 
         """
+
         import fl.util
+
         soi         = fl.util.Bureau()
         soi.field_1 = 1234
         soi.field_2 = 1.234
@@ -182,9 +212,12 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau can be serialised to a string.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         soi.field = b'value'
+
         assert str(soi) == "{'field': b'value'}"
 
     # -------------------------------------------------------------------------
@@ -194,9 +227,12 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus as fields on demand.
 
         """
+
         import fl.util
+
         soi    = fl.util.Bureau()
         nested = soi['field1']['field2']['field3']
+
         assert isinstance(nested, fl.util.Bureau)
 
     # -------------------------------------------------------------------------
@@ -206,10 +242,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus for writing on demand.
 
         """
+
         import fl.util
+
         soi    = fl.util.Bureau()
         value  = 100
         soi['field1']['field2']['field3'] = value
+
         assert soi['field1']['field2']['field3'] == value
 
     # -------------------------------------------------------------------------
@@ -219,7 +258,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus as attributes on demand.
 
         """
+
         import fl.util
+
         soi                      = fl.util.Bureau()
         value                    = 100
         soi.field1.field2.field3 = value
@@ -234,7 +275,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus as a string path on demand.
 
         """
+
         import fl.util
+
         soi                         = fl.util.Bureau()
         value                       = 100
         soi['field1.field2.field3'] = value
@@ -249,7 +292,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus as a path on demand.
 
         """
+
         import fl.util
+
         soi                               = fl.util.Bureau()
         value                             = 100
         soi[('field1','field2','field3')] = value
@@ -265,7 +310,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau creates nested bureaus as a pathform attrib on demand.
 
         """
+
         import fl.util
+
         soi                      = fl.util.Bureau(_path_delimiter = '_')
         value                    = 100
         soi.field1_field2_field3 = value
@@ -280,7 +327,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau fields can support undoable mutations.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value_1   = 100
         value_2   = 200
@@ -304,7 +353,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau fields can support undoable and redoable mutations.
 
         """
+
         import fl.util
+
         soi       = fl.util.Bureau()
         value_1   = 100
         value_2   = 200
@@ -342,13 +393,16 @@ class SpecifyFlUtilBureau:
             Test action.
 
             """
+
             nonlocal value_written
             nonlocal path_written
+
             value_written = tup_cmd[0].value_new
             path_written  = tup_cmd[0].path
 
         import fl.rule
         import fl.util
+
         soi   = fl.util.Bureau()
         key   = 'field_1'
         value = 100
@@ -378,13 +432,16 @@ class SpecifyFlUtilBureau:
             Test action.
 
             """
+
             nonlocal value_written
             nonlocal path_written
+
             value_written = tup_cmd[0].value_new
             path_written  = tup_cmd[0].path
 
         import fl.rule
         import fl.util
+
         soi    = fl.util.Bureau()
         value1 = 100
         value2 = 200
@@ -415,13 +472,16 @@ class SpecifyFlUtilBureau:
             Test action.
 
             """
+
             nonlocal value_written
             nonlocal path_written
+
             value_written = tup_cmd[0].value_new
             path_written  = tup_cmd[0].path
 
         import fl.rule
         import fl.util
+
         soi = fl.util.Bureau()
         soi.rule(cond = fl.rule.is_root_in(('field_1',)),
                  act  = _test_action)
@@ -439,7 +499,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be represented as key-value tuples.
 
         """
+
         import fl.util
+
         soi   = fl.util.Bureau()
         soi.a = 100
         soi.b = 200
@@ -458,7 +520,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be represented as key-value tuples.
 
         """
+
         import fl.util
+
         soi     = fl.util.Bureau()
         soi.a.c = 100
         soi.a.d = 200
@@ -477,12 +541,14 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be represented as key-value tuples.
 
         """
+
         import fl.util
-        soi    = fl.util.Bureau()
-        soi.a.c  = 1234
-        soi.a.d  = 5678
-        soi.b.e  = [10, 20, 30, 40]
-        soi.b.f  = (50, 60, 70, 80)
+
+        soi     = fl.util.Bureau()
+        soi.a.c = 1234
+        soi.a.d = 5678
+        soi.b.e = [10, 20, 30, 40]
+        soi.b.f = (50, 60, 70, 80)
 
         assert soi.to_tuple() == ((('a','c'), 1234),
                                   (('a','d'), 5678),
@@ -496,12 +562,15 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be updated using key-value tuples.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_tuple(((('a', 'c'), 100),
                         (('a', 'd'), 200),
                         (('b', 'e'), 300),
                         (('b', 'f'), 400)))
+
         assert soi.a.c == 100
         assert soi.a.d == 200
         assert soi.b.e == 300
@@ -514,13 +583,16 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be partly updated using key-value tuples.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_tuple(path_root = ('root', 'path'),
                        tup_kv    = ((('a', 'c'), 100),
                                     (('a', 'd'), 200),
                                     (('b', 'e'), 300),
                                     (('b', 'f'), 400)))
+
         assert soi.root.path.a.c == 100
         assert soi.root.path.a.d == 200
         assert soi.root.path.b.e == 300
@@ -533,13 +605,16 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be partly updated using key-value tuples.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_tuple(path_root = 'root.path',
                        tup_kv    = ((('a', 'c'), 100),
                                     (('a', 'd'), 200),
                                     (('b', 'e'), 300),
                                     (('b', 'f'), 400)))
+
         assert soi.root.path.a.c == 100
         assert soi.root.path.a.d == 200
         assert soi.root.path.b.e == 300
@@ -552,7 +627,9 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be represented as a nested dict.
 
         """
+
         import fl.util
+
         soi     = fl.util.Bureau()
         soi.a.c = 100
         soi.a.d = 200
@@ -571,10 +648,13 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be updated from a nested dict.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_dict({'a': {'c': 100, 'd': 200},
                        'b': {'e': 300, 'f': 400}})
+
         assert soi.a.c == 100
         assert soi.a.d == 200
         assert soi.b.e == 300
@@ -587,11 +667,14 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be updated from a nested dict.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_dict(path_root = ('root', 'path'),
                       map_item  = {'a': {'c': 100, 'd': 200},
                                    'b': {'e': 300, 'f': 400}})
+
         assert soi.root.path.a.c == 100
         assert soi.root.path.a.d == 200
         assert soi.root.path.b.e == 300
@@ -604,11 +687,14 @@ class SpecifyFlUtilBureau:
         fl.util.Bureau containers can be updated from a nested dict.
 
         """
+
         import fl.util
+
         soi = fl.util.Bureau()
         soi.from_dict(path_root = 'rootpath',
                       map_item  = {'a': {'c': 100, 'd': 200},
                                    'b': {'e': 300, 'f': 400}})
+
         assert soi.rootpath.a.c == 100
         assert soi.rootpath.a.d == 200
         assert soi.rootpath.b.e == 300
@@ -758,6 +844,7 @@ class SpecifyFlUtilBureau:
             soi_01.b.f = 50
 
         soi_02.from_batch(batch_01)
+
         assert soi_02 == soi_01
 
         with soi_02.batch_context() as batch_02:
@@ -767,4 +854,5 @@ class SpecifyFlUtilBureau:
             soi_02.b.f = 900
 
         soi_01.from_batch(batch_02)
+
         assert soi_01 == soi_02

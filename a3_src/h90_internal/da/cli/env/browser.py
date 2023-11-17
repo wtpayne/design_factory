@@ -87,6 +87,7 @@ def run():
     Run the interactive design index browser.
 
     """
+
     dirpath_src  = _dirpath_src()
     dirname_src  = os.path.basename(dirpath_src)
     filepath_db  = os.path.join(_dirpath_tmp(), 'main/design_index.db')
@@ -97,6 +98,7 @@ def run():
     app = Browser(label_tree_root = 'ws00_pri',
                   map_data_tree   = design_index)
     app.run()
+
     return 0
 
 
@@ -106,6 +108,7 @@ class Browser(textual.app.App):
     Textual design index browser app.
 
     """
+
     _nav             = None
     _content         = None
     _label_tree_root = ''
@@ -118,6 +121,7 @@ class Browser(textual.app.App):
         Create a Browser app class.
 
         """
+
         self._label_tree_root = label_tree_root
         self._map_data_tree   = map_data_tree
         super().__init__()
@@ -128,6 +132,7 @@ class Browser(textual.app.App):
         Ensure the navigation tree has focus once the app is mounted.
 
         """
+
         self._nav.focus()
 
     # -------------------------------------------------------------------------
@@ -136,6 +141,7 @@ class Browser(textual.app.App):
         Yield all initial user interface widgets.
 
         """
+
         self._nav     = NavTree(id    = 'nav_tree',
                                 label = self._label_tree_root,
                                 data  = self._map_data_tree)
@@ -151,6 +157,7 @@ class Browser(textual.app.App):
         Update the content pane with the specified event.
 
         """
+
         try:
             metadata = event.node.data.metadata
             if isinstance(metadata, str):
@@ -169,6 +176,7 @@ class Browser(textual.app.App):
         Display the content.
 
         """
+
         self._update_content(event)
 
     # -------------------------------------------------------------------------
@@ -179,6 +187,7 @@ class Browser(textual.app.App):
         Load the children of a tree node when the parent node is expanded.
 
         """
+
         event.stop()
 
         self._update_content(event)
@@ -225,6 +234,7 @@ class NavTree(textual.widgets.Tree):
     Navigation tree widget.
 
     """
+
     Binding  = textual.binding.Binding
     BINDINGS = [
         Binding('space', 'select_cursor', 'Select', show = False),
@@ -238,6 +248,7 @@ class NavTree(textual.widgets.Tree):
         Contstruct a new navigation tree widget.
 
         """
+
         super().__init__(*args, **kwargs)
 
         self.styles.background = _THEME.background
@@ -259,6 +270,7 @@ class ContentDisplay(textual.widgets.Static):
         Contstruct a new content display widget.
 
         """
+
         super().__init__(*args, **kwargs)
 
         self.styles.background = _THEME.background
@@ -281,6 +293,7 @@ class DesignIndexDict(collections.UserDict):
         Return a DesignIndexDict instance.
 
         """
+
         super().__init__(*args, **kwargs)
 
         self.label    = label_node
@@ -301,6 +314,7 @@ def _dirpath_self():
     Return the directory path to the current module.
 
     """
+
     return os.path.dirname(os.path.realpath(__file__))
 
 
@@ -310,6 +324,7 @@ def _dirpath_workspace():
     Return the path of the workspace filesystem root directory.
 
     """
+
     return os.path.normpath(os.path.join(_dirpath_self(), '../../../../..'))
 
 
@@ -319,6 +334,7 @@ def _dirpath_src():
     Return the path of the workspace filesystem source directory.
 
     """
+
     return os.path.normpath(os.path.join(_dirpath_workspace(), 'a3_src'))
 
 
@@ -328,4 +344,5 @@ def _dirpath_tmp():
     Return the path of the workspace filesystem temporary directory.
 
     """
+
     return os.path.normpath(os.path.join(_dirpath_workspace(), 'a4_tmp'))

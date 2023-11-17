@@ -65,6 +65,7 @@ def main(path_cfg):
     Run the main view of the configured GUI.
 
     """
+
     pl.stableview.main(path_cfg, 'main')
 
 

@@ -53,7 +53,6 @@ import sqlite3
 import fl.util
 
 
-
 # -----------------------------------------------------------------------------
 @fl.util.coroutine
 def writer(id_system, dirpath_log = None):

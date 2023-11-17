@@ -20,4 +20,5 @@ class SpecifyStableflowHost:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.host

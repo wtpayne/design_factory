@@ -18,6 +18,7 @@ class SpecifySimplePipeline:
         simple_pipeline returns a valid configuration dict.
 
         """
+
         import pl.stableflow.test.util
         import fl.stableflow.cfg.validate
         cfg = pl.stableflow.test.util.simple_pipeline(
@@ -35,6 +36,7 @@ def simple_counter(inputs, state, outputs):  # pylint: disable=W0613
     Step function for a simple test node that counts to ten.
 
     """
+
     if 'count' not in state:
         state['count'] = 0
     else:
@@ -51,7 +53,9 @@ def simple_messager(inputs, state, outputs):  # pylint: disable=W0613
     Step function for a test node that prints a message after ten steps.
 
     """
+
     import pl.stableflow.test.util
+
     if inputs['input']['count'] >= 10:
         pl.stableflow.test.util.send(message = 'TEST OK')
         import pl.stableflow.exception  # pylint: disable=C0415

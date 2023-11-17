@@ -330,8 +330,6 @@ def _on_timer_tick(state, timestamp, msg):
     """
     Request a new summary.
 
-    This function is triggered when
-
     """
 
     SUMMARY_WAIT_SECS = 20

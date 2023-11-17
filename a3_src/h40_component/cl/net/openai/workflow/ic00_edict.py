@@ -59,6 +59,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     OpenAI agent coroutine.
 
     """
+
     default_args = dict(id_endpoint = 'chat_completions',
                         model       = 'gpt-3.5-turbo')
     map_id    = runtime.get('id',       dict())
@@ -163,6 +164,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 outputs[str_key]['ts'].update(timestamp)
                 outputs[str_key]['list'][:] = list_msg
 
+
 # -----------------------------------------------------------------------------
 def init_openai_client(filepath_env  = None,
                        envvar_key    = 'APIKEY_OPENAI',
@@ -205,4 +207,3 @@ def init_openai_client(filepath_env  = None,
                                         template_handler = template_handler)
 
     return (request_handler, template_handler, workflow_handler)
-

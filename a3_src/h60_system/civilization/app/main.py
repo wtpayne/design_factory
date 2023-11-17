@@ -160,6 +160,7 @@ class Civilization(kivy.app.App):
     def start_recording(self, *args):
         """
         """
+
         self.label.text = 'Listening...'
         self._start_audio_recorder()
 
@@ -167,6 +168,7 @@ class Civilization(kivy.app.App):
     def stop_recording(self, *args):
         """
         """
+
         self.label.text = 'Press the button and speak'
         self._stop_audio_recorder()
         self.process_audio()
@@ -177,24 +179,6 @@ class Civilization(kivy.app.App):
         """
 
         self._play_media(self.filepath_tmp)
-
-        # print('#' * 80)
-        # print('#' * 80)
-        # print('#' * 80)
-        # print('#' * 80)
-        # print('USE VOSK')
-        # print('#' * 80)
-        # print('#' * 80)
-        # print('#' * 80)
-        # print('#' * 80)
-
-        # ac            = jnius.autoclass
-        # AndroidString = ac('java.lang.String')
-        # Vosk          = ac('org.vosk.LibVosk')
-        # Model         = ac('org.vosk.Model')
-        # Recognizer    = ac('org.vosk.Recognizer')
-
-
 
 
 # -----------------------------------------------------------------------------

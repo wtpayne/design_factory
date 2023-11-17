@@ -41,6 +41,7 @@ class ImmediateHalt(ControlSignal):
         Return an instance of an ImmediateHalt ControlSignal object.
 
         """
+
         self.return_code = return_code
         super().__init__()
 
@@ -72,6 +73,7 @@ class GracefulHalt(ControlSignal):
         Return an instance of a GracefulHalt ControlSignal object.
 
         """
+
         self.return_code = return_code
         super().__init__()
 
@@ -99,6 +101,7 @@ class NonRecoverableError(ControlSignal):
         Return an instance of a NonRecoverableError ControlSignal object.
 
         """
+
         self.cause = cause
         super().__init__()
 

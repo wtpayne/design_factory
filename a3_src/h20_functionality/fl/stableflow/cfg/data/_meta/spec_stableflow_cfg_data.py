@@ -18,6 +18,7 @@ class SpecifyDenormalize:
         Check denormalize returns a valid denormalized config structure.
 
         """
+
         import fl.stableflow.cfg.data      # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
         denormalized_config = fl.stableflow.cfg.data.denormalize(
@@ -38,6 +39,7 @@ class Specify_ExpandNode:
         Check denormalize returns a valid denormalized config structure.
 
         """
+
         import fl.stableflow.cfg.data  # pylint: disable=C0415
         named_type = fl.stableflow.cfg.data.FieldCategory.named_type
         SubsTab    = fl.stableflow.cfg.util.SubstitutionTable

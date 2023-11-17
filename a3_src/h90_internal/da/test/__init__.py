@@ -48,8 +48,12 @@ license:
 # -----------------------------------------------------------------------------
 def all():
     """
+    Run all tests.
+
     """
+
     import da.env
+
     tup_id_env         = tuple(da.env.iter_id_env())
     list_retval        = list()
     tup_id_tier_ignore = ('h00_thirdparty',
@@ -91,7 +95,9 @@ def run(iter_path     = None,
     Run test.
 
     """
+
     import da.env
+
     if iter_path is None:
         iter_path = list()
     if isinstance(iter_path, tuple):
@@ -541,6 +547,7 @@ def run_pytest(
         Add a boolean flag to the list of options.
 
         """
+
         assert isinstance(option_argument, (NONETYPE, bool))
 
         if option_argument is True:
@@ -552,6 +559,7 @@ def run_pytest(
         Add an option to the list.
 
         """
+
         assert isinstance(option_argument, (NONETYPE, int, str))
 
         if option_argument is None:
@@ -572,6 +580,7 @@ def run_pytest(
         Add an option to the list. (multi-allowed).
 
         """
+
         assert isinstance(option_argument, (NONETYPE, int, str, tuple, list))
 
         if option_argument is None:
@@ -582,6 +591,7 @@ def run_pytest(
                 opt(option, item)
         else:
             opt(option, option_argument)
+
 
     # Define mapping from option to handling function
     #
@@ -685,7 +695,9 @@ def run_pytest(
     #
     if isinstance(path, str):
         path = [path]
+
     assert isinstance(path, (list, tuple))
+
     str_path = str_option_delimiter.join(path)
 
     str_command = 'pytest{delim}{args}{delim}{path}'.format(
@@ -697,4 +709,5 @@ def run_pytest(
         print(str_command)
 
     import da.env
+
     return da.env.run.shell_command(str_command, id_env = id_env)

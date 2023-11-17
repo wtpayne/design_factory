@@ -48,7 +48,6 @@ license:
 import fl.net.whatsapp.bot
 
 
-
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """

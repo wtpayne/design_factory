@@ -4,6 +4,7 @@ Functional specification for the fl.stableflow.cfg.override module.
 
 """
 
+
 import copy
 
 import pytest
@@ -24,6 +25,7 @@ class SpecifyApply:
         Check apply makes no changes when the override is None.
 
         """
+
         import fl.stableflow.cfg.override  # pylint: disable=C0415
 
         cfg_orig = copy.deepcopy(valid_normalized_config)
@@ -38,6 +40,7 @@ class SpecifyApply:
         Check apply makes no changes when the override is None.
 
         """
+
         import fl.stableflow.cfg.override  # pylint: disable=C0415
 
         cfg         = valid_normalized_config
@@ -57,6 +60,7 @@ class SpecifyApply:
         Check apply makes no changes when the override is None.
 
         """
+
         import fl.stableflow.cfg.override  # pylint: disable=C0415
 
         cfg           = valid_normalized_config

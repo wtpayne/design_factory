@@ -19,6 +19,7 @@ def get_skeleton_config():
     Return a skeleton configuration structure.
 
     """
+
     return {
         'system':       {},
         'host':         {},
@@ -36,6 +37,7 @@ def set_system_id(cfg, id_system):
     Mutate the config structure with a modified system_id.
 
     """
+
     cfg['system']['id_system'] = id_system
 
 
@@ -46,6 +48,7 @@ def add_host(cfg, id_host, **kwargs):
 
     """
     cfg['host'][id_host] = dict(kwargs.items())
+
 
 
 # -----------------------------------------------------------------------------
@@ -59,6 +62,7 @@ def remove_host(cfg, id_host):
     or ending at any of these nodes.
 
     """
+
     list_id_process_to_delete = list()
     for (id_process, cfg_process) in cfg['process'].items():
         if cfg_process['host'] == id_host:
@@ -76,6 +80,7 @@ def add_process(cfg, id_process, id_host = None, **kwargs):
     Mutate the config structure to add a new process.
 
     """
+
     tup_hosts = tuple(cfg['host'].keys())
     if id_host is None:
         id_host = tup_hosts[0]
@@ -96,6 +101,7 @@ def remove_process(cfg, id_process):
     these nodes.
 
     """
+
     list_id_node_to_delete = list()
     for (id_node, cfg_node) in cfg['node'].items():
         if cfg_node['process'] == id_process:
@@ -120,6 +126,7 @@ def add_node(cfg,  # pylint: disable=R0913
     Mutate the config structure to add a new node.
 
     """
+
     cfg_node = dict()
 
     if id_process is not None:
@@ -155,6 +162,7 @@ def remove_node(cfg, id_node):
     All edges starting or ending at the node are also removed.
 
     """
+
     path_prefix             = '{id_node}.'.format(id_node = id_node)
     list_cfg_edge_to_remove = list()
 
@@ -181,6 +189,7 @@ def add_edge(cfg,  # pylint: disable=R0913
     Mutate the config structure to add a new edge.
 
     """
+
     cfg['edge'].append({
         'owner': id_src,
         'data':  data,
@@ -195,6 +204,7 @@ def remove_edge(cfg, src, dst):
     Mutate the config structure to remove the specified edge.
 
     """
+
     list_cfg_edge_to_remove = list()
 
     for cfg_edge in cfg['edge']:
@@ -211,6 +221,7 @@ def add_data(cfg, id_data, spec_data):
     Mutate the config structure to add a new data type.
 
     """
+
     cfg['data'][id_data] = spec_data
 
 
@@ -220,6 +231,7 @@ def remove_data(cfg, id_data):
     Mutate the config structure to remove the specified data type.
 
     """
+
     del cfg['data'][id_data]
 
 
@@ -236,6 +248,7 @@ def add_pipeline(cfg,  # pylint: disable=R0913
     Mutate the config structure to add a pipeline of new nodes.
 
     """
+
     list_id_node   = list(iter_id_node)
     num_nodes      = len(list_id_node)
     list_edge_info = list(iter_edge_info)
@@ -291,6 +304,7 @@ def _make_list(data, type, count):
     If data is type, return count copies in a list, else return as-is.
 
     """
+
     if isinstance(data, type):
         return [data] * count
     return data

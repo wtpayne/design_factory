@@ -64,6 +64,7 @@ def add_env_tools(grp_parent):
     Add environment specific tools to the specified click command group.
 
     """
+
     for (id_env, cfg_env) in da.env.iter_cfg_env():
 
         # Add a click command group for each
@@ -119,6 +120,7 @@ def _iter_name_deps(cfg_env):
     Yield the name of each dependency in the specified environment config.
 
     """
+
     for item in cfg_env['list_item']:
 
         try:
@@ -149,8 +151,10 @@ def _bash(id_env):
     Start a bash shell.
 
     """
+
     dirpath_self  = os.path.dirname(os.path.realpath(__file__))
     filepath_init = os.path.join(dirpath_self, 'bash_init.sh')
+
     da.env.run.shell_command(
             command = 'bash --init-file {file}'.format(file = filepath_init),
             id_env  = id_env)
@@ -162,6 +166,7 @@ def _cpy(id_env):
     Start a cpython repl.
 
     """
+
     return da.env.run.python_interpreter(id_env = id_env)
 
 
@@ -171,6 +176,7 @@ def _ipy(id_env):
     Start a ipython repl.
 
     """
+
     source = 'import ptpython.ipython; ptpython.ipython.embed()'
     return da.env.run.python_source(source = source,
                                     id_env = id_env)
@@ -182,6 +188,7 @@ def _ptpy(id_env):
     Start a ptpython repl.
 
     """
+
     source = 'import ptpython.repl; ptpython.repl.embed(globals(), locals())'
     return da.env.run.python_source(source = source,
                                     id_env = id_env)
@@ -193,6 +200,7 @@ def _bpy(id_env):
     Start a bpython repl.
 
     """
+
     source = 'import bpython; bpython.embed()'
     return da.env.run.python_source(source = source,
                                     id_env = id_env)

@@ -132,6 +132,7 @@ def start():
     """
 
     import da.cli.service.process_assistant
+
     sys.exit(da.cli.service.process_assistant.start())
 
 
@@ -144,6 +145,7 @@ def stop():
     """
 
     import da.cli.service.process_assistant
+
     sys.exit(da.cli.service.process_assistant.stop())
 
 
@@ -168,6 +170,7 @@ def uuid():
     """
 
     import da.cli.utility
+
     sys.exit(da.cli.utility.uuid())
 
 
@@ -192,6 +195,7 @@ def all():
     """
 
     import da.test
+
     sys.exit(da.test.all())
 
 
@@ -263,6 +267,7 @@ def _dirpath_src():
     """
 
     dirpath_self = os.path.dirname(os.path.realpath(__file__))
+
     return os.path.normpath(os.path.join(dirpath_self, '../../..'))
 
 

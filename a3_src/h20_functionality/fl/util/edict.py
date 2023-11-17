@@ -58,6 +58,7 @@ def validate(inputs         = None,
     Validate inputs or outputs.
 
     """
+
     if ((inputs is not None) and (outputs is None) and (cfg is None)):
         str_arg = 'inputs'
         set_key = set(inputs.keys())
@@ -140,6 +141,7 @@ def is_ready(inputs, outputs):
     Reset all outputs and return True if ready.
 
     """
+
     reset(outputs)
 
     ready = True

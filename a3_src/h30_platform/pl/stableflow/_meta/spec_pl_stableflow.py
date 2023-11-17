@@ -25,6 +25,7 @@ class SpecifyStableflow:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.proc
 
     # -------------------------------------------------------------------------
@@ -36,6 +37,7 @@ class SpecifyStableflow:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.node
 
     # -------------------------------------------------------------------------
@@ -47,6 +49,7 @@ class SpecifyStableflow:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.queue
 
     # -------------------------------------------------------------------------
@@ -58,6 +61,7 @@ class SpecifyStableflow:
         problem with building native extensions.
 
         """
+
         import pl.stableflow.signal
 
     # -------------------------------------------------------------------------
@@ -66,6 +70,7 @@ class SpecifyStableflow:
         pl.stableflow.cli.command.grp_main supports single process execution.
 
         """
+
         import pl.stableflow.test.util
         pl.stableflow.test.util.run(
                 env = pl.stableflow.test.util.env(filepath = __file__),
@@ -85,6 +90,7 @@ class SpecifyStableflow:
         pl.stableflow.cli.command.grp_main supports multiprocess execution.
 
         """
+
         import pl.stableflow.test.util
         pl.stableflow.test.util.run(
                 env = pl.stableflow.test.util.env(filepath = __file__),
@@ -105,6 +111,7 @@ class SpecifyStableflow:
         pl.stableflow.cli.command.grp_main supports nodes spec'd as strings.
 
         """
+
         import pl.stableflow.test.util
         pl.stableflow.test.util.run(
                 env = pl.stableflow.test.util.env(filepath = __file__),
@@ -124,6 +131,7 @@ class SpecifyStableflow:
         pl.stableflow.cli.command.grp_main supports nodes spec'd as coroutines.
 
         """
+
         import pl.stableflow.test.util
         pl.stableflow.test.util.run(
                 env = pl.stableflow.test.util.env(filepath = __file__),
@@ -144,6 +152,7 @@ class SpecifyStableflow:
         pl.stableflow.cli.command.grp_main supports nodes in a feedback loop.
 
         """
+
         import pl.stableflow.test.util
         pl.stableflow.test.util.run(
                 env = pl.stableflow.test.util.env(filepath = __file__),
@@ -172,6 +181,7 @@ class SpecifyGrpMain:
         pl.stableflow.cli.command.grp_main prints help when called w/no args.
 
         """
+
         import pl.stableflow.cli.command  # pylint: disable=C0415
 
         runner        = click.testing.CliRunner()
@@ -191,6 +201,7 @@ class SpecifyGrpMain:
         pl.stableflow.cli.command.grp_main prints help when called w/ help arg.
 
         """
+
         import pl.stableflow.cli.command  # pylint: disable=C0415
 
         runner        = click.testing.CliRunner()
@@ -212,6 +223,7 @@ def expected_help_text_main():
     Return the expected help text for pl.stableflow.cli.command.grp_main.
 
     """
+
     return (
         'Usage: main [OPTIONS] COMMAND [ARGS]...\n\n'
         '  Stableflow command line interface.\n\n'
@@ -238,6 +250,7 @@ def simple_counter(inputs, state, outputs):  # pylint: disable=W0613
     Step function for a simple test node that counts to ten.
 
     """
+
     if 'count' not in state:
         state['count'] = 0
     else:
@@ -254,6 +267,7 @@ def simple_messager(inputs, state, outputs):  # pylint: disable=W0613
     Step function for a test node that prints a message after ten steps.
 
     """
+
     import pl.stableflow.test.util
     if inputs['input']['count'] >= 10:
         pl.stableflow.test.util.send(message = 'TEST OK')
@@ -267,6 +281,7 @@ def coro_counter(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     Coroutine for a simple test node that counts to ten.
 
     """
+
     import pl.stableflow.signal
     count  = -1
     signal = (None,)
@@ -284,6 +299,7 @@ def coro_messager(runtime, cfg, inputs, state, outputs):  # pylint: disable=W061
     Coroutine for a test node that prints a message after ten steps.
 
     """
+
     import pl.stableflow.signal
     import pl.stableflow.test.util
     signal = (None,)
@@ -300,6 +316,7 @@ def feedback_counter(runtime, cfg, inputs, state, outputs):  # pylint: disable=W
     Coroutine for a simple test node that counts to ten.
 
     """
+
     import pl.stableflow.signal
     import pl.stableflow.test.util
     count = 0
@@ -319,6 +336,7 @@ def feedback_decisioner(runtime, cfg, inputs, state, outputs):  # pylint: disabl
     Coroutine for a test node that decides to halt after ten steps.
 
     """
+
     outputs['output']['do_halt'] = False
     signal = (None,)
     while True:

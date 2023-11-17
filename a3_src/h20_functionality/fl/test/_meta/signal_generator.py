@@ -11,6 +11,7 @@ def reset(runtime, cfg, inputs, state, outputs):
     Reset the signal generator.
 
     """
+
     state['channels'] = cfg['channels']
     for channel in state['channels']:
         channel['num_samples'] = len(channel['signal'])
@@ -22,6 +23,7 @@ def step(inputs, state, outputs):
     Step the signal generator.
 
     """
+
     for channel in state['channels']:
         offset = inputs['ctrl']['ts']['idx'] % channel['num_samples']
         sample_value = channel['signal'][offset]

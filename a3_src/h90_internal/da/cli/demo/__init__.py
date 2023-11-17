@@ -64,6 +64,7 @@ def add_demos(grp_parent):
     Add a command group for each demo.
 
     """
+
     dirpath_root      = _dirpath_root()
     dirpath_internal  = os.path.join(dirpath_root,     'a3_src/h90_internal')
     dirpath_demo_root = os.path.join(dirpath_internal, 'da/demo')
@@ -97,6 +98,7 @@ def _dirpath_root():
     Return the directory path of the root of the repository.
 
     """
+
     dirpath_self = os.path.dirname(os.path.realpath(__file__))
     relpath_root = '../../../../..'
     dirpath_root = os.path.normpath(os.path.join(dirpath_self, relpath_root))
@@ -109,6 +111,7 @@ def _is_demo_dir(path):
     Return true if and only if the specified directory name is a demo.
 
     """
+
     dirname = os.path.basename(path)
     is_demo = os.path.isdir(path) and dirname.startswith('dm')
     return is_demo
@@ -120,6 +123,7 @@ def _create_group_for_demo(grp_parent, id_demo):
     Return a click command group for the specified demo id.
     
     """
+
     str_help     = 'Demo {id}.'.format(id = id_demo)
     grp_demo     = da.cli.group.Ordered(id_demo, help = str_help)
     num_demo     = id_demo.split(sep = '_', maxsplit = 1)[0]
@@ -133,6 +137,7 @@ def _filepath_python_module(dirpath, id_demo):
     Return the filepath of the demo entrypoint module.
 
     """
+
     return os.path.join(dirpath, '{id}.py'.format(id = id_demo))
 
 
@@ -142,6 +147,7 @@ def _filepath_stableflow_config(dirpath, id_demo):
     Return the filepath of the demo stableflow configuration file.
 
     """
+
     return os.path.join(dirpath,
                         '{id}.stableflow.cfg.yaml'.format(id = id_demo))
 
@@ -152,6 +158,7 @@ def _add_functions_from_python_module_to_group(group, filepath, rootpath):
     Add functions from the specified python module to the group as commands.
 
     """
+
     spec_module  = _spec_module(filepath, rootpath)
     module       = importlib.import_module(spec_module)
     iter_members = inspect.getmembers(module)
@@ -184,7 +191,9 @@ def _spec_module(filepath, rootpath):
     Return the module spec for the specified python file and root directory.
 
     """
+
     rel_path = os.path.relpath(filepath, rootpath)
+
     return rel_path[:-3].replace(os.sep, '.')
     
 
@@ -194,6 +203,7 @@ def _add_command_to_group(group, spec_module, name, callback):
     Add a command to the specified group using the provided parameters.
 
     """
+
     if hasattr(callback, '__doc__'):
         str_help = callback.__doc__.strip()
     else:
@@ -213,6 +223,7 @@ def _add_start_stop_commands_for_stableflow_config(group, filepath, id_demo):
     Add start and stop commands for the specified stableflow config.
 
     """
+
     fcn_start = functools.partial(da.env.run.stableflow_start,
                                   path_cfg = filepath)
     group.add_command(

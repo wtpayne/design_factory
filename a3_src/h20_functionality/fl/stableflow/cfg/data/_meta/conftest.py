@@ -20,6 +20,7 @@ def valid_partly_denormalized_config():
     structure is validated.
 
     """
+
     return {
         'system':  {
             'id_system': 'some_system'

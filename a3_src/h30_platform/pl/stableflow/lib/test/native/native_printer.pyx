@@ -16,6 +16,7 @@ def reset(runtime, cfg, inputs, state, outputs):
     Reset the pretty printer.
 
     """
+
     # Ensure any existing open files are closed.
     # (Ignore stdout and stderr)
     if 'stream' in state and not state['stream'].name.startswith('<std'):
@@ -46,6 +47,7 @@ def step(inputs, state, outputs):
     Step the pretty printer.
 
     """
+
     if state['pretty']:
         pprint.pprint(inputs, stream = state['stream'])
     else:
@@ -58,4 +60,5 @@ def finalize(runtime, cfg, inputs, state, outputs):
     Finalize the pretty printer.
 
     """
+
     pass

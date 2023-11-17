@@ -22,6 +22,7 @@ class Queue:
         Return an instance of a Queue object.
 
         """
+
         self.owner     = cfg_edge['owner']
         self.direction = cfg_edge['dirn']
         self._queue    = multiprocessing.Queue()
@@ -32,6 +33,7 @@ class Queue:
         Return the next item from the FIFO queue, waiting if necessary.
 
         """
+
         return self._queue.get(block = True)
 
     # -------------------------------------------------------------------------
@@ -40,6 +42,7 @@ class Queue:
         Write to the end of the FIFO queue, raising an exception if full.
 
         """
+
         return self._queue.put(copy.deepcopy(msg), block = False)
 
     # -------------------------------------------------------------------------
@@ -48,4 +51,5 @@ class Queue:
         Return the approximate size of the queue.
 
         """
+
         return self._queue.qsize()

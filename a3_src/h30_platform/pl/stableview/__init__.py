@@ -59,6 +59,7 @@ import fl.util
 import fl.util.debug
 import fl.util.io
 
+
 try:
     __version__ = importlib.metadata.version('stableview')
 except importlib.metadata.PackageNotFoundError:
@@ -279,6 +280,7 @@ def _filepath_cfg_view(dirpath_app, id_view):
     Load configuration for the UI from the specified view.
 
     """
+
     filename_cfg = '{name}.stableview.cfg.yaml'.format(name = id_view)
     filepath_cfg = os.path.join(dirpath_app, id_view, filename_cfg)
     return filepath_cfg
@@ -356,6 +358,7 @@ def widget(cfg, fcn, *args, **kwargs):
     Add the specfied widget to the view.
 
     """
+
     cfg._fcn = fcn
 
     if args:

@@ -11,6 +11,7 @@ def denormalize(cfg):
     Add default queue config.
 
     """
+
     if 'queue' not in cfg:
         cfg['queue'] = dict()
         cfg['queue']['inter_process']     = 'pl.stableflow.queue.multiprocessing'

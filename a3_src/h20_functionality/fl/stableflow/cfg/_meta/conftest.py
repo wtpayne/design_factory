@@ -25,6 +25,7 @@ def dict_of_strings():
     structure is validated.
 
     """
+
     return { 'some':      'sort',
              'of':        'data',
              'structure': 'with',
@@ -40,6 +41,7 @@ def invalid_config():
     Return a test data structure.
 
     """
+
     return { 'some':   'sort',
              'of':     'invalid',
              'config': 100 }
@@ -57,6 +59,7 @@ def valid_normalized_config():
     structure is validated.
 
     """
+
     return {
         'system':  {
             'id_system': 'some_system'
@@ -119,6 +122,7 @@ def filepath_cfg_yaml(tmp_path, dict_of_strings):
     Return the file path to a mock config file as a string.
 
     """
+
     return _create_cfg_file(dirpath_root = tmp_path,
                             cfg_data     = dict_of_strings,
                             ext          = 'yaml',
@@ -132,6 +136,7 @@ def filepath_cfg_json(tmp_path, dict_of_strings):
     Return the file path to a mock config file as a string.
 
     """
+
     return _create_cfg_file(dirpath_root = tmp_path,
                             cfg_data     = dict_of_strings,
                             ext          = 'json',
@@ -145,6 +150,7 @@ def filepath_cfg_xml(tmp_path, dict_of_strings):
     Return the file path to a mock config file as a string.
 
     """
+
     return _create_cfg_file(dirpath_root = tmp_path,
                             cfg_data     = dict_of_strings,
                             ext          = 'xml',
@@ -158,6 +164,7 @@ def dirpath_cfg_yaml(tmp_path, dict_of_strings):
     Return the directory path of a mock config directory as a string.
 
     """
+
     return _create_cfg_dir(dirpath_root = tmp_path,
                            cfg_data     = dict_of_strings,
                            ext          = 'yaml',
@@ -171,6 +178,7 @@ def dirpath_cfg_json(tmp_path, dict_of_strings):
     Return the directory path of a mock config directory as a string.
 
     """
+
     return _create_cfg_dir(dirpath_root = tmp_path,
                            cfg_data     = dict_of_strings,
                            ext          = 'json',
@@ -184,6 +192,7 @@ def dirpath_cfg_xml(tmp_path, dict_of_strings):
     Return the directory path of a mock config directory as a string.
 
     """
+
     return _create_cfg_dir(dirpath_root = tmp_path,
                            cfg_data     = dict_of_strings,
                            ext          = 'xml',
@@ -196,6 +205,7 @@ def _create_cfg_file(dirpath_root, cfg_data, ext, dumper):
     Create sample configuration as a single config file.
 
     """
+
     filename     = 'test.cfg.{ext}'.format(ext = ext)
     dirpath_cfg  = dirpath_root / 'cfg'
     filepath_cfg = dirpath_cfg / filename
@@ -210,6 +220,7 @@ def _create_cfg_dir(dirpath_root, cfg_data, ext, dumper):
     Create sample configuration as a directory of separate config files.
 
     """
+
     dirpath_cfg = dirpath_root / 'cfg'
     dirpath_cfg.mkdir()
     for key in cfg_data.keys():
@@ -225,6 +236,7 @@ def _dump_as_json(data):
     Serialize the specified data structure to a JSON format string.
 
     """
+
     return json.dumps(data)
 
 
@@ -234,6 +246,7 @@ def _dump_as_yaml(data):
     Serialize the specified data structure to a YAML format string.
 
     """
+
     stream_cfg = io.StringIO()
     yaml.dump(data, stream_cfg)
     stream_cfg.seek(0)
@@ -246,4 +259,5 @@ def _dump_as_xml(data):
     Serialize the specified data structure to a XML format string.
 
     """
+
     return xmltodict.unparse({'root': data}, pretty = True)

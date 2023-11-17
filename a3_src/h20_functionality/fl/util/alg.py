@@ -44,6 +44,7 @@ license:
 ...
 """
 
+
 import collections
 import collections.abc
 import inspect
@@ -129,6 +130,7 @@ def walk(obj:            typing.Any,          # pylint: disable=R0912,R0913
     ...
 
     """
+
     # If the object is elemental, it cannot be
     # decomposed, so we must bottom out the
     # recursion and yield the object and its'
@@ -166,6 +168,7 @@ def walk(obj:            typing.Any,          # pylint: disable=R0912,R0913
         return
     memo.add(_id)
 
+    # -------------------------------------------------------------------------
     # If the object is not elemental (i.e. it is
     # an Iterable), then it may be decomposed, so
     # we should recurse down into each component,
@@ -181,7 +184,9 @@ def walk(obj:            typing.Any,          # pylint: disable=R0912,R0913
         iteration function to use.
 
         """
+
         return getattr(mapping, 'items', mapping.items)()
+
     itfcn = mapiter if isinstance(obj, collections.abc.Mapping) else enumerate
 
     for pathpart, component in itfcn(obj):
@@ -355,6 +360,7 @@ def topological_sort(map_forward, map_backward = None):
     order.
 
     """
+
     # If the backward map has not been
     # specified, we can easily build it
     # by inverting the (bijective) forward
@@ -431,6 +437,7 @@ def _nodes_at_count_zero(map_indegree):
     Return the set of id_node with input degree zero.
 
     """
+
     return set(key for (key, count) in map_indegree.items() if count == 0)
 
 
@@ -440,6 +447,7 @@ def _del_items(map_data, set_keys):
     Delete the specified items from the dict.
 
     """
+
     for key in set_keys:
         del map_data[key]
 
@@ -454,6 +462,7 @@ def _list_downstream_neighbors(set_id_node, map_forward):
     nodes.
 
     """
+
     list_neighbors = list()
     for id_node in set_id_node:
         if id_node in map_forward:
@@ -468,6 +477,7 @@ def _ensure_list(key, delim):
     Ensure that key is represented as a list of names.
 
     """
+
     if isinstance(key, str):
         list_str  = key.split(delim)
         list_name = []

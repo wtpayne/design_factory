@@ -12,7 +12,7 @@ description:
     with the command 'pip install --editable'."
 
 id:
-    "8b1e1ff4-8a8a-44fb-92e4-767ceb1a9af2"
+    "991f7514-6da0-4263-ad4a-cb5bc1b4f286"
 
 type:
     dt001_python_script
@@ -46,6 +46,9 @@ license:
 ...
 """
 
+
 import setuptools
+
+
 setuptools.setup(name       = 'h70_bespoke',
                  py_modules = [])

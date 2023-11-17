@@ -22,6 +22,7 @@ def denormalize(cfg):
     Add redundant information to each edge to make it more convenient to use.
 
     """
+
     _denormalize_nodes(cfg)
     set_id_host_remote_owner = _denormalize_edges(cfg)
     _denormalize_hosts(cfg, set_id_host_remote_owner)
@@ -34,6 +35,7 @@ def _denormalize_nodes(cfg):
     Add derived information to each node.
 
     """
+
     for (id_node, cfg_node) in cfg['node'].items():
         id_process = cfg_node['process']
         id_host    = cfg['process'][id_process]['host']
@@ -52,8 +54,10 @@ def _denormalize_edges(cfg):
     Add derived information to each edge.
 
     """
+
     set_id_host_remote_owner = set()
     map_idx_edge = collections.defaultdict(int)
+
     for cfg_edge in cfg['edge']:
 
         (path_src, id_process_src, id_host_src) = _add_src_info(cfg, cfg_edge)
@@ -98,6 +102,7 @@ def _add_src_info(cfg, cfg_edge):
     Add information about the source of each edge.
 
     """
+
     path_src       = cfg_edge['src']
     path_parts_src = path_src.split('.')
     id_node_src    = path_parts_src[0]
@@ -117,6 +122,7 @@ def _add_dst_info(cfg, cfg_edge):
     Add information about the destination of each edge.
 
     """
+
     path_dst       = cfg_edge['dst']
     path_parts_dst = path_dst.split('.')
     id_node_dst    = path_parts_dst[0]
@@ -136,6 +142,7 @@ def _add_host_owner(cfg, cfg_edge):
     Add information about the process host on which the edge owner resides.
 
     """
+
     id_node_owner = cfg_edge['owner']
     id_host_owner = cfg['node'][id_node_owner]['host']
     cfg_edge['id_host_owner'] = id_host_owner
@@ -151,14 +158,15 @@ def _add_ipc_type(cfg_edge,
     Add IPC type information to the edge configuration.
 
     """
-    is_same_process      = (id_process_src == id_process_dst)
-    is_same_host         = (id_host_src == id_host_dst)
-    is_intra_process     = is_same_host and is_same_process
-    is_inter_process     = is_same_host and (not is_same_process)
-    is_inter_host        = (not is_same_host) and (not is_same_process)
-    ipc_type             = _ipc_type(is_intra_process,
-                                     is_inter_process,
-                                     is_inter_host)
+
+    is_same_process  = (id_process_src == id_process_dst)
+    is_same_host     = (id_host_src == id_host_dst)
+    is_intra_process = is_same_host and is_same_process
+    is_inter_process = is_same_host and (not is_same_process)
+    is_inter_host    = (not is_same_host) and (not is_same_process)
+    ipc_type         = _ipc_type(is_intra_process,
+                                 is_inter_process,
+                                 is_inter_host)
     cfg_edge['ipc_type'] = ipc_type
 
     return is_inter_host
@@ -170,6 +178,7 @@ def _denormalize_hosts(cfg, set_id_host_remote_owner):
     Add derived information to each host.
 
     """
+
     for (id_host, cfg_host) in cfg['host'].items():
         cfg_host['is_inter_host_edge_owner'] = (
                                         id_host in set_id_host_remote_owner)
@@ -181,6 +190,7 @@ def _ipc_type(is_intra_process, is_inter_process, is_inter_host):
     Return ipc_type as a string.
 
     """
+
     if is_intra_process:
         ipc_type = 'intra_process'
     elif is_inter_process:

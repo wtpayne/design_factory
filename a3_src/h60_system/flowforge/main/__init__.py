@@ -61,6 +61,7 @@ import fl.util
 import pl.stableview
 import pl.stableflow.sys
 
+
 # -----------------------------------------------------------------------------
 def coro(ctx):
     """
@@ -93,6 +94,7 @@ def coro(ctx):
 def _configure_recent_files_list(ctx):
     """
     """
+
     ctx.store.rule(cond = fl.rule.is_root_in(('store', 'recent_files')),
                    act  = _update_recent_files_menu)
 
@@ -125,6 +127,7 @@ def _configure_recent_files_list(ctx):
 def _load_most_recent_file(ctx):
     """
     """
+
     if len(ctx.store.recent_files) >= 1:
         (_, filepath) = ctx.store.recent_files[0]
 
@@ -155,6 +158,7 @@ def _add_to_recent_files(ctx, filepath, max_length = 8):
 def _update_recent_files_menu(ctx, tup_cmd):
     """
     """
+
     with ctx.batch_context():
 
         # Clear old items.
@@ -178,6 +182,7 @@ def _update_recent_files_menu(ctx, tup_cmd):
 def _open_specific_file(sender, app_data, ctx):
     """
     """
+
     code_sender = sender.split('.')[-1]
     for (code, filepath) in ctx.store.recent_files:
         if code == code_sender:
@@ -295,7 +300,6 @@ def _update_from_application_model(ctx, tup_cmd):
             edge._cfg = map_edge[id_edge]
 
 
-
 # -----------------------------------------------------------------------------
 def mouseright(sender, app_data, ctx):
     """
@@ -338,6 +342,7 @@ def resize(sender, app_data, ctx):
     Handle window resize events.
 
     """
+
     rect_win = ctx.ui.get_item_rect_size('view.vp.win')
     rect_btn = ctx.ui.get_item_rect_size('view.vp.win.toolbar.grp_btn')
 
@@ -647,7 +652,6 @@ def ctx_node_cancel(sender, app_data, ctx):
 # -----------------------------------------------------------------------------
 def node_link(sender, app_data):
     """
-
     """
 
     print('LINK CALLBACK')
@@ -661,7 +665,6 @@ def node_delink(sender, app_data):
 
     print('DELINK CALLBACK')
     # ctx.ui.delete_item(app_data)
-
 
 
 # -----------------------------------------------------------------------------
@@ -751,4 +754,3 @@ def keypress(sender, app_data, ctx):
 
         if app_data == ctx.ui.mvKey_Escape:
             _close_all_open_dialogs_and_windows(ctx)
-

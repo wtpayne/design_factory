@@ -4,7 +4,9 @@ Functional specification for fl.ui.gradio.nlp.simple
 
 """
 
+
 import pytest
+
 
 # =============================================================================
 class SpecifyFlUiGradioText:
@@ -20,4 +22,5 @@ class SpecifyFlUiGradioText:
         fl.ui.gradio.nlp.simple can be imported.
 
         """
+
         import fl.ui.gradio.nlp.simple

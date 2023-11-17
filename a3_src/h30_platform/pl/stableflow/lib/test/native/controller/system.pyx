@@ -54,6 +54,7 @@ def step(inputs, state, outputs):
     Send a control message with timestamps and mode flags.
 
     """
+
     (time_us, load_rel) = _execution_rate_control(inputs, state)
     (do_halt, retval)   = _halt_signal_control(inputs, state, time_us)
     (id_year, id_day, id_hour, id_min, id_sec) = _temporal_aggregation_codes()
@@ -174,6 +175,7 @@ def _temporal_aggregation_codes():
     Return temporal aggregation codes.
 
     """
+
     gmt     = time.gmtime()
     id_year = gmt.tm_year
     id_day  = (id_year * 1000) + gmt.tm_yday
@@ -190,6 +192,7 @@ def _time_target_us(state, is_fixed_rate):
     Return the target execution time in us.
 
     """
+
     if is_fixed_rate:
         return state['time_start_us'] + (state['idx'] * state['period_us'])
     else:
@@ -202,6 +205,7 @@ def _time_us():
     Return the current time in milliseconds.
 
     """
+
     time_secs = time.monotonic()
     time_us   = _int_microseconds(time_secs)
 
@@ -214,6 +218,7 @@ def _float_seconds(num_us):
     Convert integer microseconds to floating point seconds.
 
     """
+
     us_per_second = 1000000
     num_secs      = float(num_us) / float(us_per_second)
 
@@ -226,6 +231,7 @@ def _int_microseconds(num_secs):
     Convert floating point seconds to integer microseconds.
 
     """
+
     us_per_second = 1000000
     num_us        = int(num_secs * us_per_second)
 

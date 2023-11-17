@@ -19,3 +19,5 @@ class CfgError(Exception):
     Base class for custom exceptions used for stableflow configuration errors.
 
     """
+
+    pass

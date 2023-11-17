@@ -18,6 +18,7 @@ class SpecifySerialize:
         Serialize returns a python string.
 
         """
+
         import pl.stableflow.util.serialization  # pylint: disable=C0415
 
         original = {'a': 1, 'b': 2, 'c': 3}
@@ -30,7 +31,8 @@ class SpecifySerialize:
         Serialize returns a python string encoded as base64.
 
         """
-        import re                         # pylint: disable=C0415
+
+        import re                                # pylint: disable=C0415
         import pl.stableflow.util.serialization  # pylint: disable=C0415
 
         original = {'a': 1, 'b': 2, 'c': 3}
@@ -44,6 +46,7 @@ class SpecifySerialize:
         Serialize compresses data.
 
         """
+
         import pl.stableflow.util.serialization  # pylint: disable=C0415
 
         original = {
@@ -68,6 +71,7 @@ class SpecifyDeserialize:
         Deserialize returns a python dict.
 
         """
+
         import pl.stableflow.util.serialization  # pylint: disable=C0415
 
         encoded = 'eNpLtFIw5EqyUjDiSrZSMOYCABljAuk='
@@ -80,6 +84,7 @@ class SpecifyDeserialize:
         Serialize and deserialize can do a lossless round trip.
 
         """
+
         import pl.stableflow.util.serialization  # pylint: disable=C0415
 
         original = {'a': 1, 'b': 2, 'c': 3}

@@ -72,8 +72,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # FUNCTIONALITY .........
         result = coro.send (prompt)
 
-
-
         outputs['text']['ena'] = True
         outputs['text']['list'] = list()
         outputs['text']['list'].append('foo')

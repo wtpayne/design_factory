@@ -28,4 +28,5 @@ class SpecifyClUiGradioNlpSimpleIc00_edict:
         cl.net.openai.client.ic00_edict can be imported.
 
         """
+
         import cl.ui.gradio.nlp.simple.ic00_edict

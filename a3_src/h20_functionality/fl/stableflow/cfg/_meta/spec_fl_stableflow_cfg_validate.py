@@ -22,6 +22,7 @@ class SpecifyNormalized:
         Check normalized does not throw when given valid data.
 
         """
+
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
 
         fl.stableflow.cfg.validate.normalized(valid_normalized_config)
@@ -33,6 +34,7 @@ class SpecifyNormalized:
         Check normalized raises an exception when given invalid data.
 
         """
+
         import fl.stableflow.cfg.exception  # pylint: disable=C0415
         import fl.stableflow.cfg.validate   # pylint: disable=C0415
 
@@ -54,6 +56,7 @@ class SpecifyDenormalized:
         Check normalized does not throw when given valid data.
 
         """
+
         import fl.stableflow.cfg           # pylint: disable=C0415
         import fl.stableflow.cfg.validate  # pylint: disable=C0415
 
@@ -68,6 +71,7 @@ class SpecifyDenormalized:
         Check normalized raises an exception when given invalid data.
 
         """
+
         import fl.stableflow.cfg.exception  # pylint: disable=C0415
         import fl.stableflow.cfg.validate   # pylint: disable=C0415
 

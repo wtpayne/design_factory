@@ -11,6 +11,7 @@ def apply(data, address, value, delim_cfg_addr = '.'):
     Apply a single configuration field override on the specified path.
 
     """
+
     addr_parts = address.split(delim_cfg_addr)
     subtree    = data
 
@@ -36,6 +37,7 @@ class SubstitutionTable():  # pylint: disable=R0903
         Construct a SubstitutionTable instance with the specified LUT.
 
         """
+
         self._lut = lut
 
     # -------------------------------------------------------------------------
@@ -44,6 +46,7 @@ class SubstitutionTable():  # pylint: disable=R0903
         Return self._lut[key] if key in self._lut else key.
 
         """
+
         try:
             return self._lut[key] if key in self._lut else key
         except TypeError:

@@ -22,6 +22,7 @@ class SpecifyApply:
         Check apply can be used to modify nested struct fields.
 
         """
+
         import fl.stableflow.cfg.util  # pylint: disable=C0415
 
         data = {'a': {'b': 1}}
@@ -35,6 +36,7 @@ class SpecifyApply:
         Check apply can be used to modify nested struct fields.
 
         """
+
         import fl.stableflow.cfg.util  # pylint: disable=C0415
 
         data = {'a': {'b': 1}}

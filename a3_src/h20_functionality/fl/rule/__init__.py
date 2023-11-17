@@ -56,7 +56,9 @@ def always():
         Return True.
 
         """
+
         return True
+
     return _indicator
 
 
@@ -72,7 +74,9 @@ def never():
         Return False.
 
         """
+
         return False
+
     return _indicator
 
 
@@ -88,7 +92,9 @@ def is_not(fcn):
         Return the negation of the specified indicator.
 
         """
+
         return not fcn(cmd)
+
     return _indicator
 
 
@@ -104,7 +110,9 @@ def is_root_in(tup_path_root):
         Return True iff cmd.path is rooted in the specified location.
 
         """
+
         return cmd.path[:len(tup_path_root)] == tup_path_root
+
     return _indicator
 
 
@@ -120,7 +128,9 @@ def is_leaf_at(tup_path_leaf):
         Return True iff cmd.path is leafed at the specified location.
 
         """
+
         return cmd.path[-len(tup_path_leaf):] == tup_path_leaf
+
     return _indicator
 
 
@@ -136,5 +146,7 @@ def is_operation(operation):
         Return True iff cmd.path is leafed at the specified location.
 
         """
+
         return cmd.operation == operation
+
     return _indicator

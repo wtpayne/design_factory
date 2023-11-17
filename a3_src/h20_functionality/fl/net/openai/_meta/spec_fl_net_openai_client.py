@@ -45,7 +45,9 @@ def testvector_completions_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'completions'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -122,7 +124,9 @@ def testvector_chat_completions_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'chat_completions'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -200,7 +204,9 @@ def testvector_edits_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint      = 'edits'
     uid_workflow     = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template     = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -280,7 +286,9 @@ def testvector_images_generations_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'images_generations'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -354,7 +362,9 @@ def testvector_images_edits_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'images_edits'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -430,7 +440,9 @@ def testvector_images_variations_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'images_variations'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -503,7 +515,9 @@ def testvector_embeddings_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint   = 'embeddings'
     uid_workflow  = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template  = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -580,7 +594,9 @@ def testvector_audio_transcriptions_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint     = 'audio_transcriptions'
     uid_workflow    = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template    = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -660,7 +676,9 @@ def testvector_audio_translations_valid_bit():
     actual call to the OpenAI server is made.
 
     """
+
     import fl.net.openai.client
+
     id_endpoint     = 'audio_translations'
     uid_workflow    = 'e6150ce3-8ebc-4553-9a9a-b1ebdc038f7e'
     uid_template    = 'e2cb431c-a709-4e7e-a9d1-dfb51d8dc4e2'
@@ -737,6 +755,7 @@ def testrunner_coro_request_handler_singleshot():
     Return a single-shot test runner fixture for coro_request_handler.
 
     """
+
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
                                list_list_input,
@@ -746,7 +765,9 @@ def testrunner_coro_request_handler_singleshot():
         Run the openAI client and wait for the first set of responses.
 
         """
+
         import fl.net.openai.client
+
         unix_time = 0
         client    = fl.net.openai.client.coro_request_handler(cfg = cfg)
 
@@ -775,6 +796,7 @@ def testrunner_coro_template_handler_singleshot():
     Return a single-shot test runner fixture for coro_template_handler.
 
     """
+
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
                                list_list_input,
@@ -784,7 +806,9 @@ def testrunner_coro_template_handler_singleshot():
         Run the openAI client and wait for the first set of responses.
 
         """
+
         import fl.net.openai.client
+
         unix_time        = 0
         request_handler  = fl.net.openai.client.coro_request_handler(
                                             cfg              = cfg)
@@ -817,6 +841,7 @@ def testrunner_coro_workflow_handler_singleshot():
     Return a single-shot test runner fixture for coro_workflow_handler.
 
     """
+
     # -------------------------------------------------------------------------
     def _get_result_singleshot(cfg,
                                list_list_input,
@@ -826,7 +851,9 @@ def testrunner_coro_workflow_handler_singleshot():
         Run the openAI client and wait for the first set of responses.
 
         """
+
         import fl.net.openai.client
+
         unix_time        = 0
         request_handler  = fl.net.openai.client.coro_request_handler(
                                         cfg              = cfg)
@@ -871,6 +898,7 @@ class SpecifyFlNetOpenAiClient:
         fl.net.openai.client can be imported.
 
         """
+
         import fl.net.openai.client
 
     # -------------------------------------------------------------------------
@@ -883,7 +911,9 @@ class SpecifyFlNetOpenAiClient:
         fl.net.openai.client coro_request_handler() can be created.
 
         """
+
         import fl.net.openai.client
+
         tup_valid       = testvector_completions_valid_bit
         cfg_valid       = tup_valid[0]
         request_handler = fl.net.openai.client.coro_request_handler(
@@ -900,7 +930,9 @@ class SpecifyFlNetOpenAiClient:
         fl.net.openai.client coro_template_handler() can be created.
 
         """
+
         import fl.net.openai.client
+
         tup_valid        = testvector_completions_valid_bit
         cfg_valid        = tup_valid[0]
         request_handler  = fl.net.openai.client.coro_request_handler(
@@ -920,7 +952,9 @@ class SpecifyFlNetOpenAiClient:
         fl.net.openai.client coro_workflow_handler() can be created.
 
         """
+
         import fl.net.openai.client
+
         tup_valid        = testvector_completions_valid_bit
         cfg_valid        = tup_valid[0]
         request_handler  = fl.net.openai.client.coro_request_handler(
@@ -942,7 +976,9 @@ class SpecifyFlNetOpenAiClient:
         All fl.net.openai.client.coro_request_handler validates config.
 
         """
+
         import fl.net.openai.client
+
         with pytest.raises(RuntimeError):
             fl.net.openai.client.coro_request_handler(cfg = {})
 
@@ -959,6 +995,7 @@ class SpecifyFlNetOpenAiClient:
         When valid completions input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -973,6 +1010,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -982,6 +1020,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -991,6 +1030,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1006,6 +1046,7 @@ class SpecifyFlNetOpenAiClient:
         When valid chat_completions input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1020,6 +1061,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1029,6 +1071,8 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1038,6 +1082,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1053,6 +1098,7 @@ class SpecifyFlNetOpenAiClient:
         When valid edits input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1067,6 +1113,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1076,6 +1123,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1085,6 +1133,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1100,6 +1149,7 @@ class SpecifyFlNetOpenAiClient:
         When valid images_generations input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1114,6 +1164,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1123,6 +1174,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1132,6 +1184,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1147,6 +1200,7 @@ class SpecifyFlNetOpenAiClient:
         When valid images_edits input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1161,6 +1215,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1170,6 +1225,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1179,6 +1235,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1194,6 +1251,7 @@ class SpecifyFlNetOpenAiClient:
         When valid images_variations input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1208,6 +1266,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1217,6 +1276,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1226,6 +1286,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1241,6 +1302,7 @@ class SpecifyFlNetOpenAiClient:
         When valid embeddings input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1255,6 +1317,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1264,6 +1327,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1273,6 +1337,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1288,6 +1353,7 @@ class SpecifyFlNetOpenAiClient:
         When valid audio_transcriptions input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1302,6 +1368,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1311,6 +1378,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1320,6 +1388,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected
 
     # -------------------------------------------------------------------------
@@ -1335,6 +1404,7 @@ class SpecifyFlNetOpenAiClient:
         When valid audio_translations input sent, valid bit output yielded.
 
         """
+
         (cfg_valid,
          workflow_valid,
          template_valid,
@@ -1349,6 +1419,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_1 = testrunner_coro_request_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[request_valid]])
+
         assert list_output_1 == list_output_expected
 
         # Check that the mid-level string and
@@ -1358,6 +1429,7 @@ class SpecifyFlNetOpenAiClient:
         list_output_2 = testrunner_coro_template_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[template_valid, param_valid]])
+
         assert list_output_2 == list_output_expected
 
         # Check that the high-level workflow
@@ -1367,4 +1439,5 @@ class SpecifyFlNetOpenAiClient:
         list_output_3 = testrunner_coro_workflow_handler_singleshot(
                             cfg             = cfg_valid,
                             list_list_input = [[workflow_valid, param_valid]])
+
         assert list_output_3 == list_output_expected

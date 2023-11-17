@@ -178,6 +178,7 @@ def serialize(map_data, str_format):
                toml   = serialize_to_toml_string,
                yaml   = serialize_to_yaml_string,
                yml    = serialize_to_yaml_string)
+
     return lut[str_format](map_data)
 
 
@@ -195,6 +196,7 @@ def deserialize(str_data, str_format):
                toml   = deserialize_from_toml_string,
                yaml   = deserialize_from_yaml_string,
                yml    = deserialize_from_yaml_string)
+
     return lut[str_format](str_data)
 
 
@@ -520,5 +522,3 @@ def deserialize_from_yaml_string(str_yaml):
             map_error['idx_col']  = mark.column
 
     return (map_data, map_error)
-
-

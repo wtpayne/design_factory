@@ -28,6 +28,7 @@ class Node():  # pylint: disable=R0902
         Return an instance of a Node object.
 
         """
+
         # Create our own copy of the runtime.
         self.runtime = {'id': {}, 'proc': {}}
         self.runtime['id'].update(runtime['id'])
@@ -57,6 +58,7 @@ class Node():  # pylint: disable=R0902
         Reset or zeroize node data structures.
 
         """
+
         iter_signal = _call_reset(
                 id_node   = self.id_node,
                 fcn_reset = self.fcn_reset,
@@ -81,6 +83,7 @@ class Node():  # pylint: disable=R0902
         Step node logic.
 
         """
+
         _dequeue_inputs(
                     input_queues = self.input_queues,
                     input_memory = self.inputs)
@@ -105,6 +108,7 @@ class Node():  # pylint: disable=R0902
         Finalize node logic.
 
         """
+
         iter_signal = _call_finalize(
                 id_node      = self.id_node,
                 fcn_finalize = self.fcn_finalize,
@@ -123,6 +127,7 @@ def _load_functionality(cfg_func):
     Return a tuple containing the reset and step functions.
 
     """
+
     fcn_reset    = None
     fcn_step     = None
     fcn_finalize = None
@@ -156,6 +161,7 @@ def _load_from_module(spec_module):
     Try to import the specified module.
 
     """
+
     module = pl.stableflow.proc.ensure_imported(spec_module)  # throws
 
     if _is_step(map_func = module.__dict__):
@@ -182,6 +188,7 @@ def _load_serialized(spec, unpacker):
     Load functionality from serialized objects.
 
     """
+
     if _is_step(map_func = spec):
         fcn_reset    = unpacker(spec['reset'])
         fcn_step     = unpacker(spec['step'])
@@ -206,6 +213,7 @@ def _is_step(map_func):
     Return true iff map_func has a reset and step function defined.
 
     """
+
     is_coro = 'coro'  in map_func
     is_step = 'reset' in map_func and 'step' in map_func
     assert is_coro or is_step
@@ -218,6 +226,7 @@ def _has_finalize(map_func):
     Return true iff map_func has a finalize function defined.
 
     """
+
     has_finalize = 'finalize' in map_func
     return has_finalize
 
@@ -228,6 +237,7 @@ def _coro_reset(coro, runtime, config, inputs, state, outputs):
     Create the coroutine and run it to the first yield point.
 
     """
+
     state['__stableflow_coro__'] = coro(runtime, config, inputs, state, outputs)
     (outputs, signal) = state['__stableflow_coro__'].send(None)
     return signal
@@ -239,6 +249,7 @@ def _coro_step(inputs, state, outputs):
     Single step the coroutine, running it to the next yield point.
 
     """
+
     try:
         (outputs, signal) = state['__stableflow_coro__'].send(inputs)
         return signal
@@ -256,6 +267,7 @@ def _call_reset(id_node, fcn_reset, runtime, config, inputs, state, outputs):
     can return/throw a control signal.
 
     """
+
     if fcn_reset is None:
         return (pl.stableflow.signal.continue_ok,)
 
@@ -278,6 +290,7 @@ def _prime_feedback(id_node, inputs, input_queues, outputs, output_queues):
     Prime all owned feedback input and output queues with one message.
 
     """
+
     for (path, queue) in output_queues.items():
         if queue.owner == id_node and queue.direction == 'feedback':
             item = _get_ref(outputs, path)
@@ -299,6 +312,7 @@ def _call_step(id_node, fcn_step, inputs, state, outputs):
     can return/throw a control signal.
 
     """
+
     if fcn_step is None:
         return (pl.stableflow.signal.continue_ok,)
 
@@ -326,6 +340,7 @@ def _call_finalize(
     can return/throw a control signal.
 
     """
+
     if fcn_finalize is None:
         return (pl.stableflow.signal.continue_ok,)
 
@@ -354,6 +369,7 @@ def _dequeue_inputs(input_queues, input_memory):
     other.
 
     """
+
     for (path, queue) in input_queues.items():
         item = queue.blocking_read()
         _put_ref(input_memory, path, item)
@@ -371,6 +387,7 @@ def _enqueue_outputs(output_queues, output_memory):
     other.
 
     """
+
     for (path, queue) in output_queues.items():
         item = _get_ref(output_memory, path)
         queue.non_blocking_write(item)
@@ -382,6 +399,7 @@ def _put_ref(ref, path, item):
     Make the specified node and path point to the specified memory.
 
     """
+
     for name in path[:-1]:
         ref = ref[name]
 
@@ -397,6 +415,7 @@ def _get_ref(ref, path):
     Get a reference to the value that path refers to.
 
     """
+
     for name in path:
         ref = ref[name]
     return ref

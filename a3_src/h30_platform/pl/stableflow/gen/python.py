@@ -27,6 +27,7 @@ def map_allocator(cfg_data):
     in the cfg_data data dictionary.
 
     """
+
     map_alloc = _map_function(cfg_data, _allocator)
     map_alloc[None] = dict
     return map_alloc
@@ -42,6 +43,7 @@ def map_initializer(cfg_data):
     clean initial state.
 
     """
+
     return _map_function(cfg_data, _initializer)
 
 
@@ -58,6 +60,7 @@ def map_validator(cfg_data):
     to detect some simple bugs.
 
     """
+
     return _map_function(cfg_data, _validator)
 
 
@@ -76,6 +79,7 @@ def _map_function(cfg_data, _get_function):
     from the cfg_data.
 
     """
+
     map_function = dict()
     for (id_type, list_node) in cfg_data.items():
         map_function[id_type] = _get_function(id_type, list_node)
@@ -88,6 +92,7 @@ def _allocator(id_type, list_node):
     Return an allocator function for the specified type.
 
     """
+
     prototype = _make_prototype_instance(id_type, list_node)
     return lambda: copy.copy(getattr(prototype, 'data', prototype))
 
@@ -98,6 +103,7 @@ def _make_prototype_instance(id_type, list_node):  # pylint: disable=W0613
     Return a prototype data instance for the specified type.
 
     """
+
     blacklist = set(('compound_type',
                      'compound_type_scope_closer'))
 
@@ -141,6 +147,7 @@ def _initializer(id_type, list_node):  # pylint: disable=W0613
     Return an initializer function for the specified type.
 
     """
+
     default_initializer_list = _get_initializers_for_all_nodes(list_node)
 
     # -------------------------------------------------------------------------
@@ -165,6 +172,7 @@ def _get_initializers_for_all_nodes(list_node):
     Return a list of initializer functions, one for each node in the list.
 
     """
+
     blacklist = set(('compound_type',
                      'compound_type_scope_closer'))
 
@@ -181,6 +189,7 @@ def _get_initializer_for_one_node(node):
     Return an initializer function for the specified node.
 
     """
+
     path  = node['dst_path']
     dtype = numpy.dtype(node['typeinfo']['id'])
     value = dtype.type(node['preset'])
@@ -214,6 +223,7 @@ def _validator(id_type, list_node):  # pylint: disable=W0613
     Return a validator function for the specified type.
 
     """
+
     # blacklist = set(('compound_type',
     #                  'compound_type_scope_closer'))
 

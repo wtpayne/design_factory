@@ -79,6 +79,7 @@ def gen_list_fileinfo(iter_dirpath_root,
     Yield a sequence of file information lists matching the specified criteria.
 
     """
+
     build_fileinfo = functools.partial(
                         _build_fileinfo,
                         regex_read_as_txt = _combine_regex(iter_read_as_txt),
@@ -102,6 +103,7 @@ def _build_fileinfo(filepath, regex_read_as_txt, regex_read_as_bin):
     Return a file info structure that corresponds to the specified filepath.
 
     """
+
     fileinfo = dict()
     fileinfo['filepath']           = filepath
     fileinfo['list_nonconformity'] = list()
@@ -121,6 +123,7 @@ def _load_as_text(fileinfo):
     Update fileinfo with text data loaded from disk.
 
     """
+
     filepath     = fileinfo['filepath']
     bytes_buffer = None
 
@@ -167,6 +170,7 @@ def _load_as_binary(fileinfo):
     Update fileinfo with binary data loaded from disk.
 
     """
+
     with open(fileinfo['filepath'], 'rb') as file:
 
         try:
@@ -196,6 +200,7 @@ def _combine_regex(iter_regex = None, op = '|'):
     returned.
 
     """
+
     if not iter_regex:
         return re.compile('(?!x)x')  # Will never match anything
 
@@ -203,6 +208,7 @@ def _combine_regex(iter_regex = None, op = '|'):
     str_inner = str_delim.join(iter_regex)
     str_regex = '({inner})'.format(inner = str_inner)
     obj_regex = re.compile(str_regex)
+
     return obj_regex
 
 
@@ -230,6 +236,7 @@ def _gen_list_filepath(iter_dirpath_root,
     the specified size_batch parameter.
 
     """
+
     # gen_filepath_mod either yields
     # modified files or repeatedly
     # yields None if no modified
@@ -352,7 +359,9 @@ def _generate_filepath_all(do_output_all,
     logic in that top-level function.
 
     """
+
     if do_output_all:
+
         while True:
             for filepath in _generate_filepath_all_once(
                                          iter_dirpath_root = iter_dirpath_root,
@@ -382,6 +391,7 @@ def _generate_filepath_all_once(iter_dirpath_root,
     Yield paths of matching files from the list of roots, stopping when done.
 
     """
+
     list_generator = list()
     for dirpath_root in iter_dirpath_root:
         list_generator.append(
@@ -403,6 +413,7 @@ def _filtered_filepath_generator(dirpath_root,
     Yield each matching file in the directory tree under dirpath_src.
 
     """
+
     re_pathincl = _combine_regex(iter_regex = iter_pathincl, op = '|')
     re_pathexcl = _combine_regex(iter_regex = iter_pathexcl, op = '|')
     re_direxcl  = _combine_regex(iter_regex = iter_direxcl,  op = '|')
@@ -447,6 +458,7 @@ def _generate_filepath_modified(do_output_modified,
     Yield filepaths of recently modified matching files.
 
     """
+
     if not do_output_modified:
         return itertools.repeat(None)
 
@@ -501,6 +513,7 @@ def _list_tup_observer_handler(iter_dirpath_root):
     Return a list of change-observer, change-handler tuple pairs.
 
     """
+
     list_tup_observer_handler = list()
     for dirpath_root in iter_dirpath_root:
         observer  = watchdog.observers.Observer()
@@ -519,6 +532,7 @@ def _modified_files(handler):
     Return a list of modified files from the specified event handler.
 
     """
+
     list_filepath  = list()
     list_tup_event = handler.get()
     for tup_event in list_tup_event:
@@ -555,6 +569,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Construct a EventEnqueueingHandler instance.
 
         """
+
         super(EventEnqueueingHandler, self).__init__()
         self.queue = multiprocessing.Queue()
 
@@ -565,6 +580,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Dispatch watchdog.events.FileMovedEvent events.
 
         """
+
         super(EventEnqueueingHandler, self).on_moved(event)
         self._enqueue(event)
 
@@ -574,6 +590,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Dispatch watchdog.events.FileCreatedEvent events.
 
         """
+
         super(EventEnqueueingHandler, self).on_created(event)
         self._enqueue(event)
 
@@ -583,6 +600,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Dispatch watchdog.events.FileDeletedEvent events.
 
         """
+
         super(EventEnqueueingHandler, self).on_deleted(event)
         self._enqueue(event)
 
@@ -592,6 +610,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Dispatch watchdog.events.FileModifiedEvent events.
 
         """
+
         super(EventEnqueueingHandler, self).on_modified(event)
         self._enqueue(event)
 
@@ -601,6 +620,7 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Add the specified event to the queue.
 
         """
+
         path_src = None
         path_dst = None
         is_dir   = False
@@ -629,11 +649,15 @@ class EventEnqueueingHandler(watchdog.events.FileSystemEventHandler):
         Get all events currently on the queue.
 
         """
+
         set_tup_event = set()
         while True:
+
             try:
                 set_tup_event.add(self.queue.get(block = False))
             except queue.Empty:
                 break
+
         list_tup_event = list(set_tup_event)
+
         return list_tup_event

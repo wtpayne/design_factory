@@ -157,6 +157,7 @@ def _abstract_grid(map_cfg_denorm):
     Each grid unit corresponds to a single node.
 
     """
+
     list_tranche_global  = fl.util.alg.topological_sort(
                                         *_acyclic_data_flow(
                                                 map_cfg_denorm['edge']))
@@ -198,6 +199,7 @@ def _acyclic_data_flow(iter_cfg_edge, id_process = None):
     downstream nodes to upstream nodes.
 
     """
+
     do_include_all = id_process is None
     map_forward    = collections.defaultdict(set)
     map_backward   = collections.defaultdict(set)
@@ -255,6 +257,7 @@ def _sorted_process_list(map_cfg_denorm, list_tranche_global):
     process ids.
 
     """
+
     # First we get the minimum tranche index
     # for each process (map_idx_tranche_min).
     #
@@ -295,6 +298,7 @@ def _max_tranche_size(map_cfg_denorm, list_tranche_global, list_id_process):
     swimlanes correctly.
 
     """
+
     # Work out how many nodes are in each
     # tranche, broken down by process.
     #
@@ -324,6 +328,7 @@ def _2d_node_indices(map_cfg_denorm, list_tranche_global, map_size_tranche_max):
     Return a map of two dimensional indices, one for each node in the graph.
 
     """
+
     # Grid positioning transverse to
     # swimlane direction. u is the "x"
     # axis with vertical swimlanes, y
@@ -372,6 +377,7 @@ def _2d_process_indices(list_id_process, map_size_tranche_max):
     of the swimlane (in abstract grid units).
 
     """
+
     map_idx_proc = dict()
     idx_u        = 0
     for id_proc in list_id_process:

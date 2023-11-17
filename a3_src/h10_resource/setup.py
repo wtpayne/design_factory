@@ -46,6 +46,9 @@ license:
 ...
 """
 
+
 import setuptools
+
+
 setuptools.setup(name       = 'h10_resource',
                  py_modules = [])
