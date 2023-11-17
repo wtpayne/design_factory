@@ -34,7 +34,22 @@ register:
     type: "virtualenv"
     desc: "Virtualenv for reflex UIs with minimal other dependencies."
 
-  e005_pdf:
-    name: "pdf"
+  e005_ocr_nougat:
+    name: "ocr_nougat"
     type: "virtualenv"
-    desc: "Virtualenv for PDF processing with minimal other dependencies."
+    desc: "Virtualenv for OCR with the nougat library."
+
+  e006_ocr_layoutparser:
+    name: "ocr_layoutparser"
+    type: "virtualenv"
+    desc: "Virtualenv for OCR with the layoutparser library."
+
+  e007_ocr_deepdoctection:
+    name: "ocr_deepdoctection"
+    type: "virtualenv"
+    desc: "Virtualenv for OCR with the deepdoctection library."
+
+  e008_ocr_unstructured:
+    name: "ocr_unstructured"
+    type: "virtualenv"
+    desc: "Virtualenv for OCR with the unstructured library."

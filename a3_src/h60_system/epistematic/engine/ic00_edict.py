@@ -43,11 +43,19 @@ license:
 ...
 """
 
+import contextlib
+import functools
 import io
+import pathlib
+import tempfile
 
-
-import pdf2image.exceptions
-import pdf2image
+import nougat
+import nougat.utils.checkpoint
+import nougat.utils.device
+import numpy
+import pypdfium2
+import torch
+import torchvision.transforms
 
 import fl.util.edict
 
@@ -59,7 +67,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    print('')
+    checkpoint = nougat.utils.checkpoint.get_checkpoint()
+    model      = nougat.NougatModel.from_pretrained(checkpoint)
+    model      = nougat.utils.device.move_to_device(model,
+                                                    bf16 = True,
+                                                    cuda = True)
+    model.eval()
 
     signal = fl.util.edict.init(outputs)
     while True:
@@ -68,46 +81,67 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
         if inputs['fileinfo']['ena']:
             length = len(inputs['fileinfo']['list'])
-            for item in inputs['fileinfo']['list']:
-                filepath    = item['filepath']
-                buffer      = item['bytes']
+            for fileinfo in inputs['fileinfo']['list']:
 
-                try:
-                    list_images = pdf2image.convert_from_path(filepath)
-                    # list_images = pdf2image.convert_from_bytes(buffer)
-                except pdf2image.exceptions.PDFInfoNotInstalledError as err:
-                    print('PDFInfoNotInstalledError')
-                    continue
-                except pdf2image.exceptions.PDFPageCountError as err:
-                    print('PDFPageCountError')
-                    continue
-                except pdf2image.exceptions.PDFSyntaxError as err:
-                    print('PDFSyntaxError')
-                    continue
-                else:
-                    print(len(list_images))
-                    for (idx, image) in enumerate(list_images):
-                        image_path = f"/media/wtp/Data1/tmp//page_{idx}.jpg"
-                        image.save(image_path, 'JPEG')
+                bytes_pdf = fileinfo['bytes']
+                list_page = [page for page in _gen_page_prediction(
+                                                        model     = model,
+                                                        bytes_pdf = bytes_pdf)]
+
+                for page in list_page:
+                    print(page['predictions'][0])
 
 
-                # try:
-                #     elements = unstructured.partition.pdf.partition_pdf(
-                #                             file                  = buffer,
-                #                             include_page_breaks   = True,
-                #                             strategy              = 'ocr_only',
-                #                             infer_table_structure = False,
-                #                             ocr_language          = 'eng',
-                #                             max_partition         = None,
-                #                             include_metadata      = True,
-                #                             metadata_filename     = filepath)
-                # except pdfminer.psparser.PSEOF:
-                #     continue
+# -----------------------------------------------------------------------------
+def _gen_page_prediction(model, bytes_pdf, desired_dpi = 96):
+    """
+    Yield page predictions from the specified PDF file.
 
-                # print(filepath)
-                # for item in elements:
-                #     print('-' * 80)
-                #     print('')
-                #     print(item)
-                #     print('')
+    """
 
+    # Calculate scaling factor.
+    #
+    points_per_inch = 72  # PDF standard unit of length.
+    scaling_factor  = desired_dpi / points_per_inch
+
+    # Yield each page from the PDF in turn.
+    #
+    pdfdoc = pypdfium2.PdfDocument(bytes_pdf)
+    for pil_page in pdfdoc.render(converter   = pypdfium2.PdfBitmap.to_pil,
+                                  n_processes = 1,
+                                  scale       = scaling_factor):
+
+        # Carry out model-specific data prep
+        # on pil_page (a PIL image in RGB order),
+        # giving us a 3D pytorch tensor with
+        # dimensions color (RBG), height then
+        # width.
+        #
+        tensor3_page = model.encoder.prepare_input(pil_page,
+                                                   random_padding = False)
+
+        # The model expects a four dimensional
+        # tensor, with the initial dimension
+        # containing the batch size. Here we
+        # have a batch size of 1, but we still
+        # need the page tensor to be in the right
+        # shape for the model to work.
+        #
+        tensor4_page = torch.utils.data.dataloader.default_collate(
+                                                            [tensor3_page,])
+
+        # Run inference using the model.
+        # This returns a dict with the following
+        # fields:
+        #
+        # {
+        #   'predictions': list(),
+        #   'sequences':   list(),
+        #   'repeats':     list(),
+        #   'repetitions': list()
+        # }
+        #
+        map_results = model.inference(image_tensors  = tensor4_page,
+                                      early_stopping = False)
+
+        yield map_results

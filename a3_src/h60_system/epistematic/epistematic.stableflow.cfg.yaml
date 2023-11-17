@@ -11,7 +11,7 @@ host:
     port_range:             '8080-8199'
     dirpath_log:            ''
     launch_cmd:             ''
-    environment:            'e005_pdf'
+    environment:            'e005_ocr_nougat'
     log_level:              'INFO'
 
 
