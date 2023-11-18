@@ -3,13 +3,13 @@
 ---
 
 title:
-    "Epestematic engine stableflow-edict component."
+    "Epistematic data persistence stableflow-edict component."
 
 description:
-    "Epestematic engine component."
+    "Epistematic data persistence component."
 
 id:
-    "f1116747-c179-4b70-9963-6f873160268b"
+    "5199ed68-0c42-4ab2-a656-e2ed391fb18f"
 
 type:
     dt004_python_stableflow_edict_component
@@ -50,7 +50,7 @@ import fl.util.edict
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Epestematic engine component coroutine.
+    Epistematic data persistence component coroutine.
 
     """
 
@@ -58,7 +58,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     tup_key_out     = tuple(outputs.keys())
     tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
     tup_key_msg_out = tuple((k for k in tup_key_out))
-    list_processed  = list()
+    list_fileinfo   = list()
     timestamp       = dict()
 
     signal = fl.util.edict.init(outputs)
@@ -72,14 +72,24 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
+        # Process inputs
+        #
         for str_key in tup_key_msg_in:
-
             if not inputs[str_key]['ena']:
                 continue
+            list_fileinfo.clear()
+            list_fileinfo.extend(inputs[str_key]['list'])
 
-            for fileinfo in inputs[str_key]['list']:
+        # Store in database
+        #
+        pass
 
-                print(fileinfo['mmd'])
+        # Retrieve from database
+        #
+        pass
 
-
-
+        if list_fileinfo:
+            for id_out in outputs.keys():
+                outputs[id_out]['ena'] = True
+                outputs[id_out]['ts'].update(timestamp)
+                outputs[id_out]['list'][:] = list_fileinfo

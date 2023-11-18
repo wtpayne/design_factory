@@ -71,19 +71,21 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 do_output_modified     = cfg.get('output_modified',     False),
                 do_terminate_when_done = cfg.get('terminate_when_done', False))
 
+    timestamp     = dict()
+    list_fileinfo = list()
+
     signal = fl.util.edict.init(outputs)
     while True:
-
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
 
         if not inputs['ctrl']['ena']:
             continue
+        timestamp.update(inputs['ctrl']['ts'])
 
-        timestamp = inputs['ctrl']['ts']
-        list_fileinfo = list()
+        list_fileinfo.clear()
         try:
-            list_fileinfo = next(gen_list_fileinfo)
+            list_fileinfo.extend(next(gen_list_fileinfo))
         except StopIteration:
             signal = (pl.stableflow.signal.exit_ok_controlled,)
 

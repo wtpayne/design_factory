@@ -100,6 +100,17 @@ node:
     state_type:             py_dict
 
   # ---------------------------------------------------------------------------
+  # Persist OCR output in a database.
+  #
+  persist:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            epistematic.persist.ic00_edict
+    state_type:             py_dict
+
+
+  # ---------------------------------------------------------------------------
   # Epistematic engine.
   #
   engine:
@@ -137,6 +148,11 @@ edge:
 
   - owner: ctrl_main
     data:  py_dict
+    src:   ctrl_main.outputs.persist
+    dst:   persist.inputs.ctrl
+
+  - owner: ctrl_main
+    data:  py_dict
     src:   ctrl_main.outputs.engine
     dst:   engine.inputs.ctrl
 
@@ -155,6 +171,11 @@ edge:
   - owner: ocr
     data:  py_dict
     src:   ocr.outputs.fileinfo
+    dst:   persist.inputs.fileinfo
+
+  - owner: persist
+    data:  py_dict
+    src:   persist.outputs.fileinfo
     dst:   engine.inputs.fileinfo
 
 
