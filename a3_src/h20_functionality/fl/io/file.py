@@ -81,7 +81,7 @@ def gen_list_fileinfo(iter_dirpath_root,
 
     """
 
-    build_fileinfo = functools.partial(
+    fcn_buildinfo = functools.partial(
                         _build_fileinfo,
                         regex_read_as_txt = _combine_regex(iter_read_as_txt),
                         regex_read_as_bin = _combine_regex(iter_read_as_bin))
@@ -95,7 +95,7 @@ def gen_list_fileinfo(iter_dirpath_root,
                                             do_repeat_all,
                                             do_output_modified,
                                             do_terminate_when_done):
-        yield [build_fileinfo(filepath) for filepath in list_filepath]
+        yield [fcn_buildinfo(filepath) for filepath in list_filepath]
 
 
 # -----------------------------------------------------------------------------

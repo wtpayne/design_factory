@@ -83,8 +83,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 continue
 
             for fileinfo in inputs[str_key]['list']:
+                list_mmd = list()
                 for pageinfo in fileinfo['list_pageinfo']:
                     pageinfo.update(ocr.send(pageinfo['pil_image']))
+                    list_mmd.append(pageinfo['mmd'])
+
+                fileinfo['mmd'] = '\n\n'.join(list_mmd)
                 list_processed.append(fileinfo)
 
         # If we have any processed documents,

@@ -78,36 +78,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 continue
 
             for fileinfo in inputs[str_key]['list']:
-                for pageinfo in fileinfo['list_pageinfo']:
 
-                    # pageinfo = {'pil_image':   ...
-                    #             'predictions': ...
-                    #             'sequences':   ...
-                    #             'repeats':     ...
-                    #             'repetitions'  ... }
+                print(fileinfo['mmd'])
 
-                    import pprint
-                    print('')
-                    print('')
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['sequences'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repeats'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repetitions'])
-                    print('')
-                    print('')
-                    print(type(pageinfo['predictions']))
 
-                    print(pageinfo.keys())
 
-        # if inputs['fileinfo']['ena']:
-        #     length = len(inputs['fileinfo']['list'])
-        #     for fileinfo in inputs['fileinfo']['list']:
-        #         print('')
-        #         print('-' * 80)
-        #         print(fileinfo['filepath'])
-        #         print(fileinfo.keys())

@@ -48,7 +48,11 @@ license:
 """
 
 
+import itertools
+import re
+
 import nougat
+import nougat.postprocessing
 import nougat.utils.checkpoint
 import nougat.utils.device
 import pypdfium2
@@ -106,7 +110,7 @@ def _predict_pageinfo(model, pil_image):
     tensor4_page = torch.utils.data.dataloader.default_collate(
                                                         [tensor3_page,])
 
-    # Run inference using the model.
+    # Run inference using the nougat model.
     # This returns a dict with the following
     # fields:
     #
@@ -117,7 +121,84 @@ def _predict_pageinfo(model, pil_image):
     #   'repetitions': list()
     # }
     #
-    pageinfo = model.inference(image_tensors  = tensor4_page,
-                                  early_stopping = False)
+    map_model_output = model.inference(image_tensors  = tensor4_page,
+                                       early_stopping = False)
 
-    return pageinfo
+    # Convert the raw model output to mathpix
+    # markdown format.
+    #
+    (list_err, str_mmd) = _model_output_to_mmd(map_model_output)
+
+    map_pageinfo = { 'mmd': str_mmd,
+                     'err': list_err }
+
+    return map_pageinfo
+
+
+# -----------------------------------------------------------------------------
+def _model_output_to_mmd(map_model_output):
+    """
+    Return a tuple (err, mmd) from the provided model output.
+
+    The returned tuple consists of a list of
+    error strings followed by a single mathpix
+    markdown string representing the predicted
+    textual content of the current page.
+
+    """
+
+    list_prediction = map_model_output['predictions']
+    list_repeat     = map_model_output['repeats']
+    iter_tuple      = itertools.zip_longest(list_prediction,
+                                            list_repeat,
+                                            fillvalue = None)
+    list_err        = list()
+    list_mmd_part   = list()
+
+    for (idx, (str_prediction, repeat)) in enumerate(iter_tuple):
+
+        (err, mmd_part) = _prediction_to_mmd(idx, str_prediction, repeat)
+
+        if mmd_part is not None:
+            list_mmd_part.append(mmd_part)
+
+        if err is not None:
+            list_err.append(err)
+
+    # Concatenate the mathpix markdown fragments.
+    #
+    str_mmd_joined = "".join(list_mmd_part).strip()
+
+    # Clean redundant newlines.
+    #
+    str_mmd_clean = re.sub(r"\n{3,}", "\n\n", str_mmd_joined).strip()
+
+    return (list_err, str_mmd_clean)
+
+
+# -----------------------------------------------------------------------------
+def _prediction_to_mmd(idx, str_prediction, repeat):
+    """
+    """
+
+    is_missing_page     = str_prediction.strip() == '[MISSING_PAGE_POST]'
+    is_truncated_output = (repeat is not None) and (repeat > 0)
+    is_out_of_domain    = (repeat is not None) and (repeat <= 0)
+
+    if is_missing_page:
+        err      = 'Page {num} is missing.'.format(num = idx + 1)
+        mmd_part = ''
+
+    elif is_truncated_output:
+        err      = 'Page {num} is truncated.'.format(num = idx + 1)
+        mmd_part = ''
+
+    elif is_out_of_domain:
+        err      = 'Page {num} is out of domain.'.format(num = idx + 1)
+        mmd_part = ''
+
+    else:
+        err      = None
+        mmd_part = nougat.postprocessing.markdown_compatible(str_prediction)
+
+    return (err, mmd_part)
