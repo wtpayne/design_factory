@@ -3,7 +3,7 @@
 ---
 
 title:
-    "File watching and loading module."
+    "File watching and reading module."
 
 description:
     "This module contains functionality for
@@ -49,6 +49,7 @@ license:
 
 import collections
 import functools
+import hashlib
 import itertools
 import multiprocessing
 import os
@@ -107,20 +108,52 @@ def _build_fileinfo(filepath, regex_read_as_txt, regex_read_as_bin):
     fileinfo = dict()
     fileinfo['filepath']           = filepath
     fileinfo['list_nonconformity'] = list()
+    fileinfo['metadata']           = dict()
+
+    fileinfo = _update_with_basic_metadata(fileinfo)
 
     if regex_read_as_txt.match(filepath) is not None:
-        fileinfo = _load_as_text(fileinfo)
+        fileinfo = _update_with_content_as_string(fileinfo)
 
     if regex_read_as_bin.match(filepath) is not None:
-        fileinfo = _load_as_binary(fileinfo)
+        fileinfo = _update_with_content_as_bytes(fileinfo)
+
+    fileinfo = _update_metadata_with_hexdigest(fileinfo)
 
     return fileinfo
 
 
-# --------------------------------------------------------------------------
-def _load_as_text(fileinfo):
+# -----------------------------------------------------------------------------
+def _update_with_basic_metadata(fileinfo):
     """
-    Update fileinfo with text data loaded from disk.
+    Update fileinfo with basic metadata
+
+    """
+
+    filepath = fileinfo['filepath']
+    metadata = fileinfo['metadata']
+
+    # File size in bytes.
+    #
+    metadata['size'] = os.path.getsize(filepath)
+
+    # Last modified time in seconds
+    # since Unix epoch. (1 Jan 1970).
+    #
+    metadata['last_modified'] = os.path.getmtime(filepath)
+
+    # Creation time in seconds since
+    # Unix epoch. (1 Jan 1970).
+    #
+    metadata['created'] = os.path.getctime(filepath)
+
+    return fileinfo
+
+
+# -----------------------------------------------------------------------------
+def _update_with_content_as_string(fileinfo):
+    """
+    Update fileinfo with text data read from disk.
 
     """
 
@@ -164,10 +197,10 @@ def _load_as_text(fileinfo):
     return fileinfo
 
 
-# --------------------------------------------------------------------------
-def _load_as_binary(fileinfo):
+# -----------------------------------------------------------------------------
+def _update_with_content_as_bytes(fileinfo):
     """
-    Update fileinfo with binary data loaded from disk.
+    Update fileinfo with binary data read from disk.
 
     """
 
@@ -189,7 +222,32 @@ def _load_as_binary(fileinfo):
     return fileinfo
 
 
-# --------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+def _update_metadata_with_hexdigest(fileinfo):
+    """
+    Update fileinfo metadata with hexdigest computed from file content.
+
+    """
+
+    if 'bytes' in fileinfo:
+        byte_buffer = fileinfo['bytes']
+    elif 'text' in fileinfo:
+        byte_buffer = fileinfo['text'].encode('utf-8')
+    else:
+        byte_buffer = None
+
+    if byte_buffer is not None:
+        hasher = hashlib.sha256()
+        hasher.update(byte_buffer)
+        hexdigest = hasher.hexdigest()
+    else:
+        hexdigest = ''
+
+    fileinfo['metadata']['hexdigest'] = hexdigest
+    return fileinfo
+
+
+# -----------------------------------------------------------------------------
 def _combine_regex(iter_regex = None, op = '|'):
     """
     Return a regular expression compiled from an iterable of strings.
@@ -382,7 +440,7 @@ def _generate_filepath_all(do_output_all,
         yield None
 
 
-# --------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _generate_filepath_all_once(iter_dirpath_root,
                                 iter_pathincl = None,
                                 iter_pathexcl = None,
@@ -403,7 +461,7 @@ def _generate_filepath_all_once(iter_dirpath_root,
 
 
 
-# --------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _filtered_filepath_generator(dirpath_root,
                                  iter_pathincl = None,
                                  iter_pathexcl = None,
