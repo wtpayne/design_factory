@@ -3,13 +3,16 @@
 ---
 
 title:
-    "Epestematic engine stableflow-edict component."
+    "PDF rasterization stableflow-edict component."
 
 description:
-    "Epestematic engine component."
+    "PDF rasterization component. Augments each
+    provided fileinfo dict with a list_pil_page
+    field which contains a list of PIL images,
+    one per page."
 
 id:
-    "f1116747-c179-4b70-9963-6f873160268b"
+    "31b1a3f8-0f07-4347-ad6f-540bd5022f72"
 
 type:
     dt004_python_stableflow_edict_component
@@ -44,21 +47,23 @@ license:
 """
 
 
+import fl.io.rasterize.pdf
 import fl.util.edict
 
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Noop component coroutine.
+    PDF rasterization stableflow-edict component coroutine.
 
     """
 
+    rasterizer      = fl.io.rasterize.pdf.coro()
     tup_key_in      = tuple(inputs.keys())
     tup_key_out     = tuple(outputs.keys())
     tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
     tup_key_msg_out = tuple((k for k in tup_key_out))
-    list_processed  = list()
+    list_rasterized = list()
     timestamp       = dict()
 
     signal = fl.util.edict.init(outputs)
@@ -72,42 +77,38 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
+        # If any other inputs have any documents,
+        # then rasterize each one of them in turn.
+        #
+        list_rasterized.clear()
         for str_key in tup_key_msg_in:
 
             if not inputs[str_key]['ena']:
                 continue
 
             for fileinfo in inputs[str_key]['list']:
-                for pageinfo in fileinfo['list_pageinfo']:
 
-                    # pageinfo = {'pil_image':   ...
-                    #             'predictions': ...
-                    #             'sequences':   ...
-                    #             'repeats':     ...
-                    #             'repetitions'  ... }
+                if 'list_pageinfo' not in fileinfo:
+                    fileinfo['list_pageinfo'] = list()
+                list_pageinfo = fileinfo['list_pageinfo']
 
-                    import pprint
-                    print('')
-                    print('')
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['sequences'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repeats'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repetitions'])
-                    print('')
-                    print('')
-                    print(type(pageinfo['predictions']))
+                list_pil_page = rasterizer.send(fileinfo['bytes'])
 
-                    print(pageinfo.keys())
+                for (idx, pil_page) in enumerate(list_pil_page):
 
-        # if inputs['fileinfo']['ena']:
-        #     length = len(inputs['fileinfo']['list'])
-        #     for fileinfo in inputs['fileinfo']['list']:
-        #         print('')
-        #         print('-' * 80)
-        #         print(fileinfo['filepath'])
-        #         print(fileinfo.keys())
+                    if idx >= len(list_pageinfo):
+                        list_pageinfo.append(dict())
+
+                    list_pageinfo[idx]['pil_image'] = pil_page
+                    fileinfo['list_pageinfo'] = list_pageinfo
+
+                list_rasterized.append(fileinfo)
+
+        # If we have rasterized any documents,
+        # then send them to all outputs.
+        #
+        if list_rasterized:
+            for str_key in tup_key_msg_out:
+                outputs[str_key]['ena'] = True
+                outputs[str_key]['ts'].update(timestamp)
+                outputs[str_key]['list'][:] = list_rasterized

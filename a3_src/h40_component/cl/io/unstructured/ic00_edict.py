@@ -45,7 +45,7 @@ license:
 """
 
 
-import fl.load.unstructured
+import fl.io.unstructured
 import fl.util.edict
 
 
@@ -63,7 +63,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     tup_id_in_data = tuple((id_in for id_in in tup_id_in
                                                     if id_in not in ('ctrl',)))
 
-    partitioner = fl.load.unstructured.coro()
+    partitioner = fl.io.unstructured.coro()
     signal      = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)

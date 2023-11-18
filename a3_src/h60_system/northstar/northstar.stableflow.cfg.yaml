@@ -53,7 +53,7 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.load.file.ic00_edict
+      py_module:            cl.io.file.ic00_edict
     state_type:             py_dict
     config:
       dirpath_root:
@@ -90,7 +90,7 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.load.unstructured.ic00_edict
+      py_module:            cl.io.unstructured.ic00_edict
     state_type:             py_dict
 
   interpret:

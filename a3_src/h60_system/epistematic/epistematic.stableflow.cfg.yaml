@@ -53,7 +53,7 @@ node:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.load.file.ic00_edict
+      py_module:            cl.io.file.ic00_edict
     state_type:             py_dict
     config:
       dirpath_root:
@@ -78,6 +78,26 @@ node:
       repeat_all:           False
       output_modified:      False
       terminate_when_done:  True
+
+  # ---------------------------------------------------------------------------
+  # PDF page rasterization.
+  #
+  rasterize:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.io.rasterize.pdf.ic00_edict
+    state_type:             py_dict
+
+  # ---------------------------------------------------------------------------
+  # Optical character recognition for academic papers.
+  #
+  ocr:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.io.ocr.nougat.ic00_edict
+    state_type:             py_dict
 
   # ---------------------------------------------------------------------------
   # Epistematic engine.
@@ -107,6 +127,16 @@ edge:
 
   - owner: ctrl_main
     data:  py_dict
+    src:   ctrl_main.outputs.rasterize
+    dst:   rasterize.inputs.ctrl
+
+  - owner: ctrl_main
+    data:  py_dict
+    src:   ctrl_main.outputs.ocr
+    dst:   ocr.inputs.ctrl
+
+  - owner: ctrl_main
+    data:  py_dict
     src:   ctrl_main.outputs.engine
     dst:   engine.inputs.ctrl
 
@@ -115,6 +145,16 @@ edge:
   - owner: load
     data:  py_dict
     src:   load.outputs.fileinfo
+    dst:   rasterize.inputs.fileinfo
+
+  - owner: rasterize
+    data:  py_dict
+    src:   rasterize.outputs.fileinfo
+    dst:   ocr.inputs.fileinfo
+
+  - owner: ocr
+    data:  py_dict
+    src:   ocr.outputs.fileinfo
     dst:   engine.inputs.fileinfo
 
 

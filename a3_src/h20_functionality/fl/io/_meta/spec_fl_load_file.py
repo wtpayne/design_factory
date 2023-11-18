@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Functional specification for fl.load.file
+Functional specification for fl.io.file
 
 """
 
@@ -50,7 +50,7 @@ def _get_map_dirpath_testdata():
 # =============================================================================
 class SpecifyFlLoadFile:
     """
-    Spec for the fl.load.file module.
+    Spec for the fl.io.file module.
 
     """
 
@@ -58,17 +58,17 @@ class SpecifyFlLoadFile:
     @pytest.mark.e002_general_research
     def it_supports_import_of_fl_load_file(self):
         """
-        fl.load.file can be imported.
+        fl.io.file can be imported.
 
         """
 
-        import fl.load.file
+        import fl.io.file
 
 
 # =============================================================================
 class SpecifyFlLoadFile_FilteredFilepathGenerator:
     """
-    Spec for the fl.load.file._filtered_filepath_generator function.
+    Spec for the fl.io.file._filtered_filepath_generator function.
 
     """
 
@@ -76,32 +76,32 @@ class SpecifyFlLoadFile_FilteredFilepathGenerator:
     @pytest.mark.e002_general_research
     def it_yields_the_expected_number_of_files(self):
         """
-        fl.load.file._filtered_filepath_generator yields the correct file count.
+        fl.io.file._filtered_filepath_generator yields the correct file count.
 
         """
 
-        import fl.load.file
+        import fl.io.file
 
         map_dirpath   = _get_map_dirpath_testdata()
         regex_tesfile = r'^.*\.testfile$'
 
-        assert len(list(fl.load.file._filtered_filepath_generator(
+        assert len(list(fl.io.file._filtered_filepath_generator(
                                     dirpath_root  = map_dirpath['zero_files'],
                                     iter_pathincl = (regex_tesfile,)))) == 0
 
-        assert len(list(fl.load.file._filtered_filepath_generator(
+        assert len(list(fl.io.file._filtered_filepath_generator(
                                     dirpath_root  = map_dirpath['one_file'],
                                     iter_pathincl = (regex_tesfile,)))) == 1
 
-        assert len(list(fl.load.file._filtered_filepath_generator(
+        assert len(list(fl.io.file._filtered_filepath_generator(
                                     dirpath_root  = map_dirpath['two_files'],
                                     iter_pathincl = (regex_tesfile,)))) == 2
 
-        assert len(list(fl.load.file._filtered_filepath_generator(
+        assert len(list(fl.io.file._filtered_filepath_generator(
                                     dirpath_root  = map_dirpath['three_files'],
                                     iter_pathincl = (regex_tesfile,)))) == 3
 
-        assert len(list(fl.load.file._filtered_filepath_generator(
+        assert len(list(fl.io.file._filtered_filepath_generator(
                                     dirpath_root  = map_dirpath['four_files'],
                                     iter_pathincl = (regex_tesfile,)))) == 4
 
@@ -109,7 +109,7 @@ class SpecifyFlLoadFile_FilteredFilepathGenerator:
 # =============================================================================
 class SpecifyFlLoadFile_GenerateFilepathAllOnce:
     """
-    Spec for the fl.load.file._generate_filepath_all_once function.
+    Spec for the fl.io.file._generate_filepath_all_once function.
 
     """
 
@@ -117,32 +117,32 @@ class SpecifyFlLoadFile_GenerateFilepathAllOnce:
     @pytest.mark.e002_general_research
     def it_yields_the_expected_number_of_files(self):
         """
-        fl.load.file._generate_filepath_all_once yields the correct file count.
+        fl.io.file._generate_filepath_all_once yields the correct file count.
 
         """
 
-        import fl.load.file
+        import fl.io.file
 
         map_dirpath   = _get_map_dirpath_testdata()
         regex_tesfile = r'^.*\.testfile$'
 
-        assert len(list(fl.load.file._generate_filepath_all_once(
+        assert len(list(fl.io.file._generate_filepath_all_once(
                             iter_dirpath_root = (map_dirpath['zero_files'],),
                             iter_pathincl     = (regex_tesfile,)))) == 0
 
-        assert len(list(fl.load.file._generate_filepath_all_once(
+        assert len(list(fl.io.file._generate_filepath_all_once(
                             iter_dirpath_root = (map_dirpath['one_file'],),
                             iter_pathincl     = (regex_tesfile,)))) == 1
 
-        assert len(list(fl.load.file._generate_filepath_all_once(
+        assert len(list(fl.io.file._generate_filepath_all_once(
                             iter_dirpath_root = (map_dirpath['two_files'],),
                             iter_pathincl     = (regex_tesfile,)))) == 2
 
-        assert len(list(fl.load.file._generate_filepath_all_once(
+        assert len(list(fl.io.file._generate_filepath_all_once(
                             iter_dirpath_root = (map_dirpath['three_files'],),
                             iter_pathincl     = (regex_tesfile,)))) == 3
 
-        assert len(list(fl.load.file._generate_filepath_all_once(
+        assert len(list(fl.io.file._generate_filepath_all_once(
                             iter_dirpath_root = (map_dirpath['four_files'],),
                             iter_pathincl     = (regex_tesfile,)))) == 4
 
@@ -151,7 +151,7 @@ class SpecifyFlLoadFile_GenerateFilepathAllOnce:
 # =============================================================================
 class SpecifyFlLoadFile_GenerateFilepathAll:
     """
-    Spec for the fl.load.file._generate_filepath_all function.
+    Spec for the fl.io.file._generate_filepath_all function.
 
     """
 
@@ -159,16 +159,16 @@ class SpecifyFlLoadFile_GenerateFilepathAll:
     @pytest.mark.e002_general_research
     def it_yields_the_expected_number_of_files(self):
         """
-        fl.load.file._generate_filepath_all yields the correct file count.
+        fl.io.file._generate_filepath_all yields the correct file count.
 
         """
 
-        import fl.load.file
+        import fl.io.file
 
         map_dirpath   = _get_map_dirpath_testdata()
         regex_tesfile = r'^.*\.testfile$'
 
-        generate_two = fl.load.file._generate_filepath_all(
+        generate_two = fl.io.file._generate_filepath_all(
                             do_output_all     = True,
                             do_repeat_all     = False,
                             iter_dirpath_root = (map_dirpath['two_files'],),
@@ -183,7 +183,7 @@ class SpecifyFlLoadFile_GenerateFilepathAll:
         assert list_filepath[2] is None
         assert list_filepath[3] is None
 
-        generate_repeat = fl.load.file._generate_filepath_all(
+        generate_repeat = fl.io.file._generate_filepath_all(
                             do_output_all     = True,
                             do_repeat_all     = True,
                             iter_dirpath_root = (map_dirpath['two_files'],),
@@ -202,7 +202,7 @@ class SpecifyFlLoadFile_GenerateFilepathAll:
 # =============================================================================
 class SpecifyFlLoadFile_GenListFilepath:
     """
-    Spec for the fl.load.file._gen_list_filepath function.
+    Spec for the fl.io.file._gen_list_filepath function.
 
     """
 
@@ -210,16 +210,16 @@ class SpecifyFlLoadFile_GenListFilepath:
     @pytest.mark.e002_general_research
     def it_yields_the_expected_number_of_files(self):
         """
-        fl.load.file._generate_filepath_all yields the correct file count.
+        fl.io.file._generate_filepath_all yields the correct file count.
 
         """
 
-        import fl.load.file
+        import fl.io.file
 
         map_dirpath   = _get_map_dirpath_testdata()
         regex_tesfile = r'^.*\.testfile$'
 
-        generate_two  = fl.load.file._gen_list_filepath(
+        generate_two  = fl.io.file._gen_list_filepath(
                             iter_dirpath_root  = (map_dirpath['three_files'],),
                             iter_pathincl      = (regex_tesfile,),
                             size_batch         = 2,

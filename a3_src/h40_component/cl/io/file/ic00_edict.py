@@ -44,7 +44,7 @@ license:
 """
 
 
-import fl.load.file
+import fl.io.file
 import fl.util.edict
 import pl.stableflow.signal
 
@@ -58,7 +58,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     fl.util.edict.validate(inputs = inputs,  must_contain = ('ctrl',))
 
-    gen_list_fileinfo = fl.load.file.gen_list_fileinfo(
+    gen_list_fileinfo = fl.io.file.gen_list_fileinfo(
                 iter_dirpath_root      = cfg['dirpath_root'],
                 iter_pathincl          = cfg.get('pathincl',            None),
                 iter_pathexcl          = cfg.get('pathexcl',            None),

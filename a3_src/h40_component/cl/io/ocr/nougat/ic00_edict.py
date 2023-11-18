@@ -3,13 +3,13 @@
 ---
 
 title:
-    "Epestematic engine stableflow-edict component."
+    "Nougat OCR stableflow-edict component."
 
 description:
-    "Epestematic engine component."
+    "Nougat OCR component."
 
 id:
-    "f1116747-c179-4b70-9963-6f873160268b"
+    "6095efad-a54d-4888-b29a-c7e257f79828"
 
 type:
     dt004_python_stableflow_edict_component
@@ -44,16 +44,18 @@ license:
 """
 
 
+import fl.io.ocr.nougat
 import fl.util.edict
 
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Noop component coroutine.
+    Nougat OCR stableflow-edict component coroutine.
 
     """
 
+    ocr             = fl.io.ocr.nougat.coro()
     tup_key_in      = tuple(inputs.keys())
     tup_key_out     = tuple(outputs.keys())
     tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
@@ -72,6 +74,9 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
+        # OCR all pages from all inputs.
+        #
+        list_processed.clear()
         for str_key in tup_key_msg_in:
 
             if not inputs[str_key]['ena']:
@@ -79,35 +84,14 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
             for fileinfo in inputs[str_key]['list']:
                 for pageinfo in fileinfo['list_pageinfo']:
+                    pageinfo.update(ocr.send(pageinfo['pil_image']))
+                list_processed.append(fileinfo)
 
-                    # pageinfo = {'pil_image':   ...
-                    #             'predictions': ...
-                    #             'sequences':   ...
-                    #             'repeats':     ...
-                    #             'repetitions'  ... }
-
-                    import pprint
-                    print('')
-                    print('')
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['sequences'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repeats'])
-                    print('')
-                    print('')
-                    pprint.pprint(pageinfo['repetitions'])
-                    print('')
-                    print('')
-                    print(type(pageinfo['predictions']))
-
-                    print(pageinfo.keys())
-
-        # if inputs['fileinfo']['ena']:
-        #     length = len(inputs['fileinfo']['list'])
-        #     for fileinfo in inputs['fileinfo']['list']:
-        #         print('')
-        #         print('-' * 80)
-        #         print(fileinfo['filepath'])
-        #         print(fileinfo.keys())
+        # If we have any processed documents,
+        # output them.
+        #
+        if list_processed:
+            for str_key in tup_key_msg_out:
+                outputs[str_key]['ena'] = True
+                outputs[str_key]['ts'].update(timestamp)
+                outputs[str_key]['list'][:] = list_processed
