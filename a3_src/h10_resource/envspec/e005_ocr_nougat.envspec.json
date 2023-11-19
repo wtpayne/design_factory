@@ -47,6 +47,14 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
+    "# Packages required for cache handling.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "sqlitedict==2.1.0"               },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
     "# Packages required for PDF file handling using nougat-ocr.",
     "#",
 

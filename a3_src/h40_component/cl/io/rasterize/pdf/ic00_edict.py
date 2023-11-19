@@ -62,7 +62,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     tup_key_in      = tuple(inputs.keys())
     tup_key_out     = tuple(outputs.keys())
     tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
-    tup_key_msg_out = tuple((k for k in tup_key_out))
     list_rasterized = list()
     timestamp       = dict()
 
@@ -108,7 +107,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # then send them to all outputs.
         #
         if list_rasterized:
-            for str_key in tup_key_msg_out:
+            for str_key in tup_key_out:
                 outputs[str_key]['ena'] = True
                 outputs[str_key]['ts'].update(timestamp)
                 outputs[str_key]['list'][:] = list_rasterized

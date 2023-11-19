@@ -34,7 +34,7 @@ node:
       py_module:            cl.ctrl.sys.ic00_edict
     state_type:             py_dict
     config:
-      frequency_hz:         10
+      idx_max:              400
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
@@ -47,9 +47,9 @@ node:
     state_type:             py_dict
 
   # ---------------------------------------------------------------------------
-  # File loader.
+  # File reader.
   #
-  load:
+  read:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
@@ -57,7 +57,8 @@ node:
     state_type:             py_dict
     config:
       dirpath_root:
-        - /media/wtp/Data1/ref/60_refman/test/
+        - /media/wtp/Data1/ref/00_intray/
+        # - /media/wtp/Data1/ref/60_refman/test/
         # - /media/wtp/Data1/ref/00_intray/01_by_year/2013/
         # - /media/wtp/Data1/ref/00_intray/00_triage/
       pathincl:
@@ -77,7 +78,19 @@ node:
       output_all:           True
       repeat_all:           False
       output_modified:      False
-      terminate_when_done:  True
+      terminate_when_done:  False
+
+  # ---------------------------------------------------------------------------
+  # Cache for OCR output.
+  #
+  ocr_cache:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            epistematic.ocr_cache.ic00_edict
+    state_type:             py_dict
+    config:
+      filepath_cache_db:    /media/wtp/Data1/ref/60_refman/ocr_cache.db
 
   # ---------------------------------------------------------------------------
   # PDF page rasterization.
@@ -98,17 +111,6 @@ node:
     functionality:
       py_module:            cl.io.ocr.nougat.ic00_edict
     state_type:             py_dict
-
-  # ---------------------------------------------------------------------------
-  # Persist OCR output in a database.
-  #
-  persist:
-    process:                proc_main
-    req_host_cfg:           default_configuration
-    functionality:
-      py_module:            epistematic.persist.ic00_edict
-    state_type:             py_dict
-
 
   # ---------------------------------------------------------------------------
   # Epistematic engine.
@@ -133,34 +135,39 @@ edge:
 
   - owner: ctrl_main
     data:  py_dict
-    src:   ctrl_main.outputs.load
-    dst:   load.inputs.ctrl
+    src:   ctrl_main.outputs.ctrl_read
+    dst:   read.inputs.ctrl
 
   - owner: ctrl_main
     data:  py_dict
-    src:   ctrl_main.outputs.rasterize
+    src:   ctrl_main.outputs.ctrl_ocr_cache
+    dst:   ocr_cache.inputs.ctrl
+
+  - owner: ctrl_main
+    data:  py_dict
+    src:   ctrl_main.outputs.ctrl_rasterize
     dst:   rasterize.inputs.ctrl
 
   - owner: ctrl_main
     data:  py_dict
-    src:   ctrl_main.outputs.ocr
+    src:   ctrl_main.outputs.ctrl_ocr
     dst:   ocr.inputs.ctrl
 
   - owner: ctrl_main
     data:  py_dict
-    src:   ctrl_main.outputs.persist
-    dst:   persist.inputs.ctrl
-
-  - owner: ctrl_main
-    data:  py_dict
-    src:   ctrl_main.outputs.engine
+    src:   ctrl_main.outputs.ctrl_engine
     dst:   engine.inputs.ctrl
 
   # File pipeline
 
-  - owner: load
+  - owner: read
     data:  py_dict
-    src:   load.outputs.fileinfo
+    src:   read.outputs.fileinfo
+    dst:   ocr_cache.inputs.fileinfo_raw
+
+  - owner: ocr_cache
+    data:  py_dict
+    src:   ocr_cache.outputs.fileinfo_raw
     dst:   rasterize.inputs.fileinfo
 
   - owner: rasterize
@@ -171,11 +178,11 @@ edge:
   - owner: ocr
     data:  py_dict
     src:   ocr.outputs.fileinfo
-    dst:   persist.inputs.fileinfo
+    dst:   ocr_cache.inputs.fileinfo_ocr
 
-  - owner: persist
+  - owner: ocr_cache
     data:  py_dict
-    src:   persist.outputs.fileinfo
+    src:   ocr_cache.outputs.fileinfo_ocr
     dst:   engine.inputs.fileinfo
 
 

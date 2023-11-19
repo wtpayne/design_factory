@@ -71,15 +71,18 @@ def coro():
     """
 
     checkpoint = nougat.utils.checkpoint.get_checkpoint()
-    model      = nougat.utils.device.move_to_device(
-                        model = nougat.NougatModel.from_pretrained(checkpoint),
-                        bf16  = True,
-                        cuda  = True)
-    model.eval()
-
+    model      = None
     pageinfo = dict()
     while True:
         pil_image = yield pageinfo
+
+        if model is None:
+            model = nougat.utils.device.move_to_device(
+                        model = nougat.NougatModel.from_pretrained(checkpoint),
+                        bf16  = True,
+                        cuda  = True)
+            model.eval()
+
         pageinfo  = _predict_pageinfo(model     = model,
                                       pil_image = pil_image)
 

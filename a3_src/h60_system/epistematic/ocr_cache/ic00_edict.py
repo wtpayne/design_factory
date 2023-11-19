@@ -3,10 +3,32 @@
 ---
 
 title:
-    "Epistematic OCR data cache stableflow-edict component."
+    "OCR data cache stableflow-edict component."
 
 description:
-    "Epistematic OCR data cache component."
+    "This module documents the design of a
+    stableflow-edict component which is intended
+    to function as a data cache for document OCR
+    results, allowing OCR results to be cached
+    persistently, reducing the need to repeat
+    time consuming and computationally expensive
+    optical character recognition.
+
+    This component recieves file information
+    from some a filesystem scanner-reader, and
+    then checks to see if OCR results for that
+    file are stored in the cache. If results
+    are present in the cache, they are used
+    as-is. Otherwise, the file information is
+    handed off to an OCR pipeline for processing.
+
+    Any file information that is returned from
+    the OCR pipeline is stored in the cache
+    for future use.
+
+    OCR results, whether retrieved from the
+    cache or computer on-demand, are then
+    handed off to the next stage in the process."
 
 id:
     "5199ed68-0c42-4ab2-a656-e2ed391fb18f"
@@ -44,6 +66,8 @@ license:
 """
 
 
+import sqlitedict
+
 import fl.util.edict
 
 
@@ -54,11 +78,23 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    tup_key_in      = tuple(inputs.keys())
-    tup_key_out     = tuple(outputs.keys())
-    tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
-    tup_key_msg_out = tuple((k for k in tup_key_out))
-    timestamp       = dict()
+    tup_key_in = (
+        'ctrl',          # Control signal from system controller.
+        'fileinfo_raw',  # Raw file information from reader.
+        'fileinfo_ocr')  # OCR processed file information from OCR pipeline.
+    tup_key_out = (
+        'fileinfo_raw',  # Raw file information to OCR pipeline.
+        'fileinfo_ocr')  # OCR processed file information to engine.
+
+    assert tup_key_in  == tuple(inputs.keys())
+    assert tup_key_out == tuple(outputs.keys())
+
+    filepath_cache = cfg.get('filepath_cache_db')
+    cache          = sqlitedict.SqliteDict(filepath_cache, autocommit = False)
+
+    timestamp         = dict()
+    list_fileinfo_raw = list()
+    list_fileinfo_ocr = list()
 
     signal = fl.util.edict.init(outputs)
     while True:
@@ -71,58 +107,61 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
-        # Search for cached OCR results for each
-        # file identified by the filesystem
-        # scanner.
+        # Build a list of OCR results that have
+        # been pulled from the cache as well as
+        # a list of files that were not found in
+        # the cache and need to be OCRd.
         #
-        list_fileinfo_raw.clear()
-        list_fileinfo_ocr.clear()
-        if inputs['raw']['ena']:
-            for fileinfo_raw in inputs['raw']['list']:
-                hexdigest    = fileinfo_raw['metadata']['hexdigest']
-                fileinfo_ocr = _lookup(key = hexdigest)
-                if fileinfo_ocr is None:  # Not in cache
+        list_fileinfo_ocr.clear()  # Retrieved from the cache.
+        list_fileinfo_raw.clear()  # Not found in cache.
+        if inputs['fileinfo_raw']['ena']:
+            for fileinfo_raw in inputs['fileinfo_raw']['list']:
+                key = fileinfo_raw['metadata']['hexdigest']
+                try:
+                    list_fileinfo_ocr.append(cache[key])
+                except KeyError:
                     list_fileinfo_raw.append(fileinfo_raw)
-                else:
-                    list_fileinfo_ocr.append(fileinfo_ocr)
 
-        # Store OCR results in the cache so
-        # we don't need to recompute them in
-        # future. (Trim off things like page
-        # images and OCR model weights).
+        # Cache OCR results, trimming things like
+        # page images and OCR model weights.
         #
-        if inputs['ocr']['ena']:
-            for fileinfo_ocr_fat in inputs['ocr']['list']:
+        if inputs['fileinfo_ocr']['ena']:
+            for fileinfo_ocr_fat in inputs['fileinfo_ocr']['list']:
                 fileinfo_ocr = _trim(fileinfo_ocr_fat)
-                _store(fileinfo_ocr)
+                key          = fileinfo_ocr['metadata']['hexdigest']
+                cache[key]   = fileinfo_ocr
                 list_fileinfo_ocr.append(fileinfo_ocr)
+            cache.commit()
 
         # Send for OCR prcessing.
         #
         if list_fileinfo_raw:
-            outputs['raw']['ena'] = True
-            outputs['raw']['ts'].update(timestamp)
-            outputs['raw']['list'][:] = list_fileinfo_raw
+            outputs['fileinfo_raw']['ena'] = True
+            outputs['fileinfo_raw']['ts'].update(timestamp)
+            outputs['fileinfo_raw']['list'][:] = list_fileinfo_raw
 
         # Send to the engine.
         #
         if list_fileinfo_ocr:
-            outputs['ocr']['ena'] = True
-            outputs['ocr']['ts'].update(timestamp)
-            outputs['ocr']['list'][:] = list_fileinfo_raw
-
+            outputs['fileinfo_ocr']['ena'] = True
+            outputs['fileinfo_ocr']['ts'].update(timestamp)
+            outputs['fileinfo_ocr']['list'][:] = list_fileinfo_ocr
 
 
 # -----------------------------------------------------------------------------
-def _trim():
+def _trim(fileinfo):
     """
-    Get rid of surplus fields like bytes or page images.
+    Get rid of large intermediate data such as page images and raw content.
 
     """
-    pass
+    try:
+        del fileinfo['list_pageinfo']
+    except KeyError:
+        pass
 
-# -----------------------------------------------------------------------------
-def _lookup(key):
-    """
-    """
-    return None
+    try:
+        del fileinfo['bytes']
+    except KeyError:
+        pass
+
+    return fileinfo
