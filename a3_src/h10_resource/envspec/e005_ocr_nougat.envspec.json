@@ -66,6 +66,14 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
+    "# Packages required for generating web components with reflex.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "reflex==0.3.2"                   },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
     "# Local workspace directories - editable install.",
     "#",
 

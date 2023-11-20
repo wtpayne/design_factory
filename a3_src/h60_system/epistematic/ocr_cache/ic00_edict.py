@@ -116,11 +116,18 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         list_fileinfo_raw.clear()  # Not found in cache.
         if inputs['fileinfo_raw']['ena']:
             for fileinfo_raw in inputs['fileinfo_raw']['list']:
+
+                print('')
+                print(fileinfo_raw['filepath'])
+
+
                 key = fileinfo_raw['metadata']['hexdigest']
                 try:
                     list_fileinfo_ocr.append(cache[key])
+                    print('CACHE HIT')
                 except KeyError:
                     list_fileinfo_raw.append(fileinfo_raw)
+                    print('CACHE MISS')
 
         # Cache OCR results, trimming things like
         # page images and OCR model weights.

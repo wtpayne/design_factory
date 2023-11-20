@@ -79,3 +79,5 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
             for fileinfo in inputs[str_key]['list']:
                 print(fileinfo['mmd'])
+
+# -----------------------------------------------------------------------------

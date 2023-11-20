@@ -44,6 +44,8 @@ license:
 """
 
 
+import itertools
+
 import pypdfium2
 
 import fl.util
@@ -114,15 +116,36 @@ def _rasterize_all_pages(bytes_pdf, desired_dpi = 96):
     user_space_units_per_inch = 72  # According to ISO 23000-2:2020 8.3.2.3
     pixels_per_canvas_unit    = desired_dpi / user_space_units_per_inch
 
+    list_pil_page = list()
+    try:
+        pdfdoc     = pypdfium2.PdfDocument(bytes_pdf)
+        gen_render = pdfdoc.render(converter   = pypdfium2.PdfBitmap.to_pil,
+                                   n_processes = 6,
+                                   scale       = pixels_per_canvas_unit)
+    except RuntimeError:
+        # pypdfium2._helpers.misc.PdfiumError
+        # An exception from the PDFium library,
+        # detected by function return code.
+        #
+        return list_pil_page
+
     # Each page gets rendered to a PIL image,
     # which is stored as a 3-channel color image
     # with channel, height, width raster order,
     # with color channels sorted in RGB order.
     #
-    pdfdoc        = pypdfium2.PdfDocument(bytes_pdf)
-    list_pil_page = list(pil_page for pil_page in pdfdoc.render(
-                                    converter   = pypdfium2.PdfBitmap.to_pil,
-                                    n_processes = 1,
-                                    scale       = pixels_per_canvas_unit))
+    for num_page in itertools.count(start = 1):
+
+        print(f'Rasterizing page {num_page} of ??')
+
+        try:
+            pil_page = next(gen_render)
+        except StopIteration:
+            break
+        except RuntimeError:
+            print(f'ERROR. SKIPPING PAGE {num_page}.')
+            continue
+        else:
+            list_pil_page.append(pil_page)
 
     return list_pil_page

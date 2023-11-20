@@ -34,7 +34,7 @@ node:
       py_module:            cl.ctrl.sys.ic00_edict
     state_type:             py_dict
     config:
-      idx_max:              400
+      idx_max:              1000
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
@@ -58,6 +58,7 @@ node:
     config:
       dirpath_root:
         - /media/wtp/Data1/ref/00_intray/
+        # - /media/wtp/Data1/ref/16_natural_language_processing/
         # - /media/wtp/Data1/ref/60_refman/test/
         # - /media/wtp/Data1/ref/00_intray/01_by_year/2013/
         # - /media/wtp/Data1/ref/00_intray/00_triage/

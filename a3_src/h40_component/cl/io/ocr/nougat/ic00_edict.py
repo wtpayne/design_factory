@@ -82,8 +82,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 continue
 
             for fileinfo in inputs[str_key]['list']:
-                list_mmd = list()
-                for pageinfo in fileinfo['list_pageinfo']:
+                list_mmd   = list()
+                count_page = len(fileinfo['list_pageinfo'])
+                for (idx, pageinfo) in enumerate(fileinfo['list_pageinfo']):
+
+                    print(f'OCR page {idx + 1} of {count_page}')
+
                     pageinfo.update(ocr.send(pageinfo['pil_image']))
                     list_mmd.append(pageinfo['mmd'])
 
