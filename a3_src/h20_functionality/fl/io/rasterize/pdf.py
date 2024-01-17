@@ -136,14 +136,12 @@ def _rasterize_all_pages(bytes_pdf, desired_dpi = 96):
     #
     for num_page in itertools.count(start = 1):
 
-        print(f'Rasterizing page {num_page} of ??')
-
         try:
             pil_page = next(gen_render)
         except StopIteration:
             break
         except RuntimeError:
-            print(f'ERROR. SKIPPING PAGE {num_page}.')
+            # TODO: OUTPUT AN ERROR
             continue
         else:
             list_pil_page.append(pil_page)

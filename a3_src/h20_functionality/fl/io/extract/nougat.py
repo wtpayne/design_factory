@@ -170,7 +170,7 @@ def _model_output_to_mmd(map_model_output):
 
     # Concatenate the mathpix markdown fragments.
     #
-    str_mmd_joined = "".join(list_mmd_part).strip()
+    str_mmd_joined = ' '.join(list_mmd_part).strip()
 
     # Clean redundant newlines.
     #

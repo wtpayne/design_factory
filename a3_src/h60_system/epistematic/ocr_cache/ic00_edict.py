@@ -3,32 +3,54 @@
 ---
 
 title:
-    "OCR data cache stableflow-edict component."
+    "Memoization cache component."
 
 description:
-    "This module documents the design of a
-    stableflow-edict component which is intended
-    to function as a data cache for document OCR
-    results, allowing OCR results to be cached
-    persistently, reducing the need to repeat
-    time consuming and computationally expensive
-    optical character recognition.
+    "This module documents the design of
+    a stableflow-edict component which is
+    intended to function as a memoization
+    cache for a computationally expensive
+    pipeline, allowing results to be cached
+    to persistent storage (disk) and reducing
+    the need to repeat time consuming and
+    computationally expensive processing steps.
 
-    This component recieves file information
-    from some a filesystem scanner-reader, and
-    then checks to see if OCR results for that
-    file are stored in the cache. If results
-    are present in the cache, they are used
-    as-is. Otherwise, the file information is
-    handed off to an OCR pipeline for processing.
+    We can't simply wrap a component pipeline
+    in a memoization decorator as we can with
+    a regular Python function, so to achieve
+    the same effect in a dataflow/component
+    oriented manner, we need to have a little
+    feedback loop to send raw data to the
+    component pipeline being memoized and
+    then recieve any processed results back
+    again so that they can be written to the
+    cache.
 
-    Any file information that is returned from
-    the OCR pipeline is stored in the cache
-    for future use.
+    This component recieves raw data items
+    from upstream components, and then checks
+    to see if processed results exist in the
+    cache for each of those raw data items.
 
-    OCR results, whether retrieved from the
-    cache or computer on-demand, are then
-    handed off to the next stage in the process."
+    If a corresponding processed result data
+    item is present in the cache, the cache
+    item is sent downstream. Otherwise, the
+    raw data item is output to the processing
+    component or pipeline.
+
+    Any processed data that is recieved is stored
+    in the cache for future use.
+
+    Processed data, whether retrieved from the
+    cache or computed on-demand, is then
+    handed off to downstream components.
+
+    This component has the side effect of
+    altering the order of data items, dependent
+    on whether they are found in the cache or
+    not, so it CAN affect the functional
+    behaviour of the system if that functional
+    behaviour is dependent on order-of-arrival
+    of data items."
 
 id:
     "5199ed68-0c42-4ab2-a656-e2ed391fb18f"
@@ -69,33 +91,72 @@ license:
 import sqlitedict
 
 import fl.util.edict
+import fl.util
 
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Epistematic OCR data cache component coroutine.
+    Data cache component coroutine.
+
+    Raw data items come in from upsream
+    components. We check the cache for
+    the corresponding processed data items.
+    If present, those items get sent
+    downstream. If not present, the raw
+    data items get sent for processing
+    by the pipeline being memoized. Once
+    they are recieved back again from
+    the pipeline, they are stored in
+    the cache and also sent downstream.
 
     """
 
-    tup_key_in = (
-        'ctrl',          # Control signal from system controller.
-        'fileinfo_raw',  # Raw file information from reader.
-        'fileinfo_ocr')  # OCR processed file information from OCR pipeline.
-    tup_key_out = (
-        'fileinfo_raw',  # Raw file information to OCR pipeline.
-        'fileinfo_ocr')  # OCR processed file information to engine.
+    # Configure I/O identifier sets.
+    #
+    # tup_id_in_raw        - Incoming raw data from upstream components.
+    # tup_id_out_raw       - Outgoing raw data to PIPELINE.
+    # tup_id_in_processed  - Incoming processed data from PIPELINE.
+    # tup_id_out_processed - Outgoing processed data to downstream components.
+    # tup_id_in            - All configured component inputs
+    # tup_id_out           - All configured component outputs.
+    #
+    tup_id_in_raw        = tuple(cfg.get('id_in_raw',        tuple()))
+    tup_id_out_raw       = tuple(cfg.get('id_out_raw',       tuple()))
+    tup_id_in_processed  = tuple(cfg.get('id_in_processed',  tuple()))
+    tup_id_out_processed = tuple(cfg.get('id_out_processed', tuple()))
 
-    assert tup_key_in  == tuple(inputs.keys())
-    assert tup_key_out == tuple(outputs.keys())
+    tup_id_in  =  ('ctrl',)  # Control signal from system controller.
+    tup_id_in  += tup_id_in_raw
+    tup_id_in  += tup_id_in_processed
 
+    tup_id_out =  tuple()
+    tup_id_out += tup_id_out_raw
+    tup_id_out += tup_id_out_processed
+
+    # Sanity check.
+    #
+    assert tup_id_in  == tuple(inputs.keys())
+    assert tup_id_out == tuple(outputs.keys())
+
+    # Open a connection to the cache.
+    #
     filepath_cache = cfg.get('filepath_cache_db')
     cache          = sqlitedict.SqliteDict(filepath_cache, autocommit = False)
 
-    timestamp         = dict()
-    list_fileinfo_raw = list()
-    list_fileinfo_ocr = list()
+    # Path to the unique ID used as the cache key.
+    #
+    str_path_uid = cfg.get('path_uid', 'uid')
+    tup_path_uid = tuple(fl.util._iter_path(str_path_uid, delim = '.'))
 
+    # Lists to accumulate raw and processed items.
+    #
+    timestamp           = dict()
+    list_item_raw       = list() # List of raw data items.
+    list_item_processed = list() # List of processed data items.
+
+    # Main loop.
+    #
     signal = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
@@ -107,68 +168,71 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
-        # Build a list of OCR results that have
-        # been pulled from the cache as well as
-        # a list of files that were not found in
-        # the cache and need to be OCRd.
+        # Build a list of processed items that
+        # have been pulled from the cache as well
+        # as a list of items that were not found
+        # in the cache and need to be processed.
         #
-        list_fileinfo_ocr.clear()  # Retrieved from the cache.
-        list_fileinfo_raw.clear()  # Not found in cache.
-        if inputs['fileinfo_raw']['ena']:
-            for fileinfo_raw in inputs['fileinfo_raw']['list']:
+        # list_item_processed - Retrieved from the cache.
+        # list_item_raw       - Not found in cache.
+        #
+        list_item_processed.clear()
+        list_item_raw.clear()
 
-                print('')
-                print(fileinfo_raw['filepath'])
+        for id_in_raw in tup_id_in_raw:
+            pkt_in_raw = inputs[id_in_raw]
+            if not pkt_in_raw['ena']:
+                continue
 
-
-                key = fileinfo_raw['metadata']['hexdigest']
+            # Try to retrieve processed data
+            # items from the cache.
+            #
+            for item_raw in pkt_in_raw['list']:
+                uid = _get(item_raw, tup_path_uid)
                 try:
-                    list_fileinfo_ocr.append(cache[key])
-                    print('CACHE HIT')
+                    item_processed = cache[uid]
                 except KeyError:
-                    list_fileinfo_raw.append(fileinfo_raw)
-                    print('CACHE MISS')
+                    list_item_raw.append(item_raw)
+                else:
+                    list_item_processed.append(item_processed)
 
-        # Cache OCR results, trimming things like
+        # Cache processed data items, trimming things like
         # page images and OCR model weights.
         #
-        if inputs['fileinfo_ocr']['ena']:
-            for fileinfo_ocr_fat in inputs['fileinfo_ocr']['list']:
-                fileinfo_ocr = _trim(fileinfo_ocr_fat)
-                key          = fileinfo_ocr['metadata']['hexdigest']
-                cache[key]   = fileinfo_ocr
-                list_fileinfo_ocr.append(fileinfo_ocr)
+        for id_in_processed in tup_id_in_processed:
+            if not inputs[id_in_processed]['ena']:
+                continue
+            for fileinfo_ocr in inputs[id_in_processed]['list']:
+                uid        = _get(fileinfo_ocr, tup_path_uid)
+                cache[uid] = fileinfo_ocr
+                list_item_processed.append(fileinfo_ocr)
             cache.commit()
 
-        # Send for OCR prcessing.
+        # Send raw items for prcessing.
         #
-        if list_fileinfo_raw:
-            outputs['fileinfo_raw']['ena'] = True
-            outputs['fileinfo_raw']['ts'].update(timestamp)
-            outputs['fileinfo_raw']['list'][:] = list_fileinfo_raw
+        if list_item_raw:
+            for id_out_raw in tup_id_out_raw:
+                outputs[id_out_raw]['ena'] = True
+                outputs[id_out_raw]['ts'].update(timestamp)
+                outputs[id_out_raw]['list'][:] = list_item_raw
 
-        # Send to the engine.
+        # Send processed items downstream.
         #
-        if list_fileinfo_ocr:
-            outputs['fileinfo_ocr']['ena'] = True
-            outputs['fileinfo_ocr']['ts'].update(timestamp)
-            outputs['fileinfo_ocr']['list'][:] = list_fileinfo_ocr
+        if list_item_processed:
+            for id_out_processed in tup_id_out_processed:
+                outputs[id_out_processed]['ena'] = True
+                outputs[id_out_processed]['ts'].update(timestamp)
+                outputs[id_out_processed]['list'][:] = list_item_processed
 
 
 # -----------------------------------------------------------------------------
-def _trim(fileinfo):
+def _get(item, tup_key):
     """
-    Get rid of large intermediate data such as page images and raw content.
+    Get the item at the specified path.
 
     """
-    try:
-        del fileinfo['list_pageinfo']
-    except KeyError:
-        pass
 
-    try:
-        del fileinfo['bytes']
-    except KeyError:
-        pass
-
-    return fileinfo
+    cursor = item
+    for name in tup_key:
+        cursor = cursor[name]
+    return cursor

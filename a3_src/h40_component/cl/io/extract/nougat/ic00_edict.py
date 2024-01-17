@@ -44,7 +44,7 @@ license:
 """
 
 
-import fl.io.ocr.nougat
+import fl.io.extract.nougat
 import fl.util.edict
 
 
@@ -55,14 +55,14 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     """
 
-    ocr             = fl.io.ocr.nougat.coro()
-    tup_key_in      = tuple(inputs.keys())
-    tup_key_out     = tuple(outputs.keys())
-    tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
-    list_processed  = list()
-    timestamp       = dict()
+    ocr            = fl.io.extract.nougat.coro()
+    tup_id_in      = tuple(inputs.keys())
+    tup_id_out     = tuple(outputs.keys())
+    tup_id_msg_in  = tuple((k for k in tup_id_in  if k not in ('ctrl',)))
 
-    signal = fl.util.edict.init(outputs)
+    list_processed = list()
+    timestamp      = dict()
+    signal         = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
@@ -76,7 +76,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # OCR all pages from all inputs.
         #
         list_processed.clear()
-        for str_key in tup_key_msg_in:
+        for str_key in tup_id_msg_in:
 
             if not inputs[str_key]['ena']:
                 continue
@@ -85,9 +85,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 list_mmd   = list()
                 count_page = len(fileinfo['list_pageinfo'])
                 for (idx, pageinfo) in enumerate(fileinfo['list_pageinfo']):
-
-                    print(f'OCR page {idx + 1} of {count_page}')
-
                     pageinfo.update(ocr.send(pageinfo['pil_image']))
                     list_mmd.append(pageinfo['mmd'])
 
@@ -98,7 +95,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # output them.
         #
         if list_processed:
-            for str_key in tup_key_out:
+            for str_key in tup_id_out:
                 outputs[str_key]['ena'] = True
                 outputs[str_key]['ts'].update(timestamp)
                 outputs[str_key]['list'][:] = list_processed

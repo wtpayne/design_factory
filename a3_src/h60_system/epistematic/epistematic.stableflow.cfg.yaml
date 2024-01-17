@@ -34,7 +34,7 @@ node:
       py_module:            cl.ctrl.sys.ic00_edict
     state_type:             py_dict
     config:
-      idx_max:              1000
+      idx_max:              5000
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
@@ -59,6 +59,11 @@ node:
       dirpath_root:
         - /media/wtp/Data1/ref/00_intray/
         # - /media/wtp/Data1/ref/16_natural_language_processing/
+        # - /media/wtp/Data1/ref/13_statistical_methods/
+        # - /media/wtp/Data1/ref/15_sensor_data_processing/
+        # - /media/wtp/Data1/ref/14_symbolic_methods/
+        # - /media/wtp/Data1/ref/21_standards/
+        # - /media/wtp/Data1/ref/20_engineering_disciplines/
         # - /media/wtp/Data1/ref/60_refman/test/
         # - /media/wtp/Data1/ref/00_intray/01_by_year/2013/
         # - /media/wtp/Data1/ref/00_intray/00_triage/
@@ -84,14 +89,23 @@ node:
   # ---------------------------------------------------------------------------
   # Cache for OCR output.
   #
-  ocr_cache:
+  cache:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
       py_module:            epistematic.ocr_cache.ic00_edict
     state_type:             py_dict
     config:
-      filepath_cache_db:    /media/wtp/Data1/ref/60_refman/ocr_cache.db
+      id_in_raw:
+        - fileinfo_raw
+      id_out_raw:
+        - fileinfo_raw
+      id_in_processed:
+        - fileinfo_ocr
+      id_out_processed:
+        - fileinfo_ocr
+      path_uid:             metadata.hexdigest
+      filepath_cache_db:    /media/wtp/Data1/ref/60_refman/ocr_cache_tmp.db
 
   # ---------------------------------------------------------------------------
   # PDF page rasterization.
@@ -106,12 +120,26 @@ node:
   # ---------------------------------------------------------------------------
   # Optical character recognition for academic papers.
   #
-  ocr:
+  nougat:
     process:                proc_main
     req_host_cfg:           default_configuration
     functionality:
-      py_module:            cl.io.ocr.nougat.ic00_edict
+      py_module:            cl.io.extract.nougat.ic00_edict
     state_type:             py_dict
+
+  # ---------------------------------------------------------------------------
+  # Prune unwanted data items.
+  #
+  prune:
+    process:                proc_main
+    req_host_cfg:           default_configuration
+    functionality:
+      py_module:            cl.util.prune.ic00_edict
+    state_type:             py_dict
+    config:
+      path_prune:
+        - list_pageinfo
+        - bytes
 
   # ---------------------------------------------------------------------------
   # Epistematic engine.
@@ -142,7 +170,7 @@ edge:
   - owner: ctrl_main
     data:  py_dict
     src:   ctrl_main.outputs.ctrl_ocr_cache
-    dst:   ocr_cache.inputs.ctrl
+    dst:   cache.inputs.ctrl
 
   - owner: ctrl_main
     data:  py_dict
@@ -152,7 +180,12 @@ edge:
   - owner: ctrl_main
     data:  py_dict
     src:   ctrl_main.outputs.ctrl_ocr
-    dst:   ocr.inputs.ctrl
+    dst:   nougat.inputs.ctrl
+
+  - owner: ctrl_main
+    data:  py_dict
+    src:   ctrl_main.outputs.ctrl_prune
+    dst:   prune.inputs.ctrl
 
   - owner: ctrl_main
     data:  py_dict
@@ -164,26 +197,32 @@ edge:
   - owner: read
     data:  py_dict
     src:   read.outputs.fileinfo
-    dst:   ocr_cache.inputs.fileinfo_raw
+    dst:   cache.inputs.fileinfo_raw
 
-  - owner: ocr_cache
+  - owner: cache
     data:  py_dict
-    src:   ocr_cache.outputs.fileinfo_raw
+    src:   cache.outputs.fileinfo_raw
     dst:   rasterize.inputs.fileinfo
 
   - owner: rasterize
     data:  py_dict
     src:   rasterize.outputs.fileinfo
-    dst:   ocr.inputs.fileinfo
+    dst:   nougat.inputs.fileinfo
 
-  - owner: ocr
+  - owner: nougat
     data:  py_dict
-    src:   ocr.outputs.fileinfo
-    dst:   ocr_cache.inputs.fileinfo_ocr
+    src:   nougat.outputs.fileinfo
+    dst:   prune.inputs.fileinfo
 
-  - owner: ocr_cache
+  - owner: prune
     data:  py_dict
-    src:   ocr_cache.outputs.fileinfo_ocr
+    src:   prune.outputs.fileinfo
+    dst:   cache.inputs.fileinfo_ocr
+    dirn:  feedback
+
+  - owner: cache
+    data:  py_dict
+    src:   cache.outputs.fileinfo_ocr
     dst:   engine.inputs.fileinfo
 
 

@@ -3,13 +3,13 @@
 ---
 
 title:
-    "Epestematic engine stableflow-edict component."
+    "PDF reading stableflow-edict component."
 
 description:
-    "Epestematic engine component."
+    "Nougat OCR component."
 
 id:
-    "f1116747-c179-4b70-9963-6f873160268b"
+    "f9e8cbab-5341-4d03-9f1e-e6945340508c"
 
 type:
     dt004_python_stableflow_edict_component
@@ -44,8 +44,6 @@ license:
 """
 
 
-import os
-import os.path
 
 import fl.util.edict
 
@@ -53,18 +51,17 @@ import fl.util.edict
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    Epestematic engine component coroutine.
+    Nougat OCR stableflow-edict component coroutine.
 
     """
 
-    tup_key_in      = tuple(inputs.keys())
-    tup_key_out     = tuple(outputs.keys())
-    tup_key_msg_in  = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
-    tup_key_msg_out = tuple((k for k in tup_key_out))
-    list_processed  = list()
-    timestamp       = dict()
+    tup_id_in      = tuple(inputs.keys())
+    tup_id_out     = tuple(outputs.keys())
+    tup_id_msg_in  = tuple((k for k in tup_id_in  if k not in ('ctrl',)))
 
-    signal = fl.util.edict.init(outputs)
+    list_processed = list()
+    timestamp      = dict()
+    signal         = fl.util.edict.init(outputs)
     while True:
         inputs = yield (outputs, signal)
         fl.util.edict.reset(outputs)
@@ -75,17 +72,26 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
         timestamp.update(inputs['ctrl']['ts'])
 
-        for str_key in tup_key_msg_in:
+        # Extract text from all pages from all inputs.
+        #
+        list_processed.clear()
+        for str_key in tup_id_msg_in:
 
             if not inputs[str_key]['ena']:
                 continue
 
             for fileinfo in inputs[str_key]['list']:
 
-                dirpath_tmp  = '/home/wtp/tmp/'
-                filename_tmp = '{digest}.txt'.format(
-                                digest = fileinfo['metadata']['hexdigest'])
-                filepath_tmp = os.path.join(dirpath_tmp, filename_tmp)
-                if not os.path.isfile(filepath_tmp):
-                    with open(filepath_tmp, 'wt') as file_tmp:
-                        file_tmp.write(fileinfo['mmd'])
+
+
+                fileinfo['mmd'] = '\n\n'.join(list_mmd)
+                list_processed.append(fileinfo)
+
+        # If we have any processed documents,
+        # output them.
+        #
+        if list_processed:
+            for str_key in tup_id_out:
+                outputs[str_key]['ena'] = True
+                outputs[str_key]['ts'].update(timestamp)
+                outputs[str_key]['list'][:] = list_processed
