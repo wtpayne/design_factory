@@ -62,7 +62,7 @@ def test():
 
     _run   = da.test.run
     _path  = da.env.path
-    ID_ENV = 'e005_ocr_nougat'
+    ID_ENV = 'e004_reflex'
 
     return _run(id_env        = ID_ENV,
                 verbose_level = 0,
