@@ -1,0 +1,44 @@
+title:
+  "Counterparty register"
+
+introduction:
+  "Register of counterparties, including customers
+  and suppliers."
+
+register:
+
+  co000_orion:
+    name: HighIntegrity.ai Ltd.
+    desc: >
+      This counterparty is intended to record
+      projects carried out for our own purposes.
+
+  co001_solar:
+    name: Paideia.
+    desc: >
+      Jidanzai Dashan
+
+  co002_jasmine:
+    name: Harmonica.
+    desc: >
+      Artem Zhiganov
+
+  co003_lazarus:
+    name: ChimiaDAO.
+    desc: >
+      Christina Castro
+
+  co004_orange:
+    name:
+    desc: >
+      Justin Snair.
+
+  co005_ceramic:
+    name: Plus AI Software GMBH.
+    desc: >
+      Christian Kramer
+
+  co006_domino:
+    name: CWTECH
+    desc: >
+      Christopher Small & Will Payne joint venture.

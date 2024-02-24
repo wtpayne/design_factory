@@ -1,0 +1,70 @@
+{
+  "list_item": [
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required by the 'da' command line interface.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "click==8.1.3"                    },
+    { "phase": 1, "type": "pep508", "spec": "loguru==0.5.3"                   },
+    { "phase": 1, "type": "pep508", "spec": "pudb==2022.1.3"                  },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required by stableflow systems.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "Cython==0.29.33"                 },
+    { "phase": 1, "type": "pep508", "spec": "jsonschema==4.17.3"              },
+    { "phase": 1, "type": "pep508", "spec": "numpy==1.24.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "psutil==5.9.4"                   },
+    { "phase": 1, "type": "pep508", "spec": "pyzmq==25.0.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "setproctitle==1.3.2"             },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required for serialization/deserialization.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "PyYAML==6.0"                     },
+    { "phase": 1, "type": "pep508", "spec": "ruamel.yaml==0.17.26"            },
+    { "phase": 1, "type": "pep508", "spec": "toml==0.10.2"                    },
+    { "phase": 1, "type": "pep508", "spec": "xmltodict==0.13.0"               },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required for testing.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "pytest==7.3.1"                   },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required for dspy experiments.",
+    "#",
+
+    { "phase": 1, "type": "pep508", "spec": "dspy-ai==2.1.10"                    },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Local workspace directories - editable install.",
+    "#",
+
+    { "phase": 1, "type": "local", "relpath": "a3_src/h10_resource"           },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h20_functionality"      },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h30_platform"           },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h40_component"          },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h50_subsystem"          },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h60_system"             },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h70_bespoke"            },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h80_research"           },
+    { "phase": 1, "type": "local", "relpath": "a3_src/h90_internal"           }
+  ]
+}

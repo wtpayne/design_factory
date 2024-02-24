@@ -6,8 +6,9 @@ title:
     "Telegram bot module."
 
 description:
-    "This module contains functions to run
-    a telegram bot."
+    "This module contains functions for
+    configuring and running a Telegram bot
+    using the python-telegram-bot library."
 
 id:
     "3544902d-6575-424b-b53c-80fa215dea69"
@@ -45,38 +46,33 @@ license:
 """
 
 
-import asyncio
-import contextlib
-import enum
 import functools
 import http
 import importlib.metadata
-import itertools
 import logging
 import os
 import os.path
+import sys
 import typing
 import urllib.parse
 
-import aiochannel
-import requests
 import dill
+import dotenv
 import pydantic
+import requests
 import sqlitedict
 import telegram
-import telegram.ext
-
-import key
+import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
 
+name_package = 't000_wtp.telegram.bot'
 try:
-    __version__ = importlib.metadata.version('paideia.telegram')
+    __version__ = importlib.metadata.version(name_package)
 except importlib.metadata.PackageNotFoundError:
     __version__ = '0.0.1'
 
 
 URL_CHATSERVER    = 'https://chatserver.paideia.ai'
-UUID_BEARER       = 'C6046DB3-18B4-44AA-A876-96B303378D3F'
 KEY_TOKEN         = 'TOKEN_TELEGRAM_PAIDEIA_ROBOT'
 STR_TOPIC_DEFAULT = 'Ask the question about the pros and cons of capitalism.'
 STR_TOPIC_ZUZALU  = ('What software principles should we follow for Zuzalu '
@@ -87,7 +83,7 @@ STR_TOPIC_VITALEA = ('Ask a controversial and creative question about '
 
 
 # id_chat -> coroutine
-map_logic = dict()
+map_logic = {}
 
 
 # =============================================================================
@@ -115,9 +111,9 @@ class BotRuntimeContext():
     """
 
     str_token: str
-    app:       telegram.ext._application.Application
+    app:       typing.Any
     db:        sqlitedict.SqliteDict
-    list_cmd:  list[tuple[str]] = []
+    list_cmd:  list[tuple[str, str]] = []
 
     # -------------------------------------------------------------------------
     def __init__(self, str_token):
@@ -172,13 +168,12 @@ class BotRuntimeContext():
         # main loop (polling or events) and
         # ensure we close the db at the end.
         #
-        else:
-            try:
-                self.app.run_polling()
-            finally:
-                self.db.commit()
-                self.db.close()
-                self.db = None
+        try:
+            self.app.run_polling()
+        finally:
+            self.db.commit()
+            self.db.close()
+            self.db = None
 
     # -------------------------------------------------------------------------
     def command_handler(self, fcn_callback):
@@ -187,11 +182,11 @@ class BotRuntimeContext():
 
         """
 
-        str_command = fcn_callback.__name__
+        str_command: str = fcn_callback.__name__
         if str_command.startswith('_'):
             str_command = str_command[1:]
 
-        str_doc = fcn_callback.__doc__.strip().splitlines()[0]
+        str_doc: str = fcn_callback.__doc__.strip().splitlines()[0]
         self.list_cmd.append((str_command, str_doc))
 
         self.app.add_handler(
@@ -223,10 +218,24 @@ class BotRuntimeContext():
 
         """
 
-        str_help_text = 'The following commands are available:\n\n'
+        str_help_text: str = 'The following commands are available:\n\n'
         for (str_command, str_doc) in self.list_cmd:
             str_help_text += f'/{str_command}: {str_doc}\n'
         return str_help_text
+
+
+# =========================================================================
+class BotInteractionState(pydantic.BaseModel):
+    """
+    Bot interaction state.
+
+    """
+
+    version:          int = 1
+    id_conversation:  str = ''
+    id_message_last:  str = ''
+    str_message_last: str = ''
+    str_topic:        str = ''
 
 
 # =============================================================================
@@ -240,16 +249,16 @@ class BotInteractionContext():
 
     An interaction consists of zero or one
     inputs from the user and zero or more
-    responses from the bot.
+    responses from the bot. In other words
+    any action taken by or to the bot.
 
     """
 
-    bot:             BotRuntimeContext
-    update:          typing.Any
-    context:         typing.Any
-    id_chat:         int
-    id_conversation: str
-    id_message_last: str
+    id_chat: int
+    bot:     BotRuntimeContext
+    update:  typing.Any
+    context: typing.Any
+    state:   BotInteractionState
 
     # -------------------------------------------------------------------------
     def __init__(self,
@@ -266,13 +275,9 @@ class BotInteractionContext():
         self.id_chat = update.effective_chat.id
 
         try:
-            state = bot.db[self.id_chat]
+            self.state   = BotInteractionState(**bot.db[self.id_chat])
         except KeyError:
-            self.id_conversation = ''
-            self.id_message_last = ''
-        else:
-            self.id_conversation = state['id_conversation']
-            self.id_message_last = state['id_message_last']
+            self.state   = BotInteractionState()
         finally:
             self.bot     = bot
             self.update  = update
@@ -296,124 +301,8 @@ class BotInteractionContext():
 
         """
 
-        self.bot.db[self.id_chat] = dict(
-                                        id_conversation = self.id_conversation,
-                                        id_message_last = self.id_message_last)
+        self.bot.db[self.id_chat] = self.state.dict()
         self.bot.db.commit()
-
-    # -------------------------------------------------------------------------
-    async def reset(self, str_topic = None):
-        """
-        Reset the interaction state.
-
-        """
-
-        logic = self._logic()
-        map_logic[self.id_chat] = logic
-        await logic.asend(None)
-        await logic.asend(str_topic)
-
-    # -------------------------------------------------------------------------
-    async def step(self, command = None):
-        """
-        Step the coroutine.
-
-        """
-
-        # Ensure that we have some logic instantiated.
-        #
-        try:
-            logic = map_logic[self.id_chat]
-        except KeyError:
-            logic = self._logic()
-            map_logic[self.id_chat] = logic
-            await logic.asend(None)
-
-        # Single step the logic
-        #
-        print('step: ' + repr(logic))
-        await logic.asend(None)
-
-    # -------------------------------------------------------------------------
-    async def _logic(self):
-        """
-        Program logic.
-
-        """
-
-        # Start the conversation.
-        #
-        print('START')
-        topic = yield
-        while topic is None:
-            await self.telegram('What topic do you want to discuss?')
-            yield
-            topic = self.update.message.text
-
-        # Set the topic of the conversation.
-        #
-        print('TOPIC = ' + repr(topic))
-        response = await self.new_conversation(topic)
-        await self.telegram(response)
-
-        # Carry out the conversation.
-        #
-        while True:
-
-            yield
-            message = await self.reply(self.update.message.text)
-            await self.telegram(message)
-
-
-    # -------------------------------------------------------------------------
-    async def new_conversation(self, topic):
-        """
-        Create a new conversation on the chatserver.
-
-        """
-
-        response = requests.post(
-                    url     = urllib.parse.urljoin(URL_CHATSERVER, 'new'),
-                    json    = { 'name':          'dfs_v1',
-                                'request':       { 'topic': topic }},
-                    headers = { 'accept':        'application/json',
-                                'Content-Type':  'application/json',
-                                'Authorization': f'Bearer {UUID_BEARER}'})
-        is_ok = response.status_code == http.HTTPStatus.OK
-        if is_ok:
-            payload = response.json()
-            self.id_conversation = payload['conversation_id']
-            self.id_message_last = payload['message_id']
-            return payload['message']
-        else:
-            str_error = f'Error: {response.status_code} - {response.text}'
-            print(str_error)
-            return str_error
-
-    # -------------------------------------------------------------------------
-    async def reply(self, reply):
-        """
-        Add a user reply to a conversation on the chatserver
-
-        """
-
-        response = requests.post(
-                    url     = urllib.parse.urljoin(URL_CHATSERVER, 'reply'),
-                    json    = { 'conversation_id': self.id_conversation,
-                                'message_id':      self.id_message_last,
-                                'message':         reply },
-                    headers = { 'accept':          'application/json',
-                                'Content-Type':    'application/json',
-                                'Authorization':   f'Bearer {UUID_BEARER}'})
-        is_ok = response.status_code == http.HTTPStatus.OK
-        if is_ok:
-            payload = response.json()
-            self.id_message_last = payload['id']
-            return payload['message']
-        else:
-            str_error = f'Error: {response.status_code} - {response.text}'
-            print(str_error)
-            return str_error
 
     # -------------------------------------------------------------------------
     async def telegram(self, str_text):
@@ -425,6 +314,125 @@ class BotInteractionContext():
         await self.context.bot.send_message(chat_id = self.id_chat,
                                             text    = str_text)
 
+    # -------------------------------------------------------------------------
+    async def reset(self, str_topic = ''):
+        """
+        Reset the interaction state.
+
+        """
+
+        self.state.str_topic         = str_topic
+        self.state.str_message_last  = ''
+        map_logic[self.id_chat] = self._logic()
+        await map_logic[self.id_chat].asend(None)
+        await map_logic[self.id_chat].asend(self.state)
+
+    # -------------------------------------------------------------------------
+    async def step(self, command = None):
+        """
+        Single step the logic coroutine, creating it if necessary.
+
+        """
+
+        self.state.str_message_last = self.update.message.text
+        try:
+            await map_logic[self.id_chat].asend(self.state)
+        except KeyError:
+            map_logic[self.id_chat] = self._logic(self.state)
+            await map_logic[self.id_chat].asend(None)
+            await map_logic[self.id_chat].asend(self.state)
+
+    # -------------------------------------------------------------------------
+    async def _logic(self):
+        """
+        Program logic.
+
+        """
+
+        # Start the conversation.
+        #
+        state = yield
+        while not state.str_topic:
+            await self.telegram('What topic do you want to discuss?')
+            state = yield
+            state.str_topic = state.str_message_last
+
+        await self.telegram(await self._new_conversation(state.str_topic))
+
+        # Carry out the conversation.
+        #
+        while True:
+            state   = yield
+            message = await self._reply(state.str_message_last)
+            if message:
+                await self.telegram(message)
+
+    # -------------------------------------------------------------------------
+    async def _new_conversation(self, topic):
+        """
+        Create a new conversation on the chatserver.
+
+        """
+
+        response = requests.post(**self._post_params('new'),
+                                 json = { 'name':    'dfs_v1',
+                                          'request': { 'topic': topic }})
+        if response.status_code != http.HTTPStatus.OK:
+            return self._error_message(response)
+
+        payload = response.json()
+        self.state.id_conversation = payload['conversation_id']
+        self.state.id_message_last = payload['message_id']
+        return payload['message']
+
+    # -------------------------------------------------------------------------
+    async def _reply(self, reply):
+        """
+        Add a user reply to a conversation on the chatserver
+
+        """
+
+        id_conversation = self.state.id_conversation
+        id_message_last = self.state.id_message_last
+        response = requests.post(**self._post_params('reply'),
+                                 json = { 'conversation_id': id_conversation,
+                                          'message_id':      id_message_last,
+                                          'message':         reply })
+        if response.status_code != http.HTTPStatus.OK:
+            return self._error_message(response)
+
+        payload = response.json()
+        self.state.id_message_last = payload['id']
+        return payload['message']
+
+    # -------------------------------------------------------------------------
+    def _post_params(self, endpoint):
+        """
+        Return standard requests.post parameters.
+
+        """
+
+        uuid_bearer = os.getenv("UUID_BEARER_CHATSERVER")
+        return { 'url':     urllib.parse.urljoin(URL_CHATSERVER, endpoint),
+                 'headers': { 'accept':        'application/json',
+                              'Content-Type':  'application/json',
+                              'Authorization': f'Bearer {uuid_bearer}'},
+                 'timeout': 10 }
+
+    # -------------------------------------------------------------------------
+    def _error_message(self, response):
+        """
+        Log an error and return a suitable user-facing error message.
+
+        """
+
+        logging.error(f'Error: {response.status_code} - {response.text}')
+        is_not_found = response.status_code == http.HTTPStatus.NOT_FOUND # 404
+        if is_not_found:
+            return ('We have encountered an error. '
+                    'Please restart the conversation.')
+        return f'Internal error: {response.status_code}'
+
 
 # -----------------------------------------------------------------------------
 def main():
@@ -433,10 +441,8 @@ def main():
 
     """
 
-    str_token = key.load(id_value = KEY_TOKEN)
-
-    with BotRuntimeContext(str_token) as bot:
-
+    dotenv.load_dotenv()
+    with BotRuntimeContext(os.getenv(KEY_TOKEN)) as bot:
         bot.command_handler(_start)
         bot.command_handler(_zuzalu)
         bot.command_handler(_vitalia)
@@ -545,3 +551,8 @@ async def _msg(
                                context = context) as interaction:
 
         await interaction.step()
+
+
+# -----------------------------------------------------------------------------
+if __name__ == "__main__":
+    sys.exit(main())

@@ -11,7 +11,14 @@ introduction:
 register:
 
     orion:      [co000_orion]
+    solar:      [co001_solar]
+    jasmine:    [co002_jasmine]
+    lazarus:    [co003_lazarus]
+    orange:     [co004_orange]
+    ceramic:    [co005_ceramic]
+    domino:     [co006_domino]
     invicta:    [p0000_invicta]
+    dublin:     [p0001_dublin]
     atlas:      [z0001_atlas]
     golem:      [z0002_golem]
     tictac:     [z0003_tictac]
@@ -224,13 +231,11 @@ register:
     scuba:      Null
     prepare:    Null
     demand:     Null
-    ceramic:    Null
     atlanta:    Null
     brazil:     Null
     soprano:    Null
     swim:       Null
     reply:      Null
-    orange:     Null
     break:      Null
     yoga:       Null
     exodus:     Null
@@ -238,7 +243,6 @@ register:
     change:     Null
     finland:    Null
     burger:     Null
-    lazarus:    Null
     peace:      Null
     garlic:     Null
     blue:       Null
@@ -289,7 +293,6 @@ register:
     touch:      Null
     element:    Null
     flex:       Null
-    solar:      Null
     vertigo:    Null
     civil:      Null
     albert:     Null
@@ -938,7 +941,6 @@ register:
     podium:     Null
     permit:     Null
     susan:      Null
-    jasmine:    Null
     fidel:      Null
     arnold:     Null
     finance:    Null
@@ -1484,7 +1486,6 @@ register:
     miranda:    Null
     cave:       Null
     trapeze:    Null
-    domino:     Null
     risk:       Null
     phrase:     Null
     coral:      Null
@@ -1600,7 +1601,6 @@ register:
     ethnic:     Null
     song:       Null
     guest:      Null
-    dublin:     Null
     career:     Null
     emerald:    Null
     genius:     Null

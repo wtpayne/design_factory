@@ -3,14 +3,14 @@
 ---
 
 title:
-    "dm010_telegram demo commands."
+    "dm011_dspy demo commands."
 
 description:
     "This module defines commands for the
-    dm010_telegram demonstration."
+    dm011_dspy demonstration."
 
 id:
-    "d738f591-f2a9-4f9a-b2d5-5e625e883e5c"
+    "2868c19f-8025-4664-b33e-404bc4c55771"
 
 type:
     dt003_python_module
@@ -57,11 +57,6 @@ def run():
 
     """
 
-    # Load environment variables from .env file.
-    #
-    import key
-    key.load_all(do_load = True)
-
     import da.env.run
-    return da.env.run.python_function(spec   = 't000_wtp.telegram.bot.main',
-                                      id_env = 'e009_telegram')
+    return da.env.run.python_function(spec   = 't000_wtp.dspy.experiment.main',
+                                      id_env = 'e010_dspy')

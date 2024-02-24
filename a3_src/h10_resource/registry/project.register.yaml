@@ -1,0 +1,24 @@
+title:
+  "Project register"
+
+introduction:
+  "Register of projects."
+
+register:
+
+  p0000_invicta:
+    name: Project Invicta
+    desc: >
+      Internal tools development.
+    counterparty:
+      - co000_orion
+
+  p0001_dublin:
+    name: Project Dublin
+    desc: >
+      Miscellaneous contract and consulting work
+      for customer co001_solar.
+    counterparty:
+      - co001_solar.
+
+

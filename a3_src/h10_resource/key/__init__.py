@@ -100,6 +100,18 @@ def load(id_value, filepath_env = None):
     if value is not None:
         return value
 
+    map_value = load_all(filepath_env = filepath_env)
+
+    return map_value[id_value]
+
+
+# -----------------------------------------------------------------------------
+def load_all(filepath_env = None, do_load = False):
+    """
+    Load all dotenv values.
+
+    """
+
     if filepath_env is None:
         filename_env = 'default.env'
         dirpath_self = os.path.dirname(os.path.realpath(__file__))
@@ -110,6 +122,10 @@ def load(id_value, filepath_env = None):
                                     raise_error_if_not_found = True,
                                     usecwd = True)
 
+    if do_load:
+        dotenv.load_dotenv(dotenv_path = filepath_env)
+
     map_value = dotenv.dotenv_values(dotenv_path = filepath_env,
                                      verbose     = True)
-    return map_value[id_value]
+
+    return map_value
