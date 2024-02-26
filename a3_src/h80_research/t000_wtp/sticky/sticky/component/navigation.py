@@ -52,20 +52,76 @@ import sticky.state
 
 
 # -----------------------------------------------------------------------------
-def navigation() -> reflex.Component:
+def navigation(**kwargs) -> reflex.Component:
     """
     Navigation component.
 
     """
 
-    return reflex.box(
-                reflex.center(
-                    reflex.hstack(
-                        reflex.button('<-'),
-                        reflex.text('February'),
-                        reflex.button('->'))),
-                bg       = 'red',
-                width    = '100%',
-                position = 'fixed',
-                bottom   = '0rem')
+    return reflex.hstack(
+
+                _btn_prev(
+                    flex          = 'none',
+                    width         = sticky.const.SIZE_NAV_BTN,
+                    height        = sticky.const.SIZE_NAV_BTN,
+                    border_radius = sticky.const.RADIUS_BTN),
+
+                reflex.spacer(),
+
+                reflex.card(
+                    sticky.state.App.view_month_name,
+                    flex          = 'none',
+                    height        = sticky.const.SIZE_NAV_BTN,
+                    border_radius = sticky.const.RADIUS_BTN,
+                    background    = sticky.const.RGB_PASSIVE_BG_ACCENT),
+
+                reflex.card(
+                    sticky.state.App.view_year,
+                    flex          = 'none',
+                    height        = sticky.const.SIZE_NAV_BTN,
+                    border_radius = sticky.const.RADIUS_BTN,
+                    background    = sticky.const.RGB_PASSIVE_BG_ACCENT),
+
+                reflex.spacer(),
+
+                _btn_next(
+                    flex          = 'none',
+                    width         = sticky.const.SIZE_NAV_BTN,
+                    height        = sticky.const.SIZE_NAV_BTN,
+                    border_radius = sticky.const.RADIUS_BTN,
+                    background    = sticky.const.RGB_ACTIVE_BTN),
+
+                **kwargs)
+
+
+# -----------------------------------------------------------------------------
+def _btn_prev(**kwargs) -> reflex.Component:
+    """
+    """
+
+    return reflex.button(
+
+                reflex.icon(
+                    'arrow-left',
+                    stroke_width = sticky.const.STROKE_NAV_ICON),
+
+                on_click = sticky.state.App.on_click_nav_month_prev(),
+
+                **kwargs)
+
+
+# -----------------------------------------------------------------------------
+def _btn_next(**kwargs) -> reflex.Component:
+    """
+    """
+
+    return reflex.button(
+
+                reflex.icon(
+                    'arrow-right',
+                    stroke_width = sticky.const.STROKE_NAV_ICON),
+
+                on_click = sticky.state.App.on_click_nav_month_next(),
+
+                **kwargs)
 

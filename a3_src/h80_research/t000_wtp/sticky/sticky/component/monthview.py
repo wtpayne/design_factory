@@ -52,34 +52,110 @@ import sticky.state
 
 
 # -----------------------------------------------------------------------------
-def monthview() -> reflex.Component:
+def monthview(**kwargs) -> reflex.Component:
     """
     Monthview component.
 
     """
 
-    return reflex.grid(
-        reflex.foreach(
-            sticky.state.App.list_days,
-            _monthbox),
-        template_columns="repeat(7, 1fr)",
-        template_rows="repeat(5, 1fr)",
-        h="100vh",
-        width="100%",
-        gap='0.1em',
-)
+    TUP_WEEKDAY:   tuple[str] = ( 'M', 'T', 'W', 'T', 'F', 'S', 'S' )
+    COUNT_WEEKDAY: str        = str(len(TUP_WEEKDAY))
+    MAX_WEEKS:     str        = '6'
+
+    return reflex.vstack(
+
+                _heading_row(
+                    tup_heading = TUP_WEEKDAY),
+
+                reflex.grid(
+                    reflex.foreach(
+                        sticky.state.App.list_idx_day,
+                        _month_card),
+
+                    flex    = 'auto',
+                    width   = sticky.const.SIZE_FULL,
+                    height  = sticky.const.SIZE_FULL,
+                    padding = sticky.const.SIZE_ZERO,
+                    spacing = '2',
+                    rows    = MAX_WEEKS,
+                    columns = COUNT_WEEKDAY,
+                    flow    = 'row'),
+
+                **kwargs)
 
 
 # -----------------------------------------------------------------------------
-def _monthbox(idx: int) -> reflex.Component:
+def _heading_row(tup_heading) -> reflex.Component:
     """
-    Monthbox component.
+    Heading row for the month view.
 
     """
-    return reflex.grid_item(
-                        row_span=1,
-                        col_span=1,
-                        border_radius = '0.1rem',
-                        border_color  = 'black',
-                        border = 'thin',
-                        bg="white")
+
+    return reflex.hstack(
+                reflex.foreach(
+                    tup_heading,
+                    reflex.text),
+                width    = sticky.const.SIZE_FULL,
+                style    = { 'justify-content': 'space-around' },
+                padding  = '0rem')
+
+
+# -----------------------------------------------------------------------------
+def _month_card(idx: int) -> reflex.Component:
+    """
+    Month card component.
+
+    """
+
+    return reflex.cond(
+                sticky.state.App.list_do_render[idx],
+                _month_card_in_month(idx),
+                _month_card_out_of_month())
+
+
+# -----------------------------------------------------------------------------
+def _month_card_in_month(idx: int) -> reflex.Component:
+    """
+    Month card (in month) component.
+
+    """
+
+    return reflex.card(
+                reflex.text(
+                    sticky.state.App.list_day_of_month[idx],
+                    color = sticky.const.RGB_PASSIVE_FG,
+                    size  = '1',
+                    style = { 'position': 'absolute',
+                              'top':      '0.5rem',
+                              'right':    '0.5rem' }),
+                    reflex.cond(
+                        sticky.state.App.list_has_icon[idx],
+                        reflex.center(
+                            reflex.icon(
+                                'smile',
+                                size         = 30,
+                                flex         = '0 1 auto',
+                                stroke_width = sticky.const.STROKE_CARD_ICON,
+                                color        = sticky.const.RGB_CARD_ICON),
+                            width  = '100%',
+                            height = '100%'),
+                        reflex.spacer()),
+                on_click      = lambda: sticky.state.App.on_click_month(idx),
+                background    = sticky.const.RGB_PASSIVE_BG_ACCENT,
+                border_color  = 'black',
+                border        = 'thin',
+                width         = sticky.const.SIZE_FULL)
+
+
+# -----------------------------------------------------------------------------
+def _month_card_out_of_month() -> reflex.Component:
+    """
+    Month card (in month) component.
+
+    """
+
+    return reflex.card(
+                background    = sticky.const.RGB_PASSIVE_BG,
+                border_color  = 'black',
+                border        = 'thin',
+                width         = sticky.const.SIZE_FULL)

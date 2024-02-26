@@ -49,6 +49,7 @@ license:
 import functools
 import http
 import importlib.metadata
+import inspect
 import logging
 import os
 import os.path
@@ -83,7 +84,48 @@ STR_TOPIC_VITALEA = ('Ask a controversial and creative question about '
 
 
 # id_chat -> coroutine
-map_logic = {}
+map_chat = {}
+
+
+# -----------------------------------------------------------------------------
+async def _chat(fcn_telegram,
+                fcn_new_conv,
+                fcn_reply):
+    """
+    Chat coroutine.
+
+    This synchronous coroutine is responsible for
+    defining the chat lifecycle from initiation
+    through to conclusion.
+
+    All dependencies are injected so that the
+    chat logic can be tested in isolation.
+
+    """
+
+    # TODO: THINK ABOUT CONVERSATION INITIATION
+    #
+    # if not state.is_started_conv:
+    #
+
+    # Conversation initiation.
+    #
+    state = yield
+    while not state.str_topic:
+        await fcn_telegram('What topic do you want to discuss?')
+        state = yield
+        state.str_topic = state.str_message_last
+
+    await fcn_telegram(await fcn_new_conv(state.str_topic))
+
+    # Carry out the conversation.
+    #
+    while True:
+        state   = yield
+        message = await fcn_reply(state.str_message_last)
+        if message:
+            await fcn_telegram(message)
+
 
 
 # =============================================================================
@@ -176,6 +218,17 @@ class BotRuntimeContext():
             self.db = None
 
     # -------------------------------------------------------------------------
+    # def chat_join_request_handler(self, fcn_callback):
+    #     """
+    #     Add a new chat join request handler to the bot.
+
+    #     """
+
+    #     self.app.add_handler(
+    #         telegram.ext.ChatJoinRequestHandler(
+    #                     callback = functools.partial(fcn_callback, self)))
+
+    # -------------------------------------------------------------------------
     def command_handler(self, fcn_callback):
         """
         Add a new command handler to the bot.
@@ -210,7 +263,6 @@ class BotRuntimeContext():
                         filters  = select_if_not_cmd,
                         callback = functools.partial(fcn_callback, self)))
 
-
     # -------------------------------------------------------------------------
     def help_text(self):
         """
@@ -231,11 +283,12 @@ class BotInteractionState(pydantic.BaseModel):
 
     """
 
-    version:          int = 1
-    id_conversation:  str = ''
-    id_message_last:  str = ''
-    str_message_last: str = ''
-    str_topic:        str = ''
+    version:          int  = 1
+    id_conversation:  str  = ''
+    id_message_last:  str  = ''
+    str_message_last: str  = ''
+    str_topic:        str  = ''
+    is_started_conv:  bool = False
 
 
 # =============================================================================
@@ -305,27 +358,20 @@ class BotInteractionContext():
         self.bot.db.commit()
 
     # -------------------------------------------------------------------------
-    async def telegram(self, str_text):
-        """
-        Send a message to telegram to be shown to the user.
-
-        """
-
-        await self.context.bot.send_message(chat_id = self.id_chat,
-                                            text    = str_text)
-
-    # -------------------------------------------------------------------------
     async def reset(self, str_topic = ''):
         """
         Reset the interaction state.
 
         """
 
+        logging.info(f'Reset/restart chat.')
         self.state.str_topic         = str_topic
         self.state.str_message_last  = ''
-        map_logic[self.id_chat] = self._logic()
-        await map_logic[self.id_chat].asend(None)
-        await map_logic[self.id_chat].asend(self.state)
+        map_chat[self.id_chat]       = _chat(fcn_telegram = self.telegram,
+                                             fcn_new_conv = self._new_conv,
+                                             fcn_reply    = self._reply)
+        await map_chat[self.id_chat].asend(None)  # Prime the generator
+        await map_chat[self.id_chat].asend(self.state)
 
     # -------------------------------------------------------------------------
     async def step(self, command = None):
@@ -336,41 +382,30 @@ class BotInteractionContext():
 
         self.state.str_message_last = self.update.message.text
         try:
-            await map_logic[self.id_chat].asend(self.state)
+            await map_chat[self.id_chat].asend(self.state)
         except KeyError:
-            map_logic[self.id_chat] = self._logic(self.state)
-            await map_logic[self.id_chat].asend(None)
-            await map_logic[self.id_chat].asend(self.state)
+            logging.warning(
+                f'Could not find a record of the chat. Creating a new one.')
+            map_chat[self.id_chat] = _chat(fcn_telegram = self.telegram,
+                                           fcn_new_conv = self._new_conv,
+                                           fcn_reply    = self._reply)
+            await map_chat[self.id_chat].asend(None)  # Prime the generator
+            await map_chat[self.id_chat].asend(self.state)
 
     # -------------------------------------------------------------------------
-    async def _logic(self):
+    async def telegram(self, str_text):
         """
-        Program logic.
+        Utility function to send a message to the user via telegram.
 
         """
 
-        # Start the conversation.
-        #
-        state = yield
-        while not state.str_topic:
-            await self.telegram('What topic do you want to discuss?')
-            state = yield
-            state.str_topic = state.str_message_last
-
-        await self.telegram(await self._new_conversation(state.str_topic))
-
-        # Carry out the conversation.
-        #
-        while True:
-            state   = yield
-            message = await self._reply(state.str_message_last)
-            if message:
-                await self.telegram(message)
+        await self.context.bot.send_message(chat_id = self.id_chat,
+                                            text    = str_text)
 
     # -------------------------------------------------------------------------
-    async def _new_conversation(self, topic):
+    async def _new_conv(self, topic):
         """
-        Create a new conversation on the chatserver.
+        Utility function to create a new conversation on the chatserver.
 
         """
 
@@ -388,7 +423,7 @@ class BotInteractionContext():
     # -------------------------------------------------------------------------
     async def _reply(self, reply):
         """
-        Add a user reply to a conversation on the chatserver
+        Utility function to add a reply to a conversation on the chatserver.
 
         """
 
@@ -449,6 +484,28 @@ def main():
         bot.command_handler(_help)
         bot.command_handler(_about)
         bot.message_handler(_msg)
+        # bot.chat_join_request_handler(_join)
+
+
+# -----------------------------------------------------------------------------
+# async def _join(
+#             bot:     BotRuntimeContext,
+#             update:  telegram.Update,
+#             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+#     """
+#     Called when the user joins the chat.
+
+#     """
+
+#     print("JOIN!!!!")
+
+#     return True
+
+    # with BotInteractionContext(bot     = bot,
+    #                            update  = update,
+    #                            context = context) as interaction:
+
+    #     await interaction.reset()
 
 
 # -----------------------------------------------------------------------------
@@ -520,6 +577,23 @@ async def _help(
 
 
 # -----------------------------------------------------------------------------
+def trace_log(fcn_wrapped):
+    """
+    """
+    @functools.wraps(fcn_wrapped)
+    def fcn_wrapper(*args, **kwargs):
+        """
+        Foo
+        """
+        print(fcn_wrapped.__name__)
+        # name_fcn = fcn_wrapped.__name__
+        # logging.info(f'Call: {name_fcn}()')
+        return fcn_wrapped(*args, **kwargs)
+
+    return fcn_wrapper
+
+# -----------------------------------------------------------------------------
+@trace_log
 async def _about(
             bot:     BotRuntimeContext,
             update:  telegram.Update,
@@ -528,6 +602,9 @@ async def _about(
     Print information about the bot.
 
     """
+
+    name_fcn = inspect.getframeinfo(inspect.currentframe()).function
+    logging.info(f'Call: {name_fcn}()')
 
     with BotInteractionContext(bot     = bot,
                                update  = update,

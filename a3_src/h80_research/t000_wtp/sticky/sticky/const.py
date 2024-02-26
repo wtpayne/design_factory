@@ -123,7 +123,7 @@ RGB_BRAND_SHADE_09:         str = RGB_ALMOST_BLACK
 #
 RGB_PASSIVE_BG:             str  = RGB_BRAND_TINT_09
 RGB_PASSIVE_BG_ACCENT:      str  = RGB_BRAND_TINT_08
-RGB_PASSIVE_FG:             str  = RGB_BRAND_SHADE_08
+RGB_PASSIVE_FG:             str  = RGB_BRAND_SHADE_03
 
 # Color scheme for interactive UI control elements.
 #
@@ -149,41 +149,23 @@ CSS_ACTIVE_SHADOW:          str  = 'rgba(0, 0, 0, 0.95) 0px 2px 8px'
 #
 SIZE_ZERO:                  str = '0rem'
 SIZE_FULL:                  str = '100%'
-SPACING_TOPLEVEL:           str = '1rem'
-PADDING_TOPLEVEL:           str = '1rem'
-MARGIN_TOPLEVEL:            str = SIZE_ZERO
 FONT:                       str = 'sans-serif'
-RADIUS_BDR:                 str = '1rem'
-RADIUS_BTN:                 str = '1rem'
+RADIUS_BTN:                 str = '0.5rem'
+PADDING_TOPLEVEL:           str = '0.5rem'
 
-# Layout and sizing (canvas)
+# Layout and sizing (Menu bar)
 #
-BORDER_RADIUS_USR:          str = '0.5rem'
-PADDING_LEFT_LLM:           str = '1rem'
-PADDING_LEFT_USR:           str = '1rem'
-PADDING_RIGHT_USR:          str = '1rem'
-PADDING_TOP_USR:            str = '0.25rem'
-PADDING_BOTTOM_USR:         str = '0.25rem'
-MARGIN_TOP_USR:             str = '0.25rem'
-MARGIN_BOTTOM_USR:          str = '0.25rem'
-MARGIN_LEFT_USR:            str = '0rem'
+SIZE_MENU_BAR:              str = '3rem'
+SIZE_MENU_BTN:              str = '2rem'
 
-# Layout and sizing (navigation)
+# Layout and sizing (Monthview)
 #
-SIZE_LEFT_NAVIGATION:       str = '14rem'
-SIZE_LEFT_GUTTER:           str = '15rem'
+RADIUS_CARD:                str = '0.5rem'
+STROKE_CARD_ICON:           int = 3
+RGB_CARD_ICON:              str = RGB_ACTIVE_BTN
 
-# Layout and sizing (chat)
+# Layout and sizing (Navigation bar)
 #
-SIZE_COMMAND_BAR:           str = '4.0rem'
-SIZE_COMMAND_GUTTER:        str = '7.0rem'
-PERCENT_WIDTH_CHAT:         str = '80%'
-MARGIN_CHAT_INPUT:          str = SIZE_ZERO
-BORDER_CHAT_INPUT:          str = 'thin'
-SPACING_CHAT_INPUT:         str = '0.4rem'
-PADDING_CHAT_INPUT:         str = '0.4rem'
-WIDTH_RIGHT_ELEMENT:        str = '3.5rem'
-WIDTH_BTN_SUBMIT:           str = '1.7rem'
-HEIGHT_BTN_SUBMIT:          str = '1.7rem'
-PAD_RIGHT_BTN_SUBMIT:       str = '1.7rem'
-
+SIZE_NAV_BAR:               str = '4rem'
+SIZE_NAV_BTN:               str = '3rem'
+STROKE_NAV_ICON:            int = 2

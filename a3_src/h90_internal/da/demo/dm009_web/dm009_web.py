@@ -110,3 +110,22 @@ def sticky():
                                 relpath      = 't000_wtp/sticky'),
                 id_env      = ID_ENV)
 
+# -----------------------------------------------------------------------------
+def sticky_init():
+    """
+    Init dm009 sticky UI.
+
+    """
+
+    import da.env
+    import da.env.run
+
+    ID_ENV = 'e004_reflex'
+    _path  = da.env.path
+    _run   = da.env.run.shell_command
+    return _run('reflex init',
+                working_dir = _path(
+                                process_area = 'a3_src',
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/sticky'),
+                id_env      = ID_ENV)

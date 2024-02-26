@@ -47,6 +47,7 @@ license:
 import reflex
 
 import sticky.component
+import sticky.component.menu
 import sticky.component.monthview
 import sticky.component.navigation
 import sticky.const
@@ -54,21 +55,46 @@ import sticky.state
 
 
 # -----------------------------------------------------------------------------
-@reflex.page(title   = sticky.const.NAME_APP)
+@reflex.page(title   = sticky.const.NAME_APP,
+             on_load = sticky.state.App.handle_page_index_on_load)
 def index() -> reflex.Component:
     """
     Main page.
 
     """
-    return reflex.fragment(
-                sticky.component.monthview.monthview(),
-                sticky.component.navigation.navigation())
+    return reflex.vstack(
+
+                sticky.component.navigation.navigation(
+                    flex       = 'none',
+                    width      = sticky.const.SIZE_FULL,
+                    height     = sticky.const.SIZE_NAV_BAR,
+                    padding    = sticky.const.PADDING_TOPLEVEL,
+                    background = sticky.const.RGB_PASSIVE_BG),
+
+                sticky.component.monthview.monthview(
+                    flex       = 'auto',
+                    width      = sticky.const.SIZE_FULL,
+                    height     = sticky.const.SIZE_FULL,
+                    padding    = sticky.const.PADDING_TOPLEVEL,
+                    background = sticky.const.RGB_PASSIVE_BG,
+                    style      = { 'max-width':  sticky.const.SIZE_FULL,
+                                   'max-height': sticky.const.SIZE_FULL }),
+
+                sticky.component.menu.menu(
+                    flex       = 'none',
+                    width      = sticky.const.SIZE_FULL,
+                    height     = sticky.const.SIZE_MENU_BAR,
+                    padding    = sticky.const.PADDING_TOPLEVEL,
+                    background = sticky.const.RGB_PASSIVE_BG),
+
+                width  = '100%',
+                height = '100vh')
 
 
 # -----------------------------------------------------------------------------
 style_background = 'linear-gradient(0deg, {rgb_lo}, {rgb_hi})'.format(
-                                            rgb_lo = sticky.const.RGB_PASSIVE_BG,
-                                            rgb_hi = sticky.const.RGB_PASSIVE_BG)
+                                        rgb_lo = sticky.const.RGB_PASSIVE_BG,
+                                        rgb_hi = sticky.const.RGB_PASSIVE_BG)
 map_style_app    = dict(color       = sticky.const.RGB_PASSIVE_FG,
                         background  = style_background,
                         font_family = sticky.const.FONT,
@@ -77,4 +103,13 @@ map_style_app    = dict(color       = sticky.const.RGB_PASSIVE_FG,
                         margin      = sticky.const.SIZE_ZERO,
                         resize      = 'none',
                         stylesheets = ['sticky.css'])
-app = reflex.App(style = map_style_app)
+theme_app        = reflex.theme(
+                        appearance     = 'dark',
+                        has_background = True,
+                        radius         = 'full',
+                        accent_color   = 'teal')
+
+# app = reflex.App(style = map_style_app,
+#                  theme = theme_app)
+
+app = reflex.App(theme = theme_app)
