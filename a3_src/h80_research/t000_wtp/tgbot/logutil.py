@@ -3,14 +3,16 @@
 ---
 
 title:
-    "Sticky menu UI components."
+    "Telegram bot logging utilities module."
 
 description:
-    "This package defines the menu UI
-    components for the Sticky app."
+    "This module contains logging utility
+    functions to help with configuring
+    and running a Telegram bot using the
+    python-telegram-bot library."
 
 id:
-    "bf21471d-330e-4bfe-b1a0-a3aa2ced65ab"
+    "3faff4d4-3057-43e8-99f1-37d35978aa32"
 
 type:
     dt003_python_module
@@ -22,7 +24,7 @@ protection:
     k00_general
 
 copyright:
-    "Copyright 2023 William Payne"
+    "Copyright 2024 William Payne"
 
 license:
     "Licensed under the Apache License, Version
@@ -45,30 +47,25 @@ license:
 """
 
 
-import reflex
-
-import sticky.const
-import sticky.state
+import functools
+import logging
 
 
 # -----------------------------------------------------------------------------
-def menu(**kwargs) -> reflex.Component:
+def trace(fcn_wrapped):
     """
-    Menu component.
+    Add trace logging calls to the wrapped function.
 
     """
 
-    return reflex.hstack(
+    @functools.wraps(fcn_wrapped)
+    def fcn_wrapper(*args, **kwargs):
+        """
+        Trace logging wrapper.
 
-                reflex.heading(
-                    sticky.const.NAME_APP,
-                    height = sticky.const.SIZE_MENU_BTN),
+        """
 
-                reflex.spacer(),
+        logging.debug('Call: %s()', fcn_wrapped.__name__)
+        return fcn_wrapped(*args, **kwargs)
 
-                reflex.icon(
-                    'menu',
-                    width  = sticky.const.SIZE_MENU_BTN,
-                    height = sticky.const.SIZE_MENU_BTN),
-
-                **kwargs)
+    return fcn_wrapper

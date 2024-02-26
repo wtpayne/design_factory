@@ -103,13 +103,4 @@ map_style_app    = dict(color       = sticky.const.RGB_PASSIVE_FG,
                         margin      = sticky.const.SIZE_ZERO,
                         resize      = 'none',
                         stylesheets = ['sticky.css'])
-theme_app        = reflex.theme(
-                        appearance     = 'dark',
-                        has_background = True,
-                        radius         = 'full',
-                        accent_color   = 'teal')
-
-# app = reflex.App(style = map_style_app,
-#                  theme = theme_app)
-
-app = reflex.App(theme = theme_app)
+app = reflex.App(style = map_style_app)

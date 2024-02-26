@@ -38,10 +38,13 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
-    "# Packages required for testing.",
+    "# Packages required for linting/testing.",
     "#",
 
     { "phase": 1, "type": "pep508", "spec": "pytest==7.3.1"                   },
+    { "phase": 1, "type": "pep508", "spec": "isort==5.13.2"                   },
+    { "phase": 1, "type": "pep508", "spec": "pyright==1.1.351"                },
+    { "phase": 1, "type": "pep508", "spec": "pylint==3.1.0"                   },
 
     "",
     "",

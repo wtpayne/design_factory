@@ -63,5 +63,74 @@ def run():
     key.load_all(do_load = True)
 
     import da.env.run
-    return da.env.run.python_function(spec   = 't000_wtp.telegram.bot.main',
-                                      id_env = 'e009_telegram')
+    return da.env.run.python_module(module = 't000_wtp.tgbot',
+                                    id_env = 'e009_telegram')
+
+
+# -----------------------------------------------------------------------------
+def isort():
+    """
+    Run isort tool on the dm010 telegram bot.
+
+    """
+
+    import da.env
+    import da.env.run
+    import key
+
+    key.load_all(do_load = True)
+    ID_ENV       = 'e009_telegram'
+    dirpath_work = da.env.path(
+                            control_tier = 'h80_research',
+                            relpath      = 't000_wtp',
+                            id_env       = ID_ENV)
+    return da.env.run.shell_command(
+                            command      = 'isort tgbot',
+                            id_env       = ID_ENV,
+                            working_dir  = dirpath_work)
+
+
+# -----------------------------------------------------------------------------
+def pyright():
+    """
+    Run pyright tool on the dm010 telegram bot.
+
+    """
+
+    import da.env
+    import da.env.run
+    import key
+
+    key.load_all(do_load = True)
+    ID_ENV       = 'e009_telegram'
+    dirpath_work = da.env.path(
+                            control_tier = 'h80_research',
+                            relpath      = 't000_wtp/tgbot',
+                            id_env       = ID_ENV)
+    return da.env.run.shell_command(
+                            command      = 'pyright .',
+                            id_env       = ID_ENV,
+                            working_dir  = dirpath_work)
+
+
+# -----------------------------------------------------------------------------
+def pylint():
+    """
+    Run pylint tool on the dm010 telegram bot.
+
+    """
+
+    import da.env
+    import da.env.run
+    import key
+
+    key.load_all(do_load = True)
+    ID_ENV       = 'e009_telegram'
+    dirpath_work = da.env.path(
+                            control_tier = 'h80_research',
+                            relpath      = 't000_wtp',
+                            id_env       = ID_ENV)
+    return da.env.run.shell_command(
+                            command      = 'pylint tgbot',
+                            id_env       = ID_ENV,
+                            working_dir  = dirpath_work)
