@@ -57,19 +57,33 @@ import urllib.parse
 
 import pydantic
 import requests
+import telegram
+import yaml
 
 import t000_wtp.tgbot.logutil as tgbot_logutil
 import t000_wtp.tgbot.runtime as tgbot_runtime
 
 
-URL_CHATSERVER = 'https://chatserver.paideia.ai'
+URL_CHATSERVER     = 'https://chatserver.paideia.ai'
+TIMEOUT_CHATSERVER = 60
+
+# Read topic config.
+#
+MAP_CFG_TOPIC = None
+DIRPATH_SELF  = os.path.dirname(os.path.realpath(__file__))
+FILENAME_CFG  = 'topic.cfg.yaml'
+FILEPATH_CFG  = os.path.join(DIRPATH_SELF, FILENAME_CFG)
+with open(FILEPATH_CFG, 'rt', encoding = 'utf-8') as file:
+    MAP_CFG_TOPIC = yaml.safe_load(file)
 
 # id_chat -> coroutine
 map_chat = {}
 
 
 # -----------------------------------------------------------------------------
-async def _chat(fcn_telegram,
+async def _chat(fcn_tg_msg,
+                fcn_tg_reply,
+                fcn_tg_options,
                 fcn_new_conv,
                 fcn_reply):
     """
@@ -86,13 +100,42 @@ async def _chat(fcn_telegram,
 
     # Conversation initiation.
     #
-    state = yield
+    cursor = MAP_CFG_TOPIC
+    state  = yield
     while state.str_topic == '':
-        await fcn_telegram('What topic do you want to discuss?')
-        state = yield
-        state.str_topic = state.str_message_last
 
-    await fcn_telegram(await fcn_new_conv(state.str_topic))
+        if isinstance(cursor, str):
+            state.str_topic = cursor
+            break
+
+        if not isinstance(cursor, dict):
+            str_err = 'Bad configuration (Expected a nested dict)'
+            fcn_tg_msg(str_err)
+            logging.error(str_err)
+            raise RuntimeError(str_err)
+
+        if '_txt' not in cursor:
+            str_err = 'Bad configuration (Expected a _txt field)'
+            fcn_tg_msg(str_err)
+            logging.error(str_err)
+            raise RuntimeError(str_err)
+
+        set_str_opt  = set(cursor.keys()) - {'_txt'}
+        list_str_opt = sorted(set_str_opt)
+
+        await fcn_tg_options(str_text     = cursor['_txt'],
+                             iter_str_opt = list_str_opt)
+        state     = yield
+        selection = state.str_message_last
+
+        if selection not in set_str_opt:
+            await fcn_tg_reply('Selection not recognized.')
+            continue
+
+        cursor = cursor[selection]
+        continue
+
+    await fcn_tg_reply(await fcn_new_conv(state.str_topic))
 
     # Carry out the conversation.
     #
@@ -102,7 +145,7 @@ async def _chat(fcn_telegram,
         logging.info(pprint.pformat(state.dict(), indent=4))
         message = await fcn_reply(state.str_message_last)
         if message:
-            await fcn_telegram(message)
+            await fcn_tg_reply(message)
 
 
 # =============================================================================
@@ -196,9 +239,12 @@ class Context():
         logging.info('Reset/restart chat.')
         self.state.str_topic         = str_topic
         self.state.str_message_last  = ''
-        map_chat[self.id_chat]       = _chat(fcn_telegram = self.telegram,
-                                             fcn_new_conv = self._new_conv,
-                                             fcn_reply    = self._reply)
+        map_chat[self.id_chat]       = _chat(
+                                        fcn_tg_msg     = self.telegram_msg,
+                                        fcn_tg_reply   = self.telegram_reply,
+                                        fcn_tg_options = self.telegram_options,
+                                        fcn_new_conv   = self._new_conv,
+                                        fcn_reply      = self._reply)
         await map_chat[self.id_chat].asend(None)  # Prime the generator
         await map_chat[self.id_chat].asend(self.state)
 
@@ -217,22 +263,53 @@ class Context():
             logging.warning(
                 ('Possible server restart? '
                  'Recreating chat coroutine from saved state.'))
-            map_chat[self.id_chat] = _chat(fcn_telegram = self.telegram,
-                                           fcn_new_conv = self._new_conv,
-                                           fcn_reply    = self._reply)
+            map_chat[self.id_chat] = _chat(
+                                        fcn_tg_msg     = self.telegram_msg,
+                                        fcn_tg_reply   = self.telegram_reply,
+                                        fcn_tg_options = self.telegram_options,
+                                        fcn_new_conv   = self._new_conv,
+                                        fcn_reply      = self._reply)
             await map_chat[self.id_chat].asend(None)  # Prime the generator
             await map_chat[self.id_chat].asend(self.state)
 
     # -------------------------------------------------------------------------
     @tgbot_logutil.trace
-    async def telegram(self, str_text):
+    async def telegram_msg(self, str_text, **kwargs):
         """
         Utility function to send a message to the user via telegram.
 
         """
 
         await self.context.bot.send_message(chat_id = self.id_chat,
-                                            text    = str_text)
+                                            text    = str_text,
+                                            **kwargs)
+
+    # -------------------------------------------------------------------------
+    @tgbot_logutil.trace
+    async def telegram_reply(self, str_text, **kwargs):
+        """
+        Utility function to send a reply message to the user via telegram.
+
+        """
+
+        await self.update.message.reply_text(text = str_text,
+                                             **kwargs)
+
+    # -------------------------------------------------------------------------
+    @tgbot_logutil.trace
+    async def telegram_options(self, str_text, iter_str_opt, **kwargs):
+        """
+        Utility function to present options to the user via telegram.
+
+        """
+
+        keyboard = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
+        markup   = telegram.ReplyKeyboardMarkup(keyboard,
+                                                resize_keyboard   = True,
+                                                one_time_keyboard = True)
+        await self.update.message.reply_text(text         = str_text,
+                                             reply_markup = markup,
+                                             **kwargs)
 
     # -------------------------------------------------------------------------
     async def _new_conv(self, topic):
@@ -284,7 +361,7 @@ class Context():
                  'headers': { 'accept':        'application/json',
                               'Content-Type':  'application/json',
                               'Authorization': f'Bearer {uuid_bearer}'},
-                 'timeout': 10 }
+                 'timeout': TIMEOUT_CHATSERVER }
 
     # -------------------------------------------------------------------------
     def _error_message(self, response):

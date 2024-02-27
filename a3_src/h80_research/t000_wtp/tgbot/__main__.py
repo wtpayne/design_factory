@@ -84,35 +84,10 @@ def main():
 
     dotenv.load_dotenv()
     with tgbot_runtime.Context(os.getenv(KEY_TOKEN)) as bot:
-        bot.handle_member_update(_member_udpate)
         bot.handle_command(_start)
-        bot.handle_command(_new)
-        bot.handle_command(_zuzalu)
-        bot.handle_command(_vitalia)
         bot.handle_command(_help)
         bot.handle_command(_about)
         bot.handle_messages(_msg)
-
-
-# -----------------------------------------------------------------------------
-@tgbot_logutil.trace
-async def _member_udpate(
-            bot:     tgbot_runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Called when a chat member update is recieved.
-
-    This can be used to handle members joining or
-    leaving a multi-member conversaiton.
-
-    """
-
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as _:
-
-        pass
 
 
 # -----------------------------------------------------------------------------
@@ -132,61 +107,7 @@ async def _start(
                                    update  = update,
                                    context = context) as interaction:
 
-        await interaction.telegram(
-                    f'Welcome to the Paideia copilot\n\n{bot.help_text()}')
-
-# -----------------------------------------------------------------------------
-@tgbot_logutil.trace
-async def _new(
-            bot:     tgbot_runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Configure and start a new conversation topic.
-
-    """
-
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
-
         await interaction.reset()
-
-
-# -----------------------------------------------------------------------------
-@tgbot_logutil.trace
-async def _zuzalu(
-            bot:     tgbot_runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Start a new conversation on the zuzalu topic.
-
-    """
-
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
-
-        await interaction.reset(str_topic = STR_TOPIC_ZUZALU)
-
-
-# -----------------------------------------------------------------------------
-@tgbot_logutil.trace
-async def _vitalia(
-            bot:     tgbot_runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Start a new conversation on the vitalia topic.
-
-    """
-
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
-
-        await interaction.reset(str_topic = STR_TOPIC_VITALEA)
 
 
 # -----------------------------------------------------------------------------
@@ -204,7 +125,7 @@ async def _help(
                                    update  = update,
                                    context = context) as interaction:
 
-        await interaction.telegram(bot.help_text())
+        await interaction.telegram_msg(bot.help_text())
 
 
 # -----------------------------------------------------------------------------
@@ -222,7 +143,7 @@ async def _about(
                                    update  = update,
                                    context = context) as interaction:
 
-        await interaction.telegram(f'Paideia bot version {__version__}')
+        await interaction.telegram_msg(f'Paideia bot version {__version__}')
 
 
 # -----------------------------------------------------------------------------
