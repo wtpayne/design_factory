@@ -141,7 +141,10 @@ def _month_card_in_month(idx: int) -> reflex.Component:
                             height = '100%'),
                         reflex.spacer()),
                 on_click      = lambda: sticky.state.App.on_click_month(idx),
-                background    = sticky.const.RGB_PASSIVE_BG_ACCENT,
+                background    = reflex.cond(
+                                    sticky.state.App.is_lightmode,
+                                    sticky.const.RGB_LT_BG_PASSIVE_ACCENT,
+                                    sticky.const.RGB_DK_BG_PASSIVE_ACCENT),
                 border_color  = 'black',
                 border        = 'thin',
                 width         = sticky.const.SIZE_FULL)
@@ -155,7 +158,9 @@ def _month_card_out_of_month() -> reflex.Component:
     """
 
     return reflex.card(
-                background    = sticky.const.RGB_PASSIVE_BG,
+                background    = reflex.cond(sticky.state.App.is_lightmode,
+                                            sticky.const.RGB_LT_BG_PASSIVE,
+                                            sticky.const.RGB_DK_BG_PASSIVE),
                 border_color  = 'black',
                 border        = 'thin',
                 width         = sticky.const.SIZE_FULL)

@@ -45,6 +45,8 @@ license:
 """
 
 
+import functools
+
 import reflex
 
 import sticky.const
@@ -60,7 +62,8 @@ def navigation(**kwargs) -> reflex.Component:
 
     return reflex.hstack(
 
-                _btn_prev(
+                _btn_icon(
+                    id_icon       = 'arrow-left',
                     flex          = 'none',
                     width         = sticky.const.SIZE_NAV_BTN,
                     height        = sticky.const.SIZE_NAV_BTN,
@@ -68,60 +71,142 @@ def navigation(**kwargs) -> reflex.Component:
 
                 reflex.spacer(),
 
-                reflex.card(
-                    sticky.state.App.view_month_name,
+                _menu(
+                    iter_values   = ['January', 'February', 'March', 'April'],
+                    value_default = 'February',
+                    on_select     = sticky.state.App.on_select_month,
                     flex          = 'none',
+                    width         = '7rem',
                     height        = sticky.const.SIZE_NAV_BTN,
-                    border_radius = sticky.const.RADIUS_BTN,
-                    background    = sticky.const.RGB_PASSIVE_BG_ACCENT),
+                    border_radius = sticky.const.RADIUS_BTN),
 
-                reflex.card(
-                    sticky.state.App.view_year,
+                _menu(
+                    iter_values   = ['2024', '2023', '2022'],
+                    value_default = '2024',
+                    on_select     = sticky.state.App.on_select_year,
                     flex          = 'none',
+                    width         = '7rem',
                     height        = sticky.const.SIZE_NAV_BTN,
-                    border_radius = sticky.const.RADIUS_BTN,
-                    background    = sticky.const.RGB_PASSIVE_BG_ACCENT),
+                    border_radius = sticky.const.RADIUS_BTN),
 
                 reflex.spacer(),
 
-                _btn_next(
+                _btn_icon(
+                    id_icon       = 'arrow-right',
                     flex          = 'none',
                     width         = sticky.const.SIZE_NAV_BTN,
                     height        = sticky.const.SIZE_NAV_BTN,
-                    border_radius = sticky.const.RADIUS_BTN,
-                    background    = sticky.const.RGB_ACTIVE_BTN),
+                    border_radius = sticky.const.RADIUS_BTN),
 
                 **kwargs)
 
 
 # -----------------------------------------------------------------------------
-def _btn_prev(**kwargs) -> reflex.Component:
+def _menu(iter_values, value_default, on_select, **kwargs) -> reflex.Component:
     """
+    Menu component with dark/light mode.
+
     """
 
-    return reflex.button(
+    return reflex.menu.root(
 
-                reflex.icon(
-                    'arrow-left',
-                    stroke_width = sticky.const.STROKE_NAV_ICON),
+                _menu_trigger(
+                    value_default,
+                    **kwargs),
 
-                on_click = sticky.state.App.on_click_nav_month_prev(),
+                _menu_content(
+                    iter_values,
+                    on_select = on_select,
+                    width     = kwargs['width']),
 
+                default_value = value_default)
+
+
+
+# -----------------------------------------------------------------------------
+def _menu_trigger(value_default, **kwargs) -> reflex.Component:
+    """
+    Menu trigger component with dark/light mode.
+
+    """
+
+    return reflex.cond(
+
+                sticky.state.App.is_lightmode,
+
+                reflex.menu.trigger(
+                    reflex.button(
+                        value_default,
+                        color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                        background = sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                        **kwargs),
+                    color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                    background = sticky.const.RGB_LT_BG_ACTIVE_BTN),
+
+                reflex.menu.trigger(
+                    reflex.button(
+                        value_default,
+                        color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
+                        background = sticky.const.RGB_DK_BG_ACTIVE_BTN,
+                        **kwargs),
+                    color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
+                    background = sticky.const.RGB_DK_BG_ACTIVE_BTN))
+
+
+# -----------------------------------------------------------------------------
+def _menu_content(iter_values, on_select, width, **kwargs) -> reflex.Component:
+    """
+    Menu content group component with dark/light mode functionality.
+
+    """
+
+    return reflex.menu.content(
+                reflex.foreach(
+                    iter_values,
+                    functools.partial(
+                        _menuitem,
+                        on_select = on_select)),
+                width      = width,
+                color      = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
+                background = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
                 **kwargs)
 
 
 # -----------------------------------------------------------------------------
-def _btn_next(**kwargs) -> reflex.Component:
+def _menuitem(value, on_select) -> reflex.Component:
     """
+    Menu item component as a single function.
+
+    """
+
+    return reflex.menu.item(
+                value,
+                on_select = on_select,
+                value     = value)
+
+
+# -----------------------------------------------------------------------------
+def _btn_icon(id_icon, *args, **kwargs) -> reflex.Component:
+    """
+    A standard button with an icon and dark/light mode functionality.
+
     """
 
     return reflex.button(
 
                 reflex.icon(
-                    'arrow-right',
+                    id_icon,
                     stroke_width = sticky.const.STROKE_NAV_ICON),
 
-                on_click = sticky.state.App.on_click_nav_month_next(),
-
+                *args,
+                color      = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
+                background = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
                 **kwargs)
-

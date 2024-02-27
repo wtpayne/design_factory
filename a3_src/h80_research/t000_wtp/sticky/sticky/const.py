@@ -119,6 +119,32 @@ RGB_BRAND_SHADE_07:         str = RGB_BUSH
 RGB_BRAND_SHADE_08:         str = RGB_RACING_GREEN
 RGB_BRAND_SHADE_09:         str = RGB_ALMOST_BLACK
 
+# Light/dark scheme for passive information display elements.
+#
+RGB_LT_BG_PASSIVE:          str  = RGB_BRAND_TINT_09
+RGB_LT_BG_PASSIVE_ACCENT:   str  = RGB_BRAND_TINT_08
+RGB_LT_FG_PASSIVE:          str  = RGB_BRAND_SHADE_03
+
+RGB_DK_BG_PASSIVE:          str  = RGB_BRAND_SHADE_09
+RGB_DK_BG_PASSIVE_ACCENT:   str  = RGB_BRAND_SHADE_08
+RGB_DK_FG_PASSIVE:          str  = RGB_BRAND_TINT_03
+
+# Light/dark mode color scheme
+#
+
+RGB_LT_BG_ACTIVE_BTN:       str = RGB_BRAND_TINT_05
+RGB_LT_FG_ACTIVE_BTN:       str = RGB_BRAND_SHADE_09
+
+RGB_DK_BG_ACTIVE_BTN:       str = RGB_BRAND_SHADE_07
+RGB_DK_FG_ACTIVE_BTN:       str = RGB_BRAND
+
+
+
+
+
+
+
+
 # Color scheme for passive information display elements.
 #
 RGB_PASSIVE_BG:             str  = RGB_BRAND_TINT_09
@@ -135,6 +161,10 @@ RGB_ACTIVE_FG_MUTED:        str = RGB_BRAND_SHADE_05
 RGB_ACTIVE_BTN_ALT:         str = RGB_BRAND_SHADE_01
 RGB_ACTIVE_BTN:             str = RGB_BRAND_SHADE_02
 RGB_ACTIVE_BTN_FG:          str = RGB_BRAND_SHADE_09
+
+ID_COLOR_MODE_DARK:         int = 0
+ID_COLOR_MODE_LIGHT:        int = 1
+
 
 # Styles and custome CSS for interactive UI control elements.
 #

@@ -68,7 +68,8 @@ def menu(**kwargs) -> reflex.Component:
 
                 reflex.icon(
                     'menu',
-                    width  = sticky.const.SIZE_MENU_BTN,
-                    height = sticky.const.SIZE_MENU_BTN),
+                    on_click = sticky.state.App.on_toggle_color_mode,
+                    width    = sticky.const.SIZE_MENU_BTN,
+                    height   = sticky.const.SIZE_MENU_BTN),
 
                 **kwargs)

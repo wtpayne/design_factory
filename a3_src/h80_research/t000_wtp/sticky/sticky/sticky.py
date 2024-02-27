@@ -66,17 +66,16 @@ def index() -> reflex.Component:
 
                 sticky.component.navigation.navigation(
                     flex       = 'none',
+                    zindex     = '0',
                     width      = sticky.const.SIZE_FULL,
                     height     = sticky.const.SIZE_NAV_BAR,
-                    padding    = sticky.const.PADDING_TOPLEVEL,
-                    background = sticky.const.RGB_PASSIVE_BG),
+                    padding    = sticky.const.PADDING_TOPLEVEL),
 
                 sticky.component.monthview.monthview(
                     flex       = 'auto',
                     width      = sticky.const.SIZE_FULL,
                     height     = sticky.const.SIZE_FULL,
                     padding    = sticky.const.PADDING_TOPLEVEL,
-                    background = sticky.const.RGB_PASSIVE_BG,
                     style      = { 'max-width':  sticky.const.SIZE_FULL,
                                    'max-height': sticky.const.SIZE_FULL }),
 
@@ -84,11 +83,13 @@ def index() -> reflex.Component:
                     flex       = 'none',
                     width      = sticky.const.SIZE_FULL,
                     height     = sticky.const.SIZE_MENU_BAR,
-                    padding    = sticky.const.PADDING_TOPLEVEL,
-                    background = sticky.const.RGB_PASSIVE_BG),
+                    padding    = sticky.const.PADDING_TOPLEVEL),
 
-                width  = '100%',
-                height = '100vh')
+                width      = '100%',
+                height     = '100vh',
+                background = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_BG_PASSIVE,
+                                         sticky.const.RGB_DK_BG_PASSIVE))
 
 
 # -----------------------------------------------------------------------------

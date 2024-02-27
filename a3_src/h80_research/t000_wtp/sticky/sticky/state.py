@@ -44,13 +44,14 @@ license:
 """
 
 
+import asyncio
 import calendar
 import datetime
 
-import asyncio
-
 import pydantic
 import reflex
+
+import sticky.const
 
 
 # =============================================================================
@@ -69,13 +70,36 @@ class App(reflex.State):
 
     """
 
-    COUNT_IDX:         int        = 42
-    list_idx_day:      list[int]  = list(range(COUNT_IDX))
-    list_do_render:    list[bool] = [False] * COUNT_IDX
-    list_day_of_month: list[int]  = [0]     * COUNT_IDX
-    list_has_icon:     list[bool] = [False] * COUNT_IDX
-    view_month:        int        = 0
-    view_year:         int        = 0
+    COUNT_IDX:         int            = 42
+    list_idx_day:      list[int]      = list(range(COUNT_IDX))
+    list_do_render:    list[bool]     = [False] * COUNT_IDX
+    list_day_of_month: list[int]      = [0]     * COUNT_IDX
+    list_has_icon:     list[bool]     = [False] * COUNT_IDX
+    view_month:        int            = 0
+    view_year:         int            = 0
+
+    is_lightmode:      bool           = False
+
+    # -------------------------------------------------------------------------
+    def on_select_year(self, arg1):
+        """
+        """
+
+        print('on_select_year: ' + repr(arg1))
+
+    # -------------------------------------------------------------------------
+    def on_select_month(self, arg1):
+        """
+        """
+
+        print('on_select_month: ' + repr(arg1))
+
+    # -------------------------------------------------------------------------
+    def on_toggle_color_mode(self):
+        """
+        """
+        self.is_lightmode = not self.is_lightmode
+
 
     # -------------------------------------------------------------------------
     @reflex.var
