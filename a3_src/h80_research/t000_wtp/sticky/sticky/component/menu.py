@@ -3,14 +3,14 @@
 ---
 
 title:
-    "Sticky menu UI components."
+    "Menu UI component."
 
 description:
-    "This package defines the menu UI
-    components for the Sticky app."
+    "This package defines a generic menu UI
+    component for the Sticky app."
 
 id:
-    "bf21471d-330e-4bfe-b1a0-a3aa2ced65ab"
+    "0576cce8-3f8b-4b4d-b54d-1ba183547038"
 
 type:
     dt003_python_module
@@ -45,6 +45,8 @@ license:
 """
 
 
+import functools
+
 import reflex
 
 import sticky.const
@@ -52,24 +54,88 @@ import sticky.state
 
 
 # -----------------------------------------------------------------------------
-def menu(**kwargs) -> reflex.Component:
+def menu(iter_values, value_default, on_select, **kwargs) -> reflex.Component:
     """
-    Menu component.
+    Menu component with dark/light mode.
 
     """
 
-    return reflex.hstack(
+    return reflex.menu.root(
 
-                reflex.heading(
-                    sticky.const.NAME_APP,
-                    height = sticky.const.SIZE_MENU_BTN),
+                _menu_trigger(
+                    value_default,
+                    **kwargs),
 
-                reflex.spacer(),
+                _menu_content(
+                    iter_values,
+                    on_select = on_select,
+                    width     = kwargs['width']),
 
-                reflex.icon(
-                    'menu',
-                    on_click = sticky.state.App.on_toggle_color_mode,
-                    width    = sticky.const.SIZE_MENU_BTN,
-                    height   = sticky.const.SIZE_MENU_BTN),
+                default_value = value_default)
 
+
+
+# -----------------------------------------------------------------------------
+def _menu_trigger(value_default, **kwargs) -> reflex.Component:
+    """
+    Menu trigger component with dark/light mode.
+
+    """
+
+    return reflex.cond(
+
+                sticky.state.App.is_lightmode,
+
+                reflex.menu.trigger(
+                    reflex.button(
+                        value_default,
+                        color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                        background = sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                        **kwargs),
+                    color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                    background = sticky.const.RGB_LT_BG_ACTIVE_BTN),
+
+                reflex.menu.trigger(
+                    reflex.button(
+                        value_default,
+                        color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
+                        background = sticky.const.RGB_DK_BG_ACTIVE_BTN,
+                        **kwargs),
+                    color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
+                    background = sticky.const.RGB_DK_BG_ACTIVE_BTN))
+
+
+# -----------------------------------------------------------------------------
+def _menu_content(iter_values, on_select, width, **kwargs) -> reflex.Component:
+    """
+    Menu content group component with dark/light mode functionality.
+
+    """
+
+    return reflex.menu.content(
+                reflex.foreach(
+                    iter_values,
+                    functools.partial(
+                        _menuitem,
+                        on_select = on_select)),
+                width      = width,
+                color      = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
+                background = reflex.cond(sticky.state.App.is_lightmode,
+                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
                 **kwargs)
+
+
+# -----------------------------------------------------------------------------
+def _menuitem(value, on_select) -> reflex.Component:
+    """
+    Menu item component as a single function.
+
+    """
+
+    return reflex.menu.item(
+                value,
+                on_select = on_select,
+                value     = value)

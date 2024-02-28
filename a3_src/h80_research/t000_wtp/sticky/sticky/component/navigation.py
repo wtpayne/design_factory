@@ -45,12 +45,19 @@ license:
 """
 
 
-import functools
-
 import reflex
 
+import sticky.component.menu
 import sticky.const
 import sticky.state
+
+
+ITER_STR_MONTH = ['January', 'February', 'March',
+                  'April',   'May',      'June',
+                  'July',    'August',   'September',
+                  'October', 'November', 'December']
+
+ITER_STR_YEAR = ['2020','2021','2022','2023','2024']
 
 
 # -----------------------------------------------------------------------------
@@ -71,8 +78,8 @@ def navigation(**kwargs) -> reflex.Component:
 
                 reflex.spacer(),
 
-                _menu(
-                    iter_values   = ['January', 'February', 'March', 'April'],
+                sticky.component.menu.menu(
+                    iter_values   = ITER_STR_MONTH,
                     value_default = 'February',
                     on_select     = sticky.state.App.on_select_month,
                     flex          = 'none',
@@ -80,9 +87,9 @@ def navigation(**kwargs) -> reflex.Component:
                     height        = sticky.const.SIZE_NAV_BTN,
                     border_radius = sticky.const.RADIUS_BTN),
 
-                _menu(
-                    iter_values   = ['2024', '2023', '2022'],
-                    value_default = '2024',
+                sticky.component.menu.menu(
+                    iter_values   = ITER_STR_YEAR,
+                    value_default = ITER_STR_YEAR[-1],
                     on_select     = sticky.state.App.on_select_year,
                     flex          = 'none',
                     width         = '7rem',
@@ -99,94 +106,6 @@ def navigation(**kwargs) -> reflex.Component:
                     border_radius = sticky.const.RADIUS_BTN),
 
                 **kwargs)
-
-
-# -----------------------------------------------------------------------------
-def _menu(iter_values, value_default, on_select, **kwargs) -> reflex.Component:
-    """
-    Menu component with dark/light mode.
-
-    """
-
-    return reflex.menu.root(
-
-                _menu_trigger(
-                    value_default,
-                    **kwargs),
-
-                _menu_content(
-                    iter_values,
-                    on_select = on_select,
-                    width     = kwargs['width']),
-
-                default_value = value_default)
-
-
-
-# -----------------------------------------------------------------------------
-def _menu_trigger(value_default, **kwargs) -> reflex.Component:
-    """
-    Menu trigger component with dark/light mode.
-
-    """
-
-    return reflex.cond(
-
-                sticky.state.App.is_lightmode,
-
-                reflex.menu.trigger(
-                    reflex.button(
-                        value_default,
-                        color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                        background = sticky.const.RGB_LT_BG_ACTIVE_BTN,
-                        **kwargs),
-                    color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                    background = sticky.const.RGB_LT_BG_ACTIVE_BTN),
-
-                reflex.menu.trigger(
-                    reflex.button(
-                        value_default,
-                        color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
-                        background = sticky.const.RGB_DK_BG_ACTIVE_BTN,
-                        **kwargs),
-                    color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
-                    background = sticky.const.RGB_DK_BG_ACTIVE_BTN))
-
-
-# -----------------------------------------------------------------------------
-def _menu_content(iter_values, on_select, width, **kwargs) -> reflex.Component:
-    """
-    Menu content group component with dark/light mode functionality.
-
-    """
-
-    return reflex.menu.content(
-                reflex.foreach(
-                    iter_values,
-                    functools.partial(
-                        _menuitem,
-                        on_select = on_select)),
-                width      = width,
-                color      = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
-                background = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
-                **kwargs)
-
-
-# -----------------------------------------------------------------------------
-def _menuitem(value, on_select) -> reflex.Component:
-    """
-    Menu item component as a single function.
-
-    """
-
-    return reflex.menu.item(
-                value,
-                on_select = on_select,
-                value     = value)
 
 
 # -----------------------------------------------------------------------------

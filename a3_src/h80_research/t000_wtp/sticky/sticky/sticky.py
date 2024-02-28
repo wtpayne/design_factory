@@ -47,7 +47,7 @@ license:
 import reflex
 
 import sticky.component
-import sticky.component.menu
+import sticky.component.menubar
 import sticky.component.monthview
 import sticky.component.navigation
 import sticky.const
@@ -62,34 +62,36 @@ def index() -> reflex.Component:
     Main page.
 
     """
-    return reflex.vstack(
 
-                sticky.component.navigation.navigation(
-                    flex       = 'none',
-                    zindex     = '0',
-                    width      = sticky.const.SIZE_FULL,
-                    height     = sticky.const.SIZE_NAV_BAR,
-                    padding    = sticky.const.PADDING_TOPLEVEL),
+    return reflex.fragment(
+                reflex.vstack(
 
-                sticky.component.monthview.monthview(
-                    flex       = 'auto',
-                    width      = sticky.const.SIZE_FULL,
-                    height     = sticky.const.SIZE_FULL,
-                    padding    = sticky.const.PADDING_TOPLEVEL,
-                    style      = { 'max-width':  sticky.const.SIZE_FULL,
-                                   'max-height': sticky.const.SIZE_FULL }),
+                    sticky.component.navigation.navigation(
+                        flex       = 'none',
+                        zindex     = '0',
+                        width      = sticky.const.SIZE_FULL,
+                        height     = sticky.const.SIZE_NAV_BAR,
+                        padding    = sticky.const.PADDING_TOPLEVEL),
 
-                sticky.component.menu.menu(
-                    flex       = 'none',
-                    width      = sticky.const.SIZE_FULL,
-                    height     = sticky.const.SIZE_MENU_BAR,
-                    padding    = sticky.const.PADDING_TOPLEVEL),
+                    sticky.component.monthview.monthview(
+                        flex       = 'auto',
+                        width      = sticky.const.SIZE_FULL,
+                        height     = sticky.const.SIZE_FULL,
+                        padding    = sticky.const.PADDING_TOPLEVEL,
+                        style      = { 'max-width':  sticky.const.SIZE_FULL,
+                                       'max-height': sticky.const.SIZE_FULL }),
 
-                width      = '100%',
-                height     = '100vh',
-                background = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_BG_PASSIVE,
-                                         sticky.const.RGB_DK_BG_PASSIVE))
+                    sticky.component.menubar.menubar(
+                        flex       = 'none',
+                        width      = sticky.const.SIZE_FULL,
+                        height     = sticky.const.SIZE_MENU_BAR,
+                        padding    = sticky.const.PADDING_TOPLEVEL),
+
+                    width      = '100%',
+                    height     = '100vh',
+                    background = reflex.cond(sticky.state.App.is_lightmode,
+                                             sticky.const.RGB_LT_BG_PASSIVE,
+                                             sticky.const.RGB_DK_BG_PASSIVE)))
 
 
 # -----------------------------------------------------------------------------
