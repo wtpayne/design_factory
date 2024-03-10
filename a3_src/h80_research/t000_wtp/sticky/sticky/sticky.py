@@ -47,6 +47,7 @@ license:
 import reflex
 
 import sticky.component
+import sticky.component.overlay_day
 import sticky.component.menubar
 import sticky.component.monthview
 import sticky.component.navigation
@@ -64,6 +65,20 @@ def index() -> reflex.Component:
     """
 
     return reflex.fragment(
+
+                # The day overlay is by default not
+                sticky.component.overlay_day.panel(
+                        display    = reflex.cond(
+                                        sticky.state.App.is_ena_overlay_day,
+                                        'block',
+                                        'none'),
+                        position   = 'absolute',
+                        z_index    = '5',
+                        left       = sticky.const.SIZE_ZERO,
+                        right      = sticky.const.SIZE_ZERO,
+                        top        = sticky.const.SIZE_ZERO,
+                        bottom     = sticky.const.SIZE_MENU_BAR),
+
                 reflex.vstack(
 
                     sticky.component.navigation.navigation(
@@ -75,6 +90,7 @@ def index() -> reflex.Component:
 
                     sticky.component.monthview.monthview(
                         flex       = 'auto',
+                        zindex     = '0',
                         width      = sticky.const.SIZE_FULL,
                         height     = sticky.const.SIZE_FULL,
                         padding    = sticky.const.PADDING_TOPLEVEL,
@@ -83,13 +99,14 @@ def index() -> reflex.Component:
 
                     sticky.component.menubar.menubar(
                         flex       = 'none',
+                        zindex     = '10',
                         width      = sticky.const.SIZE_FULL,
                         height     = sticky.const.SIZE_MENU_BAR,
                         padding    = sticky.const.PADDING_TOPLEVEL),
 
                     width      = '100%',
                     height     = '100vh',
-                    background = reflex.cond(sticky.state.App.is_lightmode,
+                    background = reflex.cond(sticky.state.App.is_ena_lightmode,
                                              sticky.const.RGB_LT_BG_PASSIVE,
                                              sticky.const.RGB_DK_BG_PASSIVE)))
 

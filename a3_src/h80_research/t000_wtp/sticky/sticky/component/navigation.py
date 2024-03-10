@@ -47,17 +47,14 @@ license:
 
 import reflex
 
-import sticky.component.menu
+import sticky.component.button
+import sticky.component.dropdown
 import sticky.const
 import sticky.state
 
 
-ITER_STR_MONTH = ['January', 'February', 'March',
-                  'April',   'May',      'June',
-                  'July',    'August',   'September',
-                  'October', 'November', 'December']
 
-ITER_STR_YEAR = ['2020','2021','2022','2023','2024']
+
 
 
 # -----------------------------------------------------------------------------
@@ -69,7 +66,8 @@ def navigation(**kwargs) -> reflex.Component:
 
     return reflex.hstack(
 
-                _btn_icon(
+                sticky.component.button.button_with_icon(
+                    on_click      = sticky.state.App.on_month_prev,
                     id_icon       = 'arrow-left',
                     flex          = 'none',
                     width         = sticky.const.SIZE_NAV_BTN,
@@ -78,54 +76,32 @@ def navigation(**kwargs) -> reflex.Component:
 
                 reflex.spacer(),
 
-                sticky.component.menu.menu(
-                    iter_values   = ITER_STR_MONTH,
-                    value_default = 'February',
-                    on_select     = sticky.state.App.on_select_month,
+                sticky.component.dropdown.menu(
+                    iter_values   = sticky.state.App.iter_str_month_nav,
+                    value_default = sticky.state.App.str_month_selected,
+                    on_select     = sticky.state.App.on_month_select,
                     flex          = 'none',
-                    width         = '7rem',
+                    width         = sticky.const.WIDTH_NAV_SELECT,
                     height        = sticky.const.SIZE_NAV_BTN,
                     border_radius = sticky.const.RADIUS_BTN),
 
-                sticky.component.menu.menu(
-                    iter_values   = ITER_STR_YEAR,
-                    value_default = ITER_STR_YEAR[-1],
-                    on_select     = sticky.state.App.on_select_year,
+                sticky.component.dropdown.menu(
+                    iter_values   = sticky.state.App.iter_str_year_nav,
+                    value_default = sticky.state.App.str_year_selected,
+                    on_select     = sticky.state.App.on_year_select,
                     flex          = 'none',
-                    width         = '7rem',
+                    width         = sticky.const.WIDTH_NAV_SELECT,
                     height        = sticky.const.SIZE_NAV_BTN,
                     border_radius = sticky.const.RADIUS_BTN),
 
                 reflex.spacer(),
 
-                _btn_icon(
+                sticky.component.button.button_with_icon(
+                    on_click      = sticky.state.App.on_month_next,
                     id_icon       = 'arrow-right',
                     flex          = 'none',
                     width         = sticky.const.SIZE_NAV_BTN,
                     height        = sticky.const.SIZE_NAV_BTN,
                     border_radius = sticky.const.RADIUS_BTN),
 
-                **kwargs)
-
-
-# -----------------------------------------------------------------------------
-def _btn_icon(id_icon, *args, **kwargs) -> reflex.Component:
-    """
-    A standard button with an icon and dark/light mode functionality.
-
-    """
-
-    return reflex.button(
-
-                reflex.icon(
-                    id_icon,
-                    stroke_width = sticky.const.STROKE_NAV_ICON),
-
-                *args,
-                color      = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
-                background = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
                 **kwargs)

@@ -51,7 +51,7 @@
     "#",
 
     { "phase": 1, "type": "pep508", "spec": "dominate==2.8.0"                 },
-    { "phase": 1, "type": "pep508", "spec": "reflex==0.4.1"                   },
+    { "phase": 1, "type": "pep508", "spec": "reflex==0.4.3"                   },
 
     "",
     "",

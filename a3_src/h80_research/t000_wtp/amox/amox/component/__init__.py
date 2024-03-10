@@ -3,17 +3,17 @@
 ---
 
 title:
-    "dm011_dspy demo commands."
+    "Amox UI components."
 
 description:
-    "This module defines commands for the
-    dm011_dspy experiment demonstration."
+    "This package defines UI components for the
+    Amox app."
 
 id:
-    "2868c19f-8025-4664-b33e-404bc4c55771"
+    "b5a5ff44-b1d1-4002-b6e6-faad225c5a60"
 
 type:
-    dt003_python_module
+    dt002_python_package
 
 validation_level:
     v00_minimum
@@ -22,7 +22,7 @@ protection:
     k00_general
 
 copyright:
-    "Copyright 2024 William Payne"
+    "Copyright 2023 William Payne"
 
 license:
     "Licensed under the Apache License, Version
@@ -43,20 +43,3 @@ license:
 
 
 """
-
-
-import getpass
-import os
-import sys
-
-
-# -----------------------------------------------------------------------------
-def run():
-    """
-    Run dm011 DSPy experiment.
-
-    """
-
-    import da.env.run
-    return da.env.run.python_function(spec   = 't000_wtp.dspy.experiment.main',
-                                      id_env = 'e010_dspy')

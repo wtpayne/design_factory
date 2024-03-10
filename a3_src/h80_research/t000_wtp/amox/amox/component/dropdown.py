@@ -3,11 +3,11 @@
 ---
 
 title:
-    "Menu UI component."
+    "Dropdown menu UI components."
 
 description:
-    "This package defines a generic menu UI
-    component for the Sticky app."
+    "This package defines a generic dropdown menu
+    UI component for the Amox app."
 
 id:
     "0576cce8-3f8b-4b4d-b54d-1ba183547038"
@@ -49,8 +49,8 @@ import functools
 
 import reflex
 
-import sticky.const
-import sticky.state
+import amox.const
+import amox.state
 
 
 # -----------------------------------------------------------------------------
@@ -84,25 +84,25 @@ def _menu_trigger(value_default, **kwargs) -> reflex.Component:
 
     return reflex.cond(
 
-                sticky.state.App.is_lightmode,
+                amox.state.App.is_ena_lightmode,
 
                 reflex.menu.trigger(
                     reflex.button(
                         value_default,
-                        color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                        background = sticky.const.RGB_LT_BG_ACTIVE_BTN,
+                        color      = amox.const.RGB_LT_FG_ACTIVE_BTN,
+                        background = amox.const.RGB_LT_BG_ACTIVE_BTN,
                         **kwargs),
-                    color      = sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                    background = sticky.const.RGB_LT_BG_ACTIVE_BTN),
+                    color      = amox.const.RGB_LT_FG_ACTIVE_BTN,
+                    background = amox.const.RGB_LT_BG_ACTIVE_BTN),
 
                 reflex.menu.trigger(
                     reflex.button(
                         value_default,
-                        color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
-                        background = sticky.const.RGB_DK_BG_ACTIVE_BTN,
+                        color      = amox.const.RGB_DK_FG_ACTIVE_BTN,
+                        background = amox.const.RGB_DK_BG_ACTIVE_BTN,
                         **kwargs),
-                    color      = sticky.const.RGB_DK_FG_ACTIVE_BTN,
-                    background = sticky.const.RGB_DK_BG_ACTIVE_BTN))
+                    color      = amox.const.RGB_DK_FG_ACTIVE_BTN,
+                    background = amox.const.RGB_DK_BG_ACTIVE_BTN))
 
 
 # -----------------------------------------------------------------------------
@@ -113,18 +113,19 @@ def _menu_content(iter_values, on_select, width, **kwargs) -> reflex.Component:
     """
 
     return reflex.menu.content(
-                reflex.foreach(
-                    iter_values,
-                    functools.partial(
-                        _menuitem,
-                        on_select = on_select)),
+                reflex.vstack(
+                    reflex.foreach(
+                        iter_values,
+                        functools.partial(
+                            _menuitem,
+                            on_select = on_select))),
                 width      = width,
-                color      = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_FG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_FG_ACTIVE_BTN),
-                background = reflex.cond(sticky.state.App.is_lightmode,
-                                         sticky.const.RGB_LT_BG_ACTIVE_BTN,
-                                         sticky.const.RGB_DK_BG_ACTIVE_BTN),
+                color      = reflex.cond(amox.state.App.is_ena_lightmode,
+                                         amox.const.RGB_LT_FG_ACTIVE_BTN,
+                                         amox.const.RGB_DK_FG_ACTIVE_BTN),
+                background = reflex.cond(amox.state.App.is_ena_lightmode,
+                                         amox.const.RGB_LT_BG_ACTIVE_BTN,
+                                         amox.const.RGB_DK_BG_ACTIVE_BTN),
                 **kwargs)
 
 
@@ -137,5 +138,5 @@ def _menuitem(value, on_select) -> reflex.Component:
 
     return reflex.menu.item(
                 value,
-                on_select = on_select,
+                on_select = functools.partial(on_select, value),
                 value     = value)

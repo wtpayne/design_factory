@@ -3,11 +3,11 @@
 ---
 
 title:
-    "Sticky menubar UI components."
+    "Amox menubar UI components."
 
 description:
     "This package defines the menubar UI
-    components for the Sticky app."
+    components for the Amox app."
 
 id:
     "bf21471d-330e-4bfe-b1a0-a3aa2ced65ab"
@@ -49,9 +49,9 @@ import functools
 
 import reflex
 
-import sticky.component.button
-import sticky.const
-import sticky.state
+import amox.component.button
+import amox.const
+import amox.state
 
 
 # -----------------------------------------------------------------------------
@@ -64,19 +64,19 @@ def menubar(**kwargs) -> reflex.Component:
     return reflex.hstack(
 
                 reflex.heading(
-                    sticky.const.NAME_APP,
+                    amox.const.NAME_APP,
                     color  = reflex.cond(
-                                    sticky.state.App.is_ena_lightmode,
-                                    sticky.const.RGB_LT_FG_PASSIVE,
-                                    sticky.const.RGB_DK_FG_PASSIVE),
-                    height = sticky.const.SIZE_MENU_BTN),
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                    height = amox.const.SIZE_MENUBAR_BTN),
 
                 reflex.spacer(),
 
                 _mainmenu(
                     tag_icon    = 'menu',
-                    iter_values = sticky.state.App.iter_str_menuitem,
-                    on_click    = sticky.state.App.on_click_mainmenu_item),
+                    iter_values = amox.state.App.iter_tup_menuitem,
+                    on_click    = amox.state.App.on_click_mainmenu_item),
 
                 **kwargs)
 
@@ -93,11 +93,11 @@ def _mainmenu(tag_icon, iter_values, on_click, **kwargs) -> reflex.Component:
                 _mainmenu_trigger(
                     tag_icon = tag_icon,
                     color    = reflex.cond(
-                                    sticky.state.App.is_ena_lightmode,
-                                    sticky.const.RGB_LT_FG_PASSIVE,
-                                    sticky.const.RGB_DK_FG_PASSIVE),
-                    width    = sticky.const.SIZE_MENU_BTN,
-                    height   = sticky.const.SIZE_MENU_BTN),
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                    width    = amox.const.SIZE_MENUBAR_BTN,
+                    height   = amox.const.SIZE_MENUBAR_BTN),
 
                 _mainmenu_container(
                     tag_icon    = tag_icon,
@@ -105,17 +105,17 @@ def _mainmenu(tag_icon, iter_values, on_click, **kwargs) -> reflex.Component:
                     on_click    = on_click,
                     top         = 'auto',
                     left        = 'auto',
-                    height      = sticky.const.SIZE_FULL,
-                    width       = sticky.const.SIZE_MENU_MAIN,
-                    padding     = sticky.const.PADDING_TOPLEVEL,
+                    height      = amox.const.SIZE_FULL,
+                    width       = amox.const.SIZE_MAINMENU,
+                    padding     = amox.const.PADDING_TOPLEVEL,
                     color       = reflex.cond(
-                                    sticky.state.App.is_ena_lightmode,
-                                    sticky.const.RGB_LT_FG_PASSIVE,
-                                    sticky.const.RGB_DK_FG_PASSIVE),
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
                     background  = reflex.cond(
-                                    sticky.state.App.is_ena_lightmode,
-                                    sticky.const.RGB_LT_BG_PASSIVE_ACCENT,
-                                    sticky.const.RGB_DK_BG_PASSIVE_ACCENT)),
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT,
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT)),
 
                 direction = 'right')
 
@@ -162,53 +162,60 @@ def _mainmenu_content(
 
                 reflex.foreach(
                     iter_values,
-                    functools.partial(_mainmenu_item, on_click)),
+                    functools.partial(
+                        _mainmenu_item, on_click)),
 
                 reflex.drawer.close(
                     reflex.icon(
                         tag_icon,
-                        width  = sticky.const.SIZE_MENU_BTN,
-                        height = sticky.const.SIZE_MENU_BTN)),
+                        width  = amox.const.SIZE_MENUBAR_BTN,
+                        height = amox.const.SIZE_MENUBAR_BTN)),
 
-                width = sticky.const.SIZE_FULL,
+                width = amox.const.SIZE_FULL,
                 align = 'end')
 
 # -----------------------------------------------------------------------------
-def _mainmenu_item(on_click, str_name, **kwargs) -> reflex.Component:
+def _mainmenu_item(on_click, tup_value, **kwargs) -> reflex.Component:
     """
     """
 
-    return sticky.component.button.button(
-                str_name,
+    return reflex.drawer.close(
+                _mainmenu_item_content(tag_icon  = tup_value[0],
+                                       str_label = tup_value[1]),
                 on_click = functools.partial(
-                                    sticky.state.App.on_click_mainmenu_item,
-                                    str_name),
-                width    = sticky.const.SIZE_FULL,
+                                    amox.state.App.on_click_mainmenu_item,
+                                    tup_value[1]),
+                margin   = amox.const.SIZE_ZERO,
+                padding  = amox.const.SIZE_ZERO,
+                width    = amox.const.SIZE_FULL,
+                height   = amox.const.SIZE_MAINMENU_BTN,
                 **kwargs)
 
 
+# -----------------------------------------------------------------------------
+def _mainmenu_item_content(tag_icon, str_label) -> reflex.Component:
+    """
+    """
 
-#     return reflex.menu.root(
+    return reflex.hstack(
 
-#                 _menu_content(
-#                     iter_values,
-#                     on_select = on_select,
-#                     width     = '10rem'),
+                reflex.match(
+                    tag_icon,
+                    ('settings', _mainmenu_icon('settings')),
+                    ('plus',     _mainmenu_icon('plus'))),
 
-#                 default_value = 'January')
+                str_label,
 
+                padding_left = amox.const.SIZE_MAINMENU_PAD_LEFT,
+                align        = 'center',
+                width        = amox.const.SIZE_FULL)
 
-
-
-                # sticky.component.menu.menu_main(
-                #     iter_values   = sticky.state.App.iter_str_month_nav,
-                #     value_default = reflex.icon(
-                #                         'menu',
-                #                         width    = sticky.const.SIZE_MENU_BTN,
-                #                         height   = sticky.const.SIZE_MENU_BTN),
-                #     on_select     = sticky.state.App.on_month_select,
-                #     flex          = 'none',
-                #     width         = sticky.const.SIZE_MENU_BTN,
-                #     height        = sticky.const.SIZE_MENU_BTN,
-                #     border_radius = sticky.const.RADIUS_BTN),
+# -----------------------------------------------------------------------------
+def _mainmenu_icon(tag_icon) -> reflex.Component:
+    """
+    """
+    return reflex.icon(
+                tag_icon,
+                width  = amox.const.SIZE_MAINMENU_ICON,
+                height = amox.const.SIZE_MAINMENU_ICON)
 

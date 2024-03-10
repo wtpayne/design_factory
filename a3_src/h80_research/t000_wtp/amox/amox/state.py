@@ -3,10 +3,10 @@
 ---
 
 title:
-    "Sticky state."
+    "Amox state."
 
 description:
-    "This module defines sticky application state."
+    "This module defines Amox application state."
 
 id:
     "0f93f463-83b8-4a38-a7d5-17a98564c516"
@@ -51,7 +51,7 @@ import datetime
 import pydantic
 import reflex
 
-import sticky.const
+import amox.const
 
 
 # =============================================================================
@@ -66,14 +66,15 @@ class DayInfo(pydantic.BaseModel):
 # =============================================================================
 class App(reflex.State):
     """
-    Sticky application state.
+    Amox application state.
 
     """
 
     id_user:            str         = '1a78815c-a4cb-4468-a8e6-3abecad6d4e5'
-
-    is_ena_overlay_day: bool        = False
     is_ena_lightmode:   bool        = False
+
+    str_type_overlay:   str         = 'NONE'
+
 
     iter_str_month_nav: list[str]   =  ['January',   'February',
                                         'March',     'April',
@@ -91,23 +92,47 @@ class App(reflex.State):
     list_has_icon:      list[bool]  = [False] * COUNT_IDX
     idx_day_selected:   int         = 0
 
-    iter_str_menuitem:  list[str]   = ['darkmode',
-                                       'settings',
-                                       'add_task']
+    iter_tup_menuitem:  list[tuple[str]] = [('settings',  'Settings'),
+                                            ('plus',      'New Note')]
 
-    list_str_item:      list[str]   = ['Washed',
-                                       'Teeth',
-                                       'Exercise']
+    list_str_item:      list[str]   = ['10:00',
+                                       '13:00',
+                                       '15:30']
+    list_str_setting:   list[str]  = ['darkmode']
 
     # -------------------------------------------------------------------------
     def on_click_mainmenu_item(self, str_item):
         """
         """
 
-        print('CLICK: ' + str_item)
+        if str_item.lower() == 'settings':
+            self.on_settings_open()
+
+    # -------------------------------------------------------------------------
+    def on_click_settings_item(self, str_item):
+        """
+        """
 
         if str_item.lower() == 'darkmode':
             self.on_toggle_color_mode()
+
+    # -------------------------------------------------------------------------
+    def on_settings_open(self):
+        """
+        Open the settings overlay.
+
+        """
+
+        self.str_type_overlay = 'SETTINGS'
+
+    # -------------------------------------------------------------------------
+    def on_settings_close(self):
+        """
+        Close the settings overlay.
+
+        """
+
+        self.str_type_overlay = 'NONE'
 
     # -------------------------------------------------------------------------
     def on_click_daily_item(self, str_item):
@@ -127,7 +152,7 @@ class App(reflex.State):
 
         self.idx_day_selected = idx
         self._update_state_overlay_day()
-        self.is_ena_overlay_day = True
+        self.str_type_overlay = 'DAY'
 
     # -------------------------------------------------------------------------
     def on_toggle_overlay_day(self):
@@ -136,7 +161,10 @@ class App(reflex.State):
 
         """
 
-        self.is_ena_overlay_day = not self.is_ena_overlay_day
+        if self.str_type_overlay == 'DAY':
+            self.str_type_overlay = 'NONE'
+        else:
+            self.str_type_overlay = 'DAY'
 
     # -------------------------------------------------------------------------
     def on_toggle_color_mode(self):
@@ -238,7 +266,7 @@ class App(reflex.State):
 
         """
 
-        date_today          = datetime.date.today()
+        date_today      = datetime.date.today()
         self.year_selected  = date_today.year
         self.month_selected = date_today.month
         self._update_state_monthview()

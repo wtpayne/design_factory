@@ -189,7 +189,8 @@ def _configure_all_launch_commands(cfg):
 def python_interpreter(id_env,
                        id_env_boot = None,
                        acct        = None,
-                       host        = None):
+                       host        = None,
+                       map_envvar  = None):
     """
     Run a python interpreter in the specified environment.
 
@@ -200,7 +201,8 @@ def python_interpreter(id_env,
             id_env      = id_env,
             id_env_boot = id_env_boot,
             acct        = acct,
-            host        = host)
+            host        = host,
+            map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -208,7 +210,8 @@ def python_source(source,
                   id_env,
                   id_env_boot = None,
                   acct        = None,
-                  host        = None):
+                  host        = None,
+                  map_envvar  = None):
     """
     Run a python source string in the specified environment.
 
@@ -219,7 +222,8 @@ def python_source(source,
             id_env      = id_env,
             id_env_boot = id_env_boot,
             acct        = acct,
-            host        = host)
+            host        = host,
+            map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -229,7 +233,8 @@ def python_function(spec,
                     map_kwargs  = None,
                     id_env_boot = None,
                     acct        = None,
-                    host        = None):
+                    host        = None,
+                    map_envvar  = None):
     """
     Run a python module in the specified environment.
 
@@ -270,7 +275,8 @@ def python_function(spec,
             id_env      = id_env,
             id_env_boot = id_env_boot,
             acct        = acct,
-            host        = host)
+            host        = host,
+            map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -278,7 +284,8 @@ def python_module(module,
                   id_env,
                   id_env_boot = None,
                   acct        = None,
-                  host        = None):
+                  host        = None,
+                  map_envvar  = None):
     """
     Run a python module in the specified environment.
 
@@ -289,7 +296,8 @@ def python_module(module,
             id_env      = id_env,
             id_env_boot = id_env_boot,
             acct        = acct,
-            host        = host)
+            host        = host,
+            map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -298,7 +306,8 @@ def _python(option,
             id_env,
             id_env_boot = None,
             acct        = None,
-            host        = None):
+            host        = None,
+            map_envvar  = None):
     """
     Run a python module or source string in the specified environment.
 
@@ -319,7 +328,8 @@ def _python(option,
                 id_env      = id_env,
                 id_env_boot = id_env_boot,
                 acct        = acct,
-                host        = host)
+                host        = host,
+                map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -328,7 +338,8 @@ def shell_command(command,
                   working_dir = None,
                   id_env_boot = None,
                   acct        = None,
-                  host        = None):
+                  host        = None,
+                  map_envvar  = None):
     """
     Run a shell command in the specified environment.
 
@@ -352,14 +363,15 @@ def shell_command(command,
     if working_dir is not None:
         os.chdir(working_dir)
 
-    return _run(str_fmt = str_fmt,
-                ssh     = 'ssh -X',
-                acct    = acct,
-                host    = host,
-                cmd     = command,
-                activ   = da.env.path(process_area = 'a0_env',
-                                      id_env       = id_env,
-                                      relpath      = 'bin/activate'))
+    return _run(str_fmt    = str_fmt,
+                ssh        = 'ssh -X',
+                acct       = acct,
+                host       = host,
+                cmd        = command,
+                activ      = da.env.path(process_area = 'a0_env',
+                                         id_env       = id_env,
+                                         relpath      = 'bin/activate'),
+                map_envvar = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -419,7 +431,7 @@ def _apply_defaults(id_env_boot, acct, host):
 
 
 # -----------------------------------------------------------------------------
-def _run(str_fmt, debug_print = False, **kwargs):
+def _run(str_fmt, debug_print = False, map_envvar = None, **kwargs):
     """
     Format and run the specified string as a shell script in a subprocess.
 
@@ -433,7 +445,10 @@ def _run(str_fmt, debug_print = False, **kwargs):
     if debug_print:
         print(str_command)
     try:
-        result = subprocess.run(str_command, shell = True, check = True)
+        result = subprocess.run(str_command,
+                                shell = True,
+                                check = True,
+                                env   = map_envvar)
         return result.returncode
     except subprocess.CalledProcessError as err:
         return err.returncode

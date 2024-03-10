@@ -3,11 +3,11 @@
 ---
 
 title:
-    "Sticky monthview UI components."
+    "Amox monthview UI components."
 
 description:
     "This package defines the monthview UI
-    component for the sticky app."
+    component for the Amox app."
 
 id:
     "da9cd82e-6069-420f-8ba3-ccb4fa6469eb"
@@ -47,8 +47,8 @@ license:
 
 import reflex
 
-import sticky.const
-import sticky.state
+import amox.const
+import amox.state
 
 
 # -----------------------------------------------------------------------------
@@ -69,13 +69,13 @@ def monthview(**kwargs) -> reflex.Component:
 
                 reflex.grid(
                     reflex.foreach(
-                        sticky.state.App.list_idx_day,
+                        amox.state.App.list_idx_day,
                         _month_card),
 
                     flex    = 'auto',
-                    width   = sticky.const.SIZE_FULL,
-                    height  = sticky.const.SIZE_FULL,
-                    padding = sticky.const.SIZE_ZERO,
+                    width   = amox.const.SIZE_FULL,
+                    height  = amox.const.SIZE_FULL,
+                    padding = amox.const.SIZE_ZERO,
                     spacing = '2',
                     rows    = MAX_WEEKS,
                     columns = COUNT_WEEKDAY,
@@ -95,7 +95,7 @@ def _heading_row(tup_heading) -> reflex.Component:
                 reflex.foreach(
                     tup_heading,
                     reflex.text),
-                width    = sticky.const.SIZE_FULL,
+                width    = amox.const.SIZE_FULL,
                 style    = { 'justify-content': 'space-around' },
                 padding  = '0rem')
 
@@ -108,7 +108,7 @@ def _month_card(idx: int) -> reflex.Component:
     """
 
     return reflex.cond(
-                sticky.state.App.list_do_render[idx],
+                amox.state.App.list_do_render[idx],
                 _month_card_in_month(idx),
                 _month_card_out_of_month())
 
@@ -122,32 +122,35 @@ def _month_card_in_month(idx: int) -> reflex.Component:
 
     return reflex.card(
                 reflex.text(
-                    sticky.state.App.list_day_of_month[idx],
-                    color = sticky.const.RGB_PASSIVE_FG,
+                    amox.state.App.list_day_of_month[idx],
+                    color = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
                     size  = '1',
                     style = { 'position': 'absolute',
                               'top':      '0.5rem',
                               'right':    '0.5rem' }),
                     reflex.cond(
-                        sticky.state.App.list_has_icon[idx],
+                        amox.state.App.list_has_icon[idx],
                         reflex.center(
                             reflex.icon(
                                 'smile',
                                 size         = 50,
                                 flex         = '0 1 auto',
-                                stroke_width = sticky.const.STROKE_CARD_ICON,
-                                color        = sticky.const.RGB_CARD_ICON),
+                                stroke_width = amox.const.STROKE_CARD_ICON,
+                                color        = amox.const.RGB_CARD_ICON),
                             width  = '100%',
                             height = '100%'),
                         reflex.spacer()),
-                on_click      = lambda: sticky.state.App.on_click_month(idx),
+                on_click      = lambda: amox.state.App.on_click_month(idx),
                 background    = reflex.cond(
-                                    sticky.state.App.is_ena_lightmode,
-                                    sticky.const.RGB_LT_BG_PASSIVE_ACCENT,
-                                    sticky.const.RGB_DK_BG_PASSIVE_ACCENT),
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT,
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT),
                 border_color  = 'black',
                 border        = 'thin',
-                width         = sticky.const.SIZE_FULL)
+                width         = amox.const.SIZE_FULL)
 
 
 # -----------------------------------------------------------------------------
@@ -158,9 +161,9 @@ def _month_card_out_of_month() -> reflex.Component:
     """
 
     return reflex.card(
-                background    = reflex.cond(sticky.state.App.is_ena_lightmode,
-                                            sticky.const.RGB_LT_BG_PASSIVE,
-                                            sticky.const.RGB_DK_BG_PASSIVE),
+                background    = reflex.cond(amox.state.App.is_ena_lightmode,
+                                            amox.const.RGB_LT_BG_PASSIVE,
+                                            amox.const.RGB_DK_BG_PASSIVE),
                 border_color  = 'black',
                 border        = 'thin',
-                width         = sticky.const.SIZE_FULL)
+                width         = amox.const.SIZE_FULL)

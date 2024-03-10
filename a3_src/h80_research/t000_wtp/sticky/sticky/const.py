@@ -123,15 +123,14 @@ RGB_BRAND_SHADE_09:         str = RGB_ALMOST_BLACK
 #
 RGB_LT_BG_PASSIVE:          str  = RGB_BRAND_TINT_09
 RGB_LT_BG_PASSIVE_ACCENT:   str  = RGB_BRAND_TINT_08
-RGB_LT_FG_PASSIVE:          str  = RGB_BRAND_SHADE_03
+RGB_LT_FG_PASSIVE:          str  = RGB_BRAND
 
 RGB_DK_BG_PASSIVE:          str  = RGB_BRAND_SHADE_09
 RGB_DK_BG_PASSIVE_ACCENT:   str  = RGB_BRAND_SHADE_08
-RGB_DK_FG_PASSIVE:          str  = RGB_BRAND_TINT_03
+RGB_DK_FG_PASSIVE:          str  = RGB_BRAND
 
 # Light/dark mode color scheme
 #
-
 RGB_LT_BG_ACTIVE_BTN:       str = RGB_BRAND_TINT_05
 RGB_LT_FG_ACTIVE_BTN:       str = RGB_BRAND_SHADE_09
 
@@ -182,11 +181,14 @@ SIZE_FULL:                  str = '100%'
 FONT:                       str = 'sans-serif'
 RADIUS_BTN:                 str = '0.5rem'
 PADDING_TOPLEVEL:           str = '0.5rem'
+MARGIN_TOPLEVEL:            str = '0.5rem'
 
-# Layout and sizing (Menu bar)
+# Layout and sizing (Navigation bar)
 #
-SIZE_MENU_BAR:              str = '3rem'
-SIZE_MENU_BTN:              str = '2rem'
+SIZE_NAV_BAR:               str = '4rem'
+SIZE_NAV_BTN:               str = '3rem'
+WIDTH_NAV_SELECT:           str = '7rem'
+STROKE_BTN_ICON:            int = 2
 
 # Layout and sizing (Monthview)
 #
@@ -194,8 +196,15 @@ RADIUS_CARD:                str = '0.5rem'
 STROKE_CARD_ICON:           int = 3
 RGB_CARD_ICON:              str = RGB_ACTIVE_BTN
 
-# Layout and sizing (Navigation bar)
+# Layout and sizing (Day overlay)
 #
-SIZE_NAV_BAR:               str = '4rem'
-SIZE_NAV_BTN:               str = '3rem'
-STROKE_NAV_ICON:            int = 2
+GUTTTER_DAY:                str = '1.0rem'
+GUTTTER_DAY_BOTTOM:         str = '1.6rem'
+WIDTH_DAY_DONE_BTN:         str = '8rem'
+HEIGHT_DAY_DONE_BTN:        str = '3rem'
+
+# Layout and sizing (Menu bar)
+#
+SIZE_MENU_BAR:              str = '3rem'
+SIZE_MENU_BTN:              str = '2rem'
+SIZE_MENU_MAIN:             str = '12rem'

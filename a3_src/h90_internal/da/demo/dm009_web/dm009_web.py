@@ -129,3 +129,69 @@ def sticky_init():
                                 control_tier = 'h80_research',
                                 relpath      = 't000_wtp/sticky'),
                 id_env      = ID_ENV)
+
+
+# -----------------------------------------------------------------------------
+def amox_init():
+    """
+    Init dm009 amox UI.
+
+    """
+
+    import da.env
+    import da.env.run
+
+    ID_ENV = 'e004_reflex'
+    _path  = da.env.path
+    _run   = da.env.run.shell_command
+    return _run('reflex init',
+                working_dir = _path(
+                                process_area = 'a3_src',
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/amox'),
+                id_env      = ID_ENV)
+
+
+# -----------------------------------------------------------------------------
+def amox():
+    """
+    Run dm009 amox UI.
+
+    """
+
+    import da.env
+    import da.env.run
+
+    ID_ENV = 'e004_reflex'
+    _path  = da.env.path
+    _run   = da.env.run.shell_command
+    return _run('reflex run',
+                working_dir = _path(
+                                process_area = 'a3_src',
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/amox'),
+                id_env      = ID_ENV)
+
+
+# -----------------------------------------------------------------------------
+def chimiadao():
+    """
+    Run dm009 chimiadao UI.
+
+    """
+
+    import da.env
+    import da.env.run
+
+    map_envvar = os.environ.copy()
+    map_envvar['AMOX_CONFIG'] = 'chimiadao.cfg.yaml'
+    ID_ENV     = 'e004_reflex'
+    _path      = da.env.path
+    _run       = da.env.run.shell_command
+    return _run('reflex run',
+                working_dir = _path(
+                                process_area = 'a3_src',
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/amox'),
+                id_env      = ID_ENV,
+                map_envvar  = map_envvar)
