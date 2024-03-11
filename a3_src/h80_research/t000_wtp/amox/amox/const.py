@@ -84,6 +84,11 @@ RGB_LT_FG_ACTIVE_BTN:      str = LT_FG
 RGB_DK_BG_ACTIVE_BTN:      str = DK_BG_T2
 RGB_DK_FG_ACTIVE_BTN:      str = DK_FG_S1
 
+# Drop shadows and transparent overlay opacities.
+#
+RGBA_DIMMING:              str = 'rgba(0, 0, 0, 0.60)'
+
+
 # Layout and sizing (toplevel).
 #
 SIZE_ZERO:                 str = '0rem'

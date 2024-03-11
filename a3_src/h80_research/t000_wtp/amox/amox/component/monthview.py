@@ -94,10 +94,21 @@ def _heading_row(tup_heading) -> reflex.Component:
     return reflex.hstack(
                 reflex.foreach(
                     tup_heading,
-                    reflex.text),
+                    _heading_text),
                 width    = amox.const.SIZE_FULL,
                 style    = { 'justify-content': 'space-around' },
                 padding  = '0rem')
+
+
+# -----------------------------------------------------------------------------
+def _heading_text(str_item) -> reflex.Component:
+    """
+    """
+    return reflex.text(
+                str_item,
+                color = reflex.cond(amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE))
 
 
 # -----------------------------------------------------------------------------

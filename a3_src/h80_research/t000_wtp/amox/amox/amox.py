@@ -3,10 +3,10 @@
 ---
 
 title:
-    "Amox app."
+    "AMOX configurable web application."
 
 description:
-    "Amox app."
+    "AMOX configurable web application."
 
 id:
     "739415a8-0f51-4355-9f86-46d9d661caef"
@@ -47,8 +47,8 @@ license:
 import reflex
 
 import amox.component
-import amox.component.overlay_day
-import amox.component.overlay_settings
+import amox.component.overlay.day
+import amox.component.overlay.settings
 import amox.component.menubar
 import amox.component.monthview
 import amox.component.navigation
@@ -70,16 +70,16 @@ def index() -> reflex.Component:
                 reflex.match(
                     amox.state.App.str_type_overlay,
                     ('NONE',        reflex.box(display = 'none')),
-                    ('DAY',         amox.component.overlay_day.panel(
-                                        background = 'rgba(0, 0, 0, 0.75)',
+                    ('DAY',         amox.component.overlay.day.panel(
+                                        background = amox.const.RGBA_DIMMING,
                                         position   = 'absolute',
                                         z_index    = '5',
                                         left       = amox.const.SIZE_ZERO,
                                         right      = amox.const.SIZE_ZERO,
                                         top        = amox.const.SIZE_ZERO,
                                         bottom     = amox.const.SIZE_MENUBAR)),
-                    ('SETTINGS',    amox.component.overlay_settings.panel(
-                                        background = 'rgba(0, 0, 0, 0.75)',
+                    ('SETTINGS',    amox.component.overlay.settings.panel(
+                                        background = amox.const.RGBA_DIMMING,
                                         position   = 'absolute',
                                         z_index    = '5',
                                         left       = amox.const.SIZE_ZERO,

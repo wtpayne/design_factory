@@ -153,24 +153,27 @@ def amox_init():
 
 
 # -----------------------------------------------------------------------------
-def amox():
+def treats():
     """
-    Run dm009 amox UI.
+    Run dm009 treats UI.
 
     """
 
     import da.env
     import da.env.run
 
-    ID_ENV = 'e004_reflex'
-    _path  = da.env.path
-    _run   = da.env.run.shell_command
+    map_envvar = os.environ.copy()
+    map_envvar['AMOX_CONFIG'] = 'treats.cfg.yaml'
+    ID_ENV     = 'e004_reflex'
+    _path      = da.env.path
+    _run       = da.env.run.shell_command
     return _run('reflex run',
                 working_dir = _path(
                                 process_area = 'a3_src',
                                 control_tier = 'h80_research',
                                 relpath      = 't000_wtp/amox'),
-                id_env      = ID_ENV)
+                id_env      = ID_ENV,
+                map_envvar  = map_envvar)
 
 
 # -----------------------------------------------------------------------------
@@ -195,3 +198,28 @@ def chimiadao():
                                 relpath      = 't000_wtp/amox'),
                 id_env      = ID_ENV,
                 map_envvar  = map_envvar)
+
+
+# -----------------------------------------------------------------------------
+def functionary():
+    """
+    Run dm009 functionary UI.
+
+    """
+
+    import da.env
+    import da.env.run
+
+    map_envvar = os.environ.copy()
+    map_envvar['AMOX_CONFIG'] = 'functionary.cfg.yaml'
+    ID_ENV     = 'e004_reflex'
+    _path      = da.env.path
+    _run       = da.env.run.shell_command
+    return _run('reflex run',
+                working_dir = _path(
+                                process_area = 'a3_src',
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/amox'),
+                id_env      = ID_ENV,
+                map_envvar  = map_envvar)
+

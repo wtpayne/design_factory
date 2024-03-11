@@ -141,7 +141,7 @@ def _mainmenu_container(
 
     """
     return reflex.fragment(
-                reflex.drawer.overlay(),
+                reflex.drawer.overlay(background = amox.const.RGBA_DIMMING),
                 reflex.drawer.portal(
                     reflex.drawer.content(
                         _mainmenu_content(

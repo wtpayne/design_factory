@@ -6,8 +6,8 @@ title:
     "Day overlay UI components."
 
 description:
-    "This package defines a day overlay UI
-    component for the Amox app."
+    "This package defines UI components for
+    the daily overview overlay."
 
 id:
     "6a19b70a-04fb-49d7-a4fc-d36ba6bc89e5"
@@ -61,42 +61,51 @@ def panel(**kwargs) -> reflex.Component:
 
     """
 
-    return reflex.box(
+    return reflex.center(
                 reflex.card(
 
-                    reflex.heading('Records'),
-
-                    reflex.spacer(
-                        height = amox.const.PADDING_TOPLEVEL),
-
-                    reflex.center(
-                        reflex.vstack(
-                            reflex.foreach(
-                                amox.state.App.list_str_item,
-                                _daily_item))),
-
-                    amox.component.button.button(
-                        'Done',
-                        on_click      = amox.state.App.on_toggle_overlay_day,
-                        width         = amox.const.WIDTH_DAY_DONE_BTN,
-                        height        = amox.const.HEIGHT_DAY_DONE_BTN,
-                        border_radius = amox.const.RADIUS_BTN,
-                        position      = 'absolute',
-                        right         = amox.const.PADDING_TOPLEVEL,
-                        bottom        = amox.const.PADDING_TOPLEVEL),
+                    _panel_content(),
 
                     background   = reflex.cond(
                                             amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_BG_PASSIVE,
                                             amox.const.RGB_DK_BG_PASSIVE),
-                    position     = 'absolute',
-                    left         = amox.const.GUTTTER_DAY,
-                    right        = amox.const.GUTTTER_DAY,
-                    top          = amox.const.GUTTTER_DAY,
-                    bottom       = amox.const.GUTTTER_DAY_BOTTOM,
+
+                    # position   = 'absolute',
+                    # left       = amox.const.GUTTTER_DAY,
+                    # right      = amox.const.GUTTTER_DAY,
+                    # top        = amox.const.GUTTTER_DAY,
+                    # bottom     = amox.const.GUTTTER_DAY_BOTTOM,
+
+                    width        = '22rem',
+                    height       = '90%',
                     border_color = 'black',
                     border       = 'thin'),
                 **kwargs)
+
+
+# -----------------------------------------------------------------------------
+def _panel_content() -> reflex.Component:
+    """
+    """
+    return reflex.fragment(
+                reflex.heading('Achievements'),
+                reflex.spacer(
+                    height = amox.const.PADDING_TOPLEVEL),
+                reflex.center(
+                    reflex.vstack(
+                        reflex.foreach(
+                            amox.state.App.list_str_item,
+                            _daily_item))),
+                amox.component.button.button(
+                    'Done',
+                    on_click      = amox.state.App.on_toggle_overlay_day,
+                    width         = amox.const.WIDTH_DAY_DONE_BTN,
+                    height        = amox.const.HEIGHT_DAY_DONE_BTN,
+                    border_radius = amox.const.RADIUS_BTN,
+                    position      = 'absolute',
+                    right         = amox.const.PADDING_TOPLEVEL,
+                    bottom        = amox.const.PADDING_TOPLEVEL))
 
 
 # -----------------------------------------------------------------------------

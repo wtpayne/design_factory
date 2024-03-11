@@ -3,11 +3,11 @@
 ---
 
 title:
-    "Settings UI components."
+    "Settings overlay UI components."
 
 description:
-    "This package defines a settings UI
-    component for the Amox app."
+    "This package defines UI components for
+    the settings overlay."
 
 id:
     "7a0bc997-78a7-4405-8ea7-31004e826731"
