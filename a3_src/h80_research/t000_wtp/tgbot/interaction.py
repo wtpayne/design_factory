@@ -48,6 +48,7 @@ license:
 """
 
 
+import asyncio
 import http
 import logging
 import os
@@ -76,12 +77,10 @@ FILEPATH_CFG  = os.path.join(DIRPATH_SELF, FILENAME_CFG)
 with open(FILEPATH_CFG, 'rt', encoding = 'utf-8') as file:
     MAP_CFG_TOPIC = yaml.safe_load(file)
 
-# id_chat -> coroutine
-map_chat = {}
-
 
 # -----------------------------------------------------------------------------
-async def _chat(fcn_tg_msg,
+async def _chat(queue,
+                fcn_tg_msg,
                 fcn_tg_reply,
                 fcn_tg_options,
                 fcn_new_conv,
@@ -89,9 +88,9 @@ async def _chat(fcn_tg_msg,
     """
     Chat coroutine.
 
-    This synchronous coroutine is responsible for
-    defining the chat lifecycle from initiation
-    through to conclusion.
+    This asynchronous coroutine is responsible
+    for defining the chat lifecycle from
+    initiation through to conclusion.
 
     All dependencies are injected so that the
     chat logic can be tested in isolation.
@@ -101,48 +100,59 @@ async def _chat(fcn_tg_msg,
     # Conversation initiation.
     #
     cursor = MAP_CFG_TOPIC
-    state  = yield
+    state  = await queue.get()
+
     while state.str_topic == '':
 
+        # Termination criterion. We have found the
+        # topic of conversation so we can move on.
+        #
         if isinstance(cursor, str):
             state.str_topic = cursor
             break
 
+        # Sanity checking.
+        #
         if not isinstance(cursor, dict):
             str_err = 'Bad configuration (Expected a nested dict)'
             fcn_tg_msg(str_err)
             logging.error(str_err)
             raise RuntimeError(str_err)
-
         if '_txt' not in cursor:
             str_err = 'Bad configuration (Expected a _txt field)'
             fcn_tg_msg(str_err)
             logging.error(str_err)
             raise RuntimeError(str_err)
 
+        # Present the next set of options to the
+        # user.
+        #
         set_str_opt  = set(cursor.keys()) - {'_txt'}
         list_str_opt = sorted(set_str_opt)
-
         await fcn_tg_options(str_text     = cursor['_txt'],
                              iter_str_opt = list_str_opt)
-        state     = yield
+        state     = await queue.get()
         selection = state.str_message_last
 
+        # Sanity checking.
+        #
         if selection not in set_str_opt:
             await fcn_tg_reply('Selection not recognized.')
             continue
 
+        # Descend to the next level of the tree.
+        #
         cursor = cursor[selection]
         continue
 
-    await fcn_tg_reply(await fcn_new_conv(state.str_topic))
+    question = await fcn_new_conv(state.str_topic)
+    await fcn_tg_reply(question)
 
     # Carry out the conversation.
     #
     while True:
 
-        state = yield
-        logging.info(pprint.pformat(state.dict(), indent=4))
+        state   = await queue.get()
         message = await fcn_reply(state.str_message_last)
         if message:
             await fcn_tg_reply(message)
@@ -237,16 +247,17 @@ class Context():
         """
 
         logging.info('Reset/restart chat.')
-        self.state.str_topic         = str_topic
-        self.state.str_message_last  = ''
-        map_chat[self.id_chat]       = _chat(
-                                        fcn_tg_msg     = self.telegram_msg,
-                                        fcn_tg_reply   = self.telegram_reply,
-                                        fcn_tg_options = self.telegram_options,
-                                        fcn_new_conv   = self._new_conv,
-                                        fcn_reply      = self._reply)
-        await map_chat[self.id_chat].asend(None)  # Prime the generator
-        await map_chat[self.id_chat].asend(self.state)
+        self.state.str_topic             = str_topic
+        self.state.str_message_last      = ''
+        self.bot.map_queue[self.id_chat] = asyncio.Queue()
+        self.bot.map_chat[self.id_chat]  = asyncio.create_task(
+            _chat(queue          = self.bot.map_queue[self.id_chat],
+                  fcn_tg_msg     = self.telegram_msg,
+                  fcn_tg_reply   = self.telegram_reply,
+                  fcn_tg_options = self.telegram_options,
+                  fcn_new_conv   = self._new_conv,
+                  fcn_reply      = self._reply))
+        await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
     @tgbot_logutil.trace
@@ -258,19 +269,20 @@ class Context():
 
         self.state.str_message_last = self.update.message.text
         try:
-            await map_chat[self.id_chat].asend(self.state)
+            await self.bot.map_queue[self.id_chat].put(self.state)
         except KeyError:
             logging.warning(
                 ('Possible server restart? '
                  'Recreating chat coroutine from saved state.'))
-            map_chat[self.id_chat] = _chat(
-                                        fcn_tg_msg     = self.telegram_msg,
-                                        fcn_tg_reply   = self.telegram_reply,
-                                        fcn_tg_options = self.telegram_options,
-                                        fcn_new_conv   = self._new_conv,
-                                        fcn_reply      = self._reply)
-            await map_chat[self.id_chat].asend(None)  # Prime the generator
-            await map_chat[self.id_chat].asend(self.state)
+            self.bot.map_queue[self.id_chat] = asyncio.Queue()
+            self.bot.map_chat[self.id_chat]  = asyncio.create_task(
+                _chat(queue          = self.bot.map_queue[self.id_chat],
+                      fcn_tg_msg     = self.telegram_msg,
+                      fcn_tg_reply   = self.telegram_reply,
+                      fcn_tg_options = self.telegram_options,
+                      fcn_new_conv   = self._new_conv,
+                      fcn_reply      = self._reply))
+            await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
     @tgbot_logutil.trace

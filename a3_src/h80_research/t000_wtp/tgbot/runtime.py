@@ -100,17 +100,26 @@ class Context():
         logging.basicConfig(format = str_format,
                             level  = logging.INFO)
 
-        dirpath_self  = os.path.dirname(os.path.realpath(__file__))
-        filename_db   = 'bot.db'
-        filepath_db   = os.path.join(dirpath_self, filename_db)
-        self.db       = sqlitedict.SqliteDict(filepath_db,
-                                              encode = dill.dumps,
-                                              decode = dill.loads)
+        dirpath_self   = os.path.dirname(os.path.realpath(__file__))
+        filename_db    = 'bot.db'
+        filepath_db    = os.path.join(dirpath_self, filename_db)
+        self.db        = sqlitedict.SqliteDict(filepath_db,
+                                               encode = dill.dumps,
+                                               decode = dill.loads)
 
-        app_builder   = telegram.ext.ApplicationBuilder().token(str_token)
-        self.app      = app_builder.build()
+        app_builder    = telegram.ext.ApplicationBuilder().token(str_token)
+        self.app       = app_builder.build()
 
-        self.list_cmd = []
+        # [(str_command, str_doc)], for help text.
+        self.list_cmd  = []
+
+        # id_chat -> coroutine
+        #
+        self.map_chat  = {}
+
+        # id_chat -> asyncio.queue
+        #
+        self.map_queue = {}
 
     # -------------------------------------------------------------------------
     def __enter__(self):
