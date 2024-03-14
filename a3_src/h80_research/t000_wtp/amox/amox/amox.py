@@ -63,8 +63,6 @@ def index() -> reflex.Component:
     """
     Main page.
 
-    ['100%', '50%', '50%', '50%', '50%'],
-
     """
 
     return reflex.fragment(

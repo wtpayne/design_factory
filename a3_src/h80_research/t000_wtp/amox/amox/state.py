@@ -100,6 +100,85 @@ class App(reflex.State):
     list_str_setting:   list[str]  = ['darkmode']
 
     # -------------------------------------------------------------------------
+    def on_click_nav_month_prev(self):
+        """
+        Handle the previous consecutive month being selected.
+
+        """
+
+        first_of_month      = datetime.datetime(self.year_selected,
+                                                self.month_selected,
+                                                1)
+        last_of_prev_month  = first_of_month - datetime.timedelta(days = 1)
+        self.month_selected = last_of_prev_month.month
+        self.year_selected  = last_of_prev_month.year
+        self._update_state_monthview()
+
+    # -------------------------------------------------------------------------
+    def on_select_nav_month(self, value, _):
+        """
+        Handle a new month being selected.
+
+        """
+
+        self.month_selected = datetime.datetime.strptime(value, '%B').month
+        self._update_state_monthview()
+
+    # -------------------------------------------------------------------------
+    def on_select_nav_year(self, value, _):
+        """
+        Handle a new year being selected.
+
+        """
+
+        self.year_selected = int(value)
+        self._update_state_monthview()
+
+    # -------------------------------------------------------------------------
+    def on_click_nav_month_next(self):
+        """
+        Handle the next consecutive month being selected.
+
+        """
+
+        first_of_month         = datetime.datetime(self.year_selected,
+                                                   self.month_selected,
+                                                   1)
+        some_day_in_next_month = first_of_month + datetime.timedelta(days = 31)
+        self.month_selected    = some_day_in_next_month.month
+        self.year_selected     = some_day_in_next_month.year
+        self._update_state_monthview()
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_day_past(self, idx):
+        """
+        Handle when a past day is clicked in the monthview component.
+
+        """
+
+        print('PAST')
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_today(self, idx):
+        """
+        Handle when today is clicked in the monthview component.
+
+        """
+
+        self.idx_day_selected = idx
+        self._update_state_overlay_day()
+        self.str_type_overlay = 'day'
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_day_future(self, idx):
+        """
+        Handle when a future day is clicked in the monthview component.
+
+        """
+
+        print('FUTURE')
+
+    # -------------------------------------------------------------------------
     def on_click_mainmenu(self):
         """
         """
@@ -149,17 +228,6 @@ class App(reflex.State):
         """
 
         print(str_item)
-
-    # -------------------------------------------------------------------------
-    def on_click_month(self, idx):
-        """
-        Handle when a month card is clicked in the monthview component.
-
-        """
-
-        self.idx_day_selected = idx
-        self._update_state_overlay_day()
-        self.str_type_overlay = 'day'
 
     # -------------------------------------------------------------------------
     def on_toggle_overlay_day(self):
@@ -217,56 +285,6 @@ class App(reflex.State):
         return calendar.month_name[self.month_selected]
 
     # -------------------------------------------------------------------------
-    def on_year_select(self, value, _):
-        """
-        Handle a new year being selected.
-
-        """
-
-        self.year_selected = int(value)
-        self._update_state_monthview()
-
-    # -------------------------------------------------------------------------
-    def on_month_select(self, value, _):
-        """
-        Handle a new month being selected.
-
-        """
-
-        self.month_selected = datetime.datetime.strptime(value, '%B').month
-        self._update_state_monthview()
-
-    # -------------------------------------------------------------------------
-    def on_month_prev(self):
-        """
-        Handle the previous consecutive month being selected.
-
-        """
-
-        first_of_month      = datetime.datetime(self.year_selected,
-                                                self.month_selected,
-                                                1)
-        last_of_prev_month  = first_of_month - datetime.timedelta(days = 1)
-        self.month_selected = last_of_prev_month.month
-        self.year_selected  = last_of_prev_month.year
-        self._update_state_monthview()
-
-    # -------------------------------------------------------------------------
-    def on_month_next(self):
-        """
-        Handle the next consecutive month being selected.
-
-        """
-
-        first_of_month         = datetime.datetime(self.year_selected,
-                                                   self.month_selected,
-                                                   1)
-        some_day_in_next_month = first_of_month + datetime.timedelta(days = 31)
-        self.month_selected    = some_day_in_next_month.month
-        self.year_selected     = some_day_in_next_month.year
-        self._update_state_monthview()
-
-    # -------------------------------------------------------------------------
     def handle_page_index_on_load(self):
         """
         Handle the on_load event on the index page.
@@ -299,24 +317,41 @@ class App(reflex.State):
             for day in week:
 
                 is_valid_day = (day != 0)
-                is_today     = (     is_valid_day
-                                 and is_selected_month
-                                 and day == date_today.day)
+
+                if is_valid_day:
+                    date_of_day = datetime.date(self.year_selected,
+                                                self.month_selected,
+                                                day)
+                    is_future   = date_of_day >  date_today
+                    is_past     = date_of_day <  date_today
+                    is_today    = date_of_day == date_today
+                else:
+                    is_future   = False
+                    is_past     = False
+                    is_today    = False
 
                 if not is_valid_day:
                     self.list_day_type[idx]     = 'inactive'
                     self.list_str_icon[idx]     = 'none'
                     self.list_day_of_month[idx] = 0
 
+                elif is_past:
+                    self.list_day_type[idx]     = 'past'
+                    self.list_str_icon[idx]     = 'none'
+                    self.list_day_of_month[idx] = day
+
                 elif is_today:
                     self.list_day_type[idx]     = 'today'
                     self.list_str_icon[idx]     = 'smile'
                     self.list_day_of_month[idx] = day
 
-                else:
-                    self.list_day_type[idx]     = 'active'
+                elif is_future:
+                    self.list_day_type[idx]     = 'future'
                     self.list_str_icon[idx]     = 'none'
                     self.list_day_of_month[idx] = day
+
+                else:
+                    raise RuntimeError('Something bad went wrong.')
 
                 idx += 1
 

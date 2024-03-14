@@ -63,7 +63,7 @@ def navigation(**kwargs) -> reflex.Component:
     return reflex.hstack(
 
                 amox.component.button.button_with_icon(
-                    on_click      = amox.state.App.on_month_prev,
+                    on_click      = amox.state.App.on_click_nav_month_prev,
                     tag_icon      = 'arrow-left',
                     flex          = 'none',
                     width         = amox.const.SIZE_NAV_BTN,
@@ -75,7 +75,7 @@ def navigation(**kwargs) -> reflex.Component:
                 amox.component.dropdown.menu(
                     iter_values   = amox.state.App.iter_str_month_nav,
                     value_default = amox.state.App.str_month_selected,
-                    on_select     = amox.state.App.on_month_select,
+                    on_select     = amox.state.App.on_select_nav_month,
                     flex          = 'none',
                     width         = amox.const.WIDTH_NAV_SELECT,
                     height        = amox.const.SIZE_NAV_BTN,
@@ -84,7 +84,7 @@ def navigation(**kwargs) -> reflex.Component:
                 amox.component.dropdown.menu(
                     iter_values   = amox.state.App.iter_str_year_nav,
                     value_default = amox.state.App.str_year_selected,
-                    on_select     = amox.state.App.on_year_select,
+                    on_select     = amox.state.App.on_select_nav_year,
                     flex          = 'none',
                     width         = amox.const.WIDTH_NAV_SELECT,
                     height        = amox.const.SIZE_NAV_BTN,
@@ -93,7 +93,7 @@ def navigation(**kwargs) -> reflex.Component:
                 reflex.spacer(),
 
                 amox.component.button.button_with_icon(
-                    on_click      = amox.state.App.on_month_next,
+                    on_click      = amox.state.App.on_click_nav_month_next,
                     tag_icon      = 'arrow-right',
                     flex          = 'none',
                     width         = amox.const.SIZE_NAV_BTN,

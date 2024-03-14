@@ -120,13 +120,14 @@ def _month_card(idx: int) -> reflex.Component:
 
     return reflex.match(
                 amox.state.App.list_day_type[idx],
-                ('inactive', _month_card_out_of_month()),
-                ('active',   _month_card_in_month(idx)),
-                ('today',    _month_card_today(idx)))
+                ('inactive', _mv_card_day_inactive()),
+                ('past',     _mv_card_day_past(idx)),
+                ('today',    _mv_card_day_today(idx)),
+                ('future',   _mv_card_day_future(idx)))
 
 
 # -----------------------------------------------------------------------------
-def _month_card_out_of_month() -> reflex.Component:
+def _mv_card_day_inactive() -> reflex.Component:
     """
     Month card (in month) component.
 
@@ -145,7 +146,7 @@ def _month_card_out_of_month() -> reflex.Component:
 
 
 # -----------------------------------------------------------------------------
-def _month_card_in_month(idx: int) -> reflex.Component:
+def _mv_card_day_past(idx: int) -> reflex.Component:
     """
     Month card (in month) component.
 
@@ -166,7 +167,7 @@ def _month_card_in_month(idx: int) -> reflex.Component:
                     _month_card_icon(
                         tag_icon = amox.state.App.list_str_icon[idx]),
 
-                on_click      = lambda: amox.state.App.on_click_month(idx),
+                on_click      = lambda: amox.state.App.on_click_mv_day_past(idx),
                 background    = reflex.cond(
                                     amox.state.App.is_ena_lightmode,
                                     amox.const.RGB_LT_BG_PASSIVE_ACCENT_1,
@@ -180,7 +181,7 @@ def _month_card_in_month(idx: int) -> reflex.Component:
 
 
 # -----------------------------------------------------------------------------
-def _month_card_today(idx: int) -> reflex.Component:
+def _mv_card_day_today(idx: int) -> reflex.Component:
     """
     Month card (in month) component.
 
@@ -201,7 +202,7 @@ def _month_card_today(idx: int) -> reflex.Component:
                     _month_card_icon(
                         tag_icon = amox.state.App.list_str_icon[idx]),
 
-                on_click      = lambda: amox.state.App.on_click_month(idx),
+                on_click      = lambda: amox.state.App.on_click_mv_today(idx),
                 background    = reflex.cond(
                                     amox.state.App.is_ena_lightmode,
                                     amox.const.RGB_LT_BG_PASSIVE_ACCENT_2,
@@ -213,6 +214,40 @@ def _month_card_today(idx: int) -> reflex.Component:
                 border        = 'thin',
                 width         = amox.const.SIZE_FULL)
 
+
+# -----------------------------------------------------------------------------
+def _mv_card_day_future(idx: int) -> reflex.Component:
+    """
+    Month card (in month) component.
+
+    """
+
+    return reflex.card(
+                reflex.text(
+                    amox.state.App.list_day_of_month[idx],
+                    color = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                    size  = '1',
+                    style = { 'position': 'absolute',
+                              'top':      '0.5rem',
+                              'right':    '0.5rem' }),
+
+                    _month_card_icon(
+                        tag_icon = amox.state.App.list_str_icon[idx]),
+
+                on_click      = lambda: amox.state.App.on_click_mv_day_future(idx),
+                background    = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT_1,
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_1),
+                border_color  = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                border        = 'thin',
+                width         = amox.const.SIZE_FULL)
 
 # -----------------------------------------------------------------------------
 def _month_card_icon(tag_icon: str) -> reflex.Component:
