@@ -58,7 +58,7 @@ import urllib.parse
 
 import pydantic
 import requests
-import telegram
+import telegram  # pylint: disable=wrong-import-order
 import yaml
 
 import t000_wtp.tgbot.logutil as tgbot_logutil
@@ -84,7 +84,7 @@ async def _chat(queue,
                 fcn_tg_reply,
                 fcn_tg_options,
                 fcn_new_conv,
-                fcn_reply):
+                fcn_reply):  # pylint: disable=too-many-arguments
     """
     Chat coroutine.
 

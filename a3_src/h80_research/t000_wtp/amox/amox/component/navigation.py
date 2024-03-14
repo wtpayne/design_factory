@@ -64,7 +64,7 @@ def navigation(**kwargs) -> reflex.Component:
 
                 amox.component.button.button_with_icon(
                     on_click      = amox.state.App.on_month_prev,
-                    id_icon       = 'arrow-left',
+                    tag_icon      = 'arrow-left',
                     flex          = 'none',
                     width         = amox.const.SIZE_NAV_BTN,
                     height        = amox.const.SIZE_NAV_BTN,
@@ -94,7 +94,7 @@ def navigation(**kwargs) -> reflex.Component:
 
                 amox.component.button.button_with_icon(
                     on_click      = amox.state.App.on_month_next,
-                    id_icon       = 'arrow-right',
+                    tag_icon      = 'arrow-right',
                     flex          = 'none',
                     width         = amox.const.SIZE_NAV_BTN,
                     height        = amox.const.SIZE_NAV_BTN,

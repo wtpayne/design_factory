@@ -73,11 +73,43 @@ def menubar(**kwargs) -> reflex.Component:
 
                 reflex.spacer(),
 
-                _mainmenu(
-                    tag_icon    = 'menu',
-                    iter_values = amox.state.App.iter_tup_menuitem,
-                    on_click    = amox.state.App.on_click_mainmenu_item),
+                _button_mainmenu(
+                    on_click = amox.state.App.on_click_mainmenu,
+                    tag_icon = 'menu'),
 
+                reflex.cond(
+                    amox.state.App.is_ena_mainmenu,
+                    _mainmenu(
+                        tag_icon    = 'menu',
+                        iter_values = amox.state.App.iter_tup_menuitem,
+                        on_click    = amox.state.App.on_click_mainmenu_item),
+                    reflex.fragment()),
+
+                **kwargs)
+
+
+# -----------------------------------------------------------------------------
+def _button_mainmenu(tag_icon, *args, **kwargs) -> reflex.Component:
+    """
+    A standard button with an icon and dark/light mode functionality.
+
+    """
+
+    return reflex.button(
+
+                reflex.icon(
+                    tag_icon,
+                    stroke_width = amox.const.STROKE_BTN_ICON,
+                    width        = amox.const.SIZE_MAINMENU_ICON,
+                    height       = amox.const.SIZE_MAINMENU_ICON),
+
+                *args,
+                color      = reflex.cond(amox.state.App.is_ena_lightmode,
+                                         amox.const.RGB_LT_FG_PASSIVE,
+                                         amox.const.RGB_DK_FG_PASSIVE),
+                background = reflex.cond(amox.state.App.is_ena_lightmode,
+                                         amox.const.RGB_LT_BG_PASSIVE,
+                                         amox.const.RGB_DK_BG_PASSIVE),
                 **kwargs)
 
 
@@ -88,67 +120,39 @@ def _mainmenu(tag_icon, iter_values, on_click, **kwargs) -> reflex.Component:
 
     """
 
-    return reflex.drawer.root(
+    return reflex.hstack(
 
-                _mainmenu_trigger(
-                    tag_icon = tag_icon,
-                    color    = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                    width    = amox.const.SIZE_MENUBAR_BTN,
-                    height   = amox.const.SIZE_MENUBAR_BTN),
+                reflex.spacer(
+                    display = amox.const.SPACE_RESPONSIVE_TOPLEVEL),
 
-                _mainmenu_container(
-                    tag_icon    = tag_icon,
-                    iter_values = iter_values,
-                    on_click    = on_click,
-                    top         = 'auto',
-                    left        = 'auto',
-                    height      = amox.const.SIZE_FULL,
-                    width       = amox.const.SIZE_MAINMENU,
-                    padding     = amox.const.PADDING_TOPLEVEL,
-                    color       = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                    background  = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT,
-                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT)),
+                reflex.hstack(
 
-                direction = 'right')
+                    reflex.spacer(),
 
-
-# -----------------------------------------------------------------------------
-def _mainmenu_trigger(tag_icon, **kwargs) -> reflex.Component:
-    """
-    Icon to trigger the main menu.
-
-    """
-
-    return reflex.drawer.trigger(
-                reflex.icon(
-                    tag_icon,
-                    **kwargs))
-
-
-# -----------------------------------------------------------------------------
-def _mainmenu_container(
-            tag_icon, iter_values, on_click, **kwargs) -> reflex.Component:
-    """
-    Trigger button for the main menu.
-
-    """
-    return reflex.fragment(
-                reflex.drawer.overlay(background = amox.const.RGBA_DIMMING),
-                reflex.drawer.portal(
-                    reflex.drawer.content(
+                    reflex.box(
                         _mainmenu_content(
                             tag_icon    = tag_icon,
                             iter_values = iter_values,
                             on_click    = on_click),
-                        **kwargs)))
+                        background  = reflex.cond(
+                                        amox.state.App.is_ena_lightmode,
+                                        amox.const.RGB_LT_BG_PASSIVE,
+                                        amox.const.RGB_DK_BG_PASSIVE),
+                        width      = amox.const.SIZE_RESPONSIVE_MAINMENU,
+                        height     = '100%'),
+                    width      = amox.const.WIDTH_RESPONSIVE_TOPLEVEL,
+                    height     = '100%'),
+
+                reflex.spacer(
+                    display = amox.const.SPACE_RESPONSIVE_TOPLEVEL),
+
+                background = amox.const.RGBA_DIMMING,
+                position   = 'absolute',
+                z_index    = '5',
+                left       = amox.const.SIZE_ZERO,
+                right      = amox.const.SIZE_ZERO,
+                top        = amox.const.SIZE_ZERO,
+                bottom     = amox.const.SIZE_MENUBAR)
 
 
 # -----------------------------------------------------------------------------
@@ -156,6 +160,7 @@ def _mainmenu_content(
             tag_icon, iter_values, on_click, **kwargs) -> reflex.Component:
     """
     """
+
     return reflex.vstack(
 
                 reflex.spacer(),
@@ -165,30 +170,36 @@ def _mainmenu_content(
                     functools.partial(
                         _mainmenu_item, on_click)),
 
-                reflex.drawer.close(
-                    reflex.icon(
-                        tag_icon,
-                        width  = amox.const.SIZE_MENUBAR_BTN,
-                        height = amox.const.SIZE_MENUBAR_BTN)),
+                width  = amox.const.SIZE_FULL,
+                height = '100%',
+                align  = 'end')
 
-                width = amox.const.SIZE_FULL,
-                align = 'end')
 
 # -----------------------------------------------------------------------------
 def _mainmenu_item(on_click, tup_value, **kwargs) -> reflex.Component:
     """
     """
 
-    return reflex.drawer.close(
+    return reflex.button(
                 _mainmenu_item_content(tag_icon  = tup_value[0],
                                        str_label = tup_value[1]),
-                on_click = functools.partial(
+                on_click    = functools.partial(
                                     amox.state.App.on_click_mainmenu_item,
                                     tup_value[1]),
-                margin   = amox.const.SIZE_ZERO,
-                padding  = amox.const.SIZE_ZERO,
-                width    = amox.const.SIZE_FULL,
-                height   = amox.const.SIZE_MAINMENU_BTN,
+                color       = reflex.cond(
+                                amox.state.App.is_ena_lightmode,
+                                amox.const.RGB_LT_FG_PASSIVE,
+                                amox.const.RGB_DK_FG_PASSIVE),
+                background  = reflex.cond(
+                                amox.state.App.is_ena_lightmode,
+                                amox.const.RGB_LT_BG_PASSIVE,
+                                amox.const.RGB_DK_BG_PASSIVE),
+                size        = amox.const.SIZE_MAINMENU_ITEM,
+                radius      = 'none',
+                margin      = amox.const.SIZE_ZERO,
+                padding     = amox.const.SIZE_ZERO,
+                width       = amox.const.SIZE_FULL,
+                height      = amox.const.SIZE_MAINMENU_BTN,
                 **kwargs)
 
 
@@ -201,21 +212,21 @@ def _mainmenu_item_content(tag_icon, str_label) -> reflex.Component:
 
                 reflex.match(
                     tag_icon,
-                    ('settings', _mainmenu_icon('settings')),
-                    ('plus',     _mainmenu_icon('plus'))),
+                    ('settings', _mainmenu_item_icon('settings')),
+                    ('plus',     _mainmenu_item_icon('plus'))),
 
                 str_label,
 
-                padding_left = amox.const.SIZE_MAINMENU_PAD_LEFT,
+                padding_left = amox.const.SIZE_MAINMENU_ITEM_LPAD,
                 align        = 'center',
                 width        = amox.const.SIZE_FULL)
 
 # -----------------------------------------------------------------------------
-def _mainmenu_icon(tag_icon) -> reflex.Component:
+def _mainmenu_item_icon(tag_icon) -> reflex.Component:
     """
     """
+
     return reflex.icon(
                 tag_icon,
-                width  = amox.const.SIZE_MAINMENU_ICON,
-                height = amox.const.SIZE_MAINMENU_ICON)
-
+                width  = amox.const.SIZE_MAINMENU_ITEM_ICON,
+                height = amox.const.SIZE_MAINMENU_ITEM_ICON)

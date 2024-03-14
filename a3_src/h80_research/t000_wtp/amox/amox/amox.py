@@ -63,14 +63,16 @@ def index() -> reflex.Component:
     """
     Main page.
 
+    ['100%', '50%', '50%', '50%', '50%'],
+
     """
 
     return reflex.fragment(
 
                 reflex.match(
                     amox.state.App.str_type_overlay,
-                    ('NONE',        reflex.box(display = 'none')),
-                    ('DAY',         amox.component.overlay.day.panel(
+                    ('none',        reflex.box(display = 'none')),
+                    ('day',         amox.component.overlay.day.panel(
                                         background = amox.const.RGBA_DIMMING,
                                         position   = 'absolute',
                                         z_index    = '5',
@@ -78,7 +80,7 @@ def index() -> reflex.Component:
                                         right      = amox.const.SIZE_ZERO,
                                         top        = amox.const.SIZE_ZERO,
                                         bottom     = amox.const.SIZE_MENUBAR)),
-                    ('SETTINGS',    amox.component.overlay.settings.panel(
+                    ('settings',    amox.component.overlay.settings.panel(
                                         background = amox.const.RGBA_DIMMING,
                                         position   = 'absolute',
                                         z_index    = '5',
@@ -86,45 +88,61 @@ def index() -> reflex.Component:
                                         right      = amox.const.SIZE_ZERO,
                                         top        = amox.const.SIZE_ZERO,
                                         bottom     = amox.const.SIZE_MENUBAR)),
-                    reflex.text('BAD TYPE FOR OVERLAY')),
+                    reflex.text(
+                        'BAD TYPE FOR OVERLAY',
+                        color      = 'black',
+                        background = 'red')),
 
-                reflex.vstack(
+                reflex.hstack(
 
-                    amox.component.navigation.navigation(
-                        flex       = 'none',
-                        zindex     = '0',
-                        width      = amox.const.SIZE_FULL,
-                        height     = amox.const.SIZE_NAV_BAR,
-                        padding    = amox.const.PADDING_TOPLEVEL),
+                    reflex.spacer(
+                        display = amox.const.SPACE_RESPONSIVE_TOPLEVEL),
 
-                    amox.component.monthview.monthview(
-                        flex       = 'auto',
-                        zindex     = '0',
-                        width      = amox.const.SIZE_FULL,
-                        height     = amox.const.SIZE_FULL,
-                        padding    = amox.const.PADDING_TOPLEVEL,
-                        margin     = amox.const.SIZE_ZERO,
-                        style      = { 'max-width':  amox.const.SIZE_FULL,
-                                       'max-height': amox.const.SIZE_FULL }),
+                    reflex.vstack(
 
-                    amox.component.menubar.menubar(
-                        flex       = 'none',
-                        zindex     = '10',
-                        width      = amox.const.SIZE_FULL,
-                        height     = amox.const.SIZE_MENUBAR,
-                        padding    = amox.const.PADDING_TOPLEVEL),
+                        amox.component.navigation.navigation(
+                            flex    = 'none',
+                            zindex  = '0',
+                            width   = amox.const.SIZE_FULL,
+                            height  = amox.const.SIZE_NAV_BAR,
+                            padding = amox.const.PADDING_TOPLEVEL),
 
+                        amox.component.monthview.monthview(
+                            flex    = 'auto',
+                            zindex  = '0',
+                            width   = amox.const.SIZE_FULL,
+                            height  = amox.const.SIZE_FULL,
+                            padding = amox.const.PADDING_TOPLEVEL,
+                            margin  = amox.const.SIZE_ZERO,
+                            style   = {
+                                'max-width':  amox.const.SIZE_FULL,
+                                'max-height': amox.const.SIZE_FULL }),
+
+                        amox.component.menubar.menubar(
+                            flex    = 'none',
+                            zindex  = '10',
+                            width   = amox.const.SIZE_FULL,
+                            height  = amox.const.SIZE_MENUBAR,
+                            padding = amox.const.PADDING_TOPLEVEL),
+
+                        width  = amox.const.WIDTH_RESPONSIVE_TOPLEVEL,
+                        height = '100vh'),
+
+                    reflex.spacer(
+                        display = amox.const.SPACE_RESPONSIVE_TOPLEVEL),
+
+                    background = reflex.cond(
+                                        amox.state.App.is_ena_lightmode,
+                                        amox.const.RGB_LT_BG_PASSIVE,
+                                        amox.const.RGB_DK_BG_PASSIVE),
                     width      = '100%',
-                    height     = '100vh',
-                    background = reflex.cond(amox.state.App.is_ena_lightmode,
-                                             amox.const.RGB_LT_BG_PASSIVE,
-                                             amox.const.RGB_DK_BG_PASSIVE)))
+                    height     = '100vh'))
 
 
 # -----------------------------------------------------------------------------
 style_background = 'linear-gradient(0deg, {rgb_lo}, {rgb_hi})'.format(
                                 rgb_lo = amox.const.RGB_LT_BG_PASSIVE,
-                                rgb_hi = amox.const.RGB_LT_BG_PASSIVE_ACCENT)
+                                rgb_hi = amox.const.RGB_LT_BG_PASSIVE_ACCENT_1)
 map_style_app    = dict(color       = reflex.cond(
                                             amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_FG_PASSIVE,

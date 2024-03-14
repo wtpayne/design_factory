@@ -70,27 +70,26 @@ class App(reflex.State):
 
     """
 
-    id_user:            str         = '1a78815c-a4cb-4468-a8e6-3abecad6d4e5'
-    is_ena_lightmode:   bool        = False
+    id_user:            str              = '1a78815c-a4cb-4468-a8e6-3abecad6d4e5'
+    is_ena_lightmode:   bool             = False
+    is_ena_mainmenu:    bool             = False
+    str_type_overlay:   str              = 'none'
 
-    str_type_overlay:   str         = 'NONE'
+    iter_str_month_nav: list[str]        =  ['January',   'February',
+                                             'March',     'April',
+                                             'May',       'June',
+                                             'July',      'August',
+                                             'September', 'October',
+                                             'November',  'December']
+    month_selected:     int              = datetime.date.today().month
+    year_selected:      int              = datetime.date.today().year
 
-
-    iter_str_month_nav: list[str]   =  ['January',   'February',
-                                        'March',     'April',
-                                        'May',       'June',
-                                        'July',      'August',
-                                        'September', 'October',
-                                        'November',  'December']
-    month_selected:     int         = datetime.date.today().month
-    year_selected:      int         = datetime.date.today().year
-
-    COUNT_IDX:          int         = 42
-    list_idx_day:       list[int]   = list(range(COUNT_IDX))
-    list_do_render:     list[bool]  = [False] * COUNT_IDX
-    list_day_of_month:  list[int]   = [0]     * COUNT_IDX
-    list_has_icon:      list[bool]  = [False] * COUNT_IDX
-    idx_day_selected:   int         = 0
+    COUNT_IDX:          int              = 42
+    list_idx_day:       list[int]        = list(range(COUNT_IDX))
+    list_day_type:      list[str]        = ['inactive'] * COUNT_IDX
+    list_day_of_month:  list[int]        = [0]          * COUNT_IDX
+    list_str_icon:      list[list[str]]  = ['none']     * COUNT_IDX
+    idx_day_selected:   int              = 0
 
     iter_tup_menuitem:  list[tuple[str]] = [('settings',  'Settings'),
                                             ('plus',      'New Note')]
@@ -101,12 +100,20 @@ class App(reflex.State):
     list_str_setting:   list[str]  = ['darkmode']
 
     # -------------------------------------------------------------------------
+    def on_click_mainmenu(self):
+        """
+        """
+
+        self.is_ena_mainmenu = not self.is_ena_mainmenu
+
+    # -------------------------------------------------------------------------
     def on_click_mainmenu_item(self, str_item):
         """
         """
 
         if str_item.lower() == 'settings':
             self.on_settings_open()
+        self.is_ena_mainmenu = False
 
     # -------------------------------------------------------------------------
     def on_click_settings_item(self, str_item):
@@ -123,7 +130,7 @@ class App(reflex.State):
 
         """
 
-        self.str_type_overlay = 'SETTINGS'
+        self.str_type_overlay = 'settings'
 
     # -------------------------------------------------------------------------
     def on_settings_close(self):
@@ -132,7 +139,7 @@ class App(reflex.State):
 
         """
 
-        self.str_type_overlay = 'NONE'
+        self.str_type_overlay = 'none'
 
     # -------------------------------------------------------------------------
     def on_click_daily_item(self, str_item):
@@ -152,7 +159,7 @@ class App(reflex.State):
 
         self.idx_day_selected = idx
         self._update_state_overlay_day()
-        self.str_type_overlay = 'DAY'
+        self.str_type_overlay = 'day'
 
     # -------------------------------------------------------------------------
     def on_toggle_overlay_day(self):
@@ -161,10 +168,10 @@ class App(reflex.State):
 
         """
 
-        if self.str_type_overlay == 'DAY':
-            self.str_type_overlay = 'NONE'
+        if self.str_type_overlay == 'day':
+            self.str_type_overlay = 'none'
         else:
-            self.str_type_overlay = 'DAY'
+            self.str_type_overlay = 'day'
 
     # -------------------------------------------------------------------------
     def on_toggle_color_mode(self):
@@ -251,12 +258,12 @@ class App(reflex.State):
 
         """
 
-        first_of_month      = datetime.datetime(self.year_selected,
-                                                self.month_selected,
-                                                1)
-        first_of_next_month = first_of_month + datetime.timedelta(days = 31)
-        self.month_selected = first_of_next_month.month
-        self.year_selected  = first_of_next_month.year
+        first_of_month         = datetime.datetime(self.year_selected,
+                                                   self.month_selected,
+                                                   1)
+        some_day_in_next_month = first_of_month + datetime.timedelta(days = 31)
+        self.month_selected    = some_day_in_next_month.month
+        self.year_selected     = some_day_in_next_month.year
         self._update_state_monthview()
 
     # -------------------------------------------------------------------------
@@ -266,7 +273,7 @@ class App(reflex.State):
 
         """
 
-        date_today      = datetime.date.today()
+        date_today          = datetime.date.today()
         self.year_selected  = date_today.year
         self.month_selected = date_today.month
         self._update_state_monthview()
@@ -278,23 +285,39 @@ class App(reflex.State):
 
         """
 
-        self.list_do_render    = [False] * self.COUNT_IDX
-        self.list_day_of_month = [0]     * self.COUNT_IDX
-        self.list_has_icon     = [False] * self.COUNT_IDX
+        self.list_day_type     = ['inactive'] * self.COUNT_IDX
+        self.list_day_of_month = [0]          * self.COUNT_IDX
+        self.list_str_icon     = ['none']     * self.COUNT_IDX
+
+        date_today             = datetime.date.today()
+        is_selected_month      = (     self.year_selected  == date_today.year
+                                   and self.month_selected == date_today.month)
         calendar_month         = calendar.monthcalendar(self.year_selected,
                                                         self.month_selected)
-
         idx = 0
         for week in calendar_month:
             for day in week:
-                if day != 0:
-                    self.list_do_render[idx]    = True
-                    self.list_has_icon[idx]     = False
-                    self.list_day_of_month[idx] = day
-                else:
-                    self.list_do_render[idx]    = False
-                    self.list_has_icon[idx]     = False
+
+                is_valid_day = (day != 0)
+                is_today     = (     is_valid_day
+                                 and is_selected_month
+                                 and day == date_today.day)
+
+                if not is_valid_day:
+                    self.list_day_type[idx]     = 'inactive'
+                    self.list_str_icon[idx]     = 'none'
                     self.list_day_of_month[idx] = 0
+
+                elif is_today:
+                    self.list_day_type[idx]     = 'today'
+                    self.list_str_icon[idx]     = 'smile'
+                    self.list_day_of_month[idx] = day
+
+                else:
+                    self.list_day_type[idx]     = 'active'
+                    self.list_str_icon[idx]     = 'none'
+                    self.list_day_of_month[idx] = day
+
                 idx += 1
 
     # -------------------------------------------------------------------------

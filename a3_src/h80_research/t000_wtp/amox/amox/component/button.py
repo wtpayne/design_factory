@@ -71,7 +71,7 @@ def button(*args, **kwargs) -> reflex.Component:
 
 
 # -----------------------------------------------------------------------------
-def button_with_icon(id_icon, *args, **kwargs) -> reflex.Component:
+def button_with_icon(tag_icon, *args, **kwargs) -> reflex.Component:
     """
     A standard button with an icon and dark/light mode functionality.
 
@@ -80,7 +80,7 @@ def button_with_icon(id_icon, *args, **kwargs) -> reflex.Component:
     return reflex.button(
 
                 reflex.icon(
-                    id_icon,
+                    tag_icon,
                     stroke_width = amox.const.STROKE_BTN_ICON),
 
                 *args,

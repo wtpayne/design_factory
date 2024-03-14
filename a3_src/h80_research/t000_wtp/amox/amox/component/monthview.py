@@ -118,10 +118,30 @@ def _month_card(idx: int) -> reflex.Component:
 
     """
 
-    return reflex.cond(
-                amox.state.App.list_do_render[idx],
-                _month_card_in_month(idx),
-                _month_card_out_of_month())
+    return reflex.match(
+                amox.state.App.list_day_type[idx],
+                ('inactive', _month_card_out_of_month()),
+                ('active',   _month_card_in_month(idx)),
+                ('today',    _month_card_today(idx)))
+
+
+# -----------------------------------------------------------------------------
+def _month_card_out_of_month() -> reflex.Component:
+    """
+    Month card (in month) component.
+
+    """
+
+    return reflex.card(
+                background    = reflex.cond(amox.state.App.is_ena_lightmode,
+                                            amox.const.RGB_LT_BG_PASSIVE,
+                                            amox.const.RGB_DK_BG_PASSIVE),
+                border_color  = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                border        = 'thin',
+                width         = amox.const.SIZE_FULL)
 
 
 # -----------------------------------------------------------------------------
@@ -142,39 +162,77 @@ def _month_card_in_month(idx: int) -> reflex.Component:
                     style = { 'position': 'absolute',
                               'top':      '0.5rem',
                               'right':    '0.5rem' }),
-                    reflex.cond(
-                        amox.state.App.list_has_icon[idx],
-                        reflex.center(
-                            reflex.icon(
-                                'smile',
-                                size         = 50,
-                                flex         = '0 1 auto',
-                                stroke_width = amox.const.STROKE_CARD_ICON,
-                                color        = amox.const.RGB_CARD_ICON),
-                            width  = '100%',
-                            height = '100%'),
-                        reflex.spacer()),
+
+                    _month_card_icon(
+                        tag_icon = amox.state.App.list_str_icon[idx]),
+
                 on_click      = lambda: amox.state.App.on_click_month(idx),
                 background    = reflex.cond(
                                     amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT,
-                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT),
-                border_color  = 'black',
+                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT_1,
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_1),
+                border_color  = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
                 border        = 'thin',
                 width         = amox.const.SIZE_FULL)
 
 
 # -----------------------------------------------------------------------------
-def _month_card_out_of_month() -> reflex.Component:
+def _month_card_today(idx: int) -> reflex.Component:
     """
     Month card (in month) component.
 
     """
 
     return reflex.card(
-                background    = reflex.cond(amox.state.App.is_ena_lightmode,
-                                            amox.const.RGB_LT_BG_PASSIVE,
-                                            amox.const.RGB_DK_BG_PASSIVE),
-                border_color  = 'black',
+                reflex.text(
+                    amox.state.App.list_day_of_month[idx],
+                    color = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
+                    size  = '1',
+                    style = { 'position': 'absolute',
+                              'top':      '0.5rem',
+                              'right':    '0.5rem' }),
+
+                    _month_card_icon(
+                        tag_icon = amox.state.App.list_str_icon[idx]),
+
+                on_click      = lambda: amox.state.App.on_click_month(idx),
+                background    = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT_2,
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_2),
+                border_color  = reflex.cond(
+                                    amox.state.App.is_ena_lightmode,
+                                    amox.const.RGB_LT_FG_PASSIVE,
+                                    amox.const.RGB_DK_FG_PASSIVE),
                 border        = 'thin',
                 width         = amox.const.SIZE_FULL)
+
+
+# -----------------------------------------------------------------------------
+def _month_card_icon(tag_icon: str) -> reflex.Component:
+    """
+    """
+    return reflex.match(
+                tag_icon,
+                ('smile', _specific_month_card_icon('smile')),
+                reflex.spacer())
+
+# -----------------------------------------------------------------------------
+def _specific_month_card_icon(tag_icon: str) -> reflex.Component:
+    """
+    """
+    return reflex.center(
+                reflex.icon(
+                    tag_icon,
+                    size         = 50,
+                    flex         = '0 1 auto',
+                    stroke_width = amox.const.STROKE_CARD_ICON,
+                    color        = amox.const.RGB_CARD_ICON),
+                width  = '100%',
+                height = '100%')

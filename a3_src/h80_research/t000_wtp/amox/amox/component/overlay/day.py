@@ -71,15 +71,12 @@ def panel(**kwargs) -> reflex.Component:
                                             amox.const.RGB_LT_BG_PASSIVE,
                                             amox.const.RGB_DK_BG_PASSIVE),
 
-                    # position   = 'absolute',
-                    # left       = amox.const.GUTTTER_DAY,
-                    # right      = amox.const.GUTTTER_DAY,
-                    # top        = amox.const.GUTTTER_DAY,
-                    # bottom     = amox.const.GUTTTER_DAY_BOTTOM,
-
-                    width        = '22rem',
-                    height       = '90%',
-                    border_color = 'black',
+                    width        = amox.const.WIDTH_RESPONSIVE_DAY,
+                    height       = amox.const.HEIGHT_DAY,
+                    border_color = reflex.cond(
+                                            amox.state.App.is_ena_lightmode,
+                                            amox.const.RGB_LT_FG_PASSIVE,
+                                            amox.const.RGB_DK_FG_PASSIVE),
                     border       = 'thin'),
                 **kwargs)
 
@@ -88,15 +85,20 @@ def panel(**kwargs) -> reflex.Component:
 def _panel_content() -> reflex.Component:
     """
     """
+
     return reflex.fragment(
-                reflex.heading('Achievements'),
+
+                reflex.heading(amox.const.TITLE_DAY),
+
                 reflex.spacer(
                     height = amox.const.PADDING_TOPLEVEL),
+
                 reflex.center(
                     reflex.vstack(
                         reflex.foreach(
                             amox.state.App.list_str_item,
                             _daily_item))),
+
                 amox.component.button.button(
                     'Done',
                     on_click      = amox.state.App.on_toggle_overlay_day,
@@ -145,8 +147,6 @@ def _daily_item(str_item) -> reflex.Component:
                 background = reflex.cond(amox.state.App.is_ena_lightmode,
                                          amox.const.RGB_LT_BG_PASSIVE,
                                          amox.const.RGB_DK_BG_PASSIVE))
-
-
 
                 # reflex.inset(
                 #     reflex.icon(

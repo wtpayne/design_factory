@@ -68,65 +68,97 @@ locals().update(map_cfg)
 
 # Light/dark scheme for passive information display elements.
 #
-RGB_LT_BG_PASSIVE:         str = LT_BG
-RGB_LT_BG_PASSIVE_ACCENT:  str = LT_BG_S1
-RGB_LT_FG_PASSIVE:         str = LT_FG
+RGB_LT_BG_PASSIVE:          str       = LT_BG
+RGB_LT_BG_PASSIVE_ACCENT_1: str       = LT_BG_S1
+RGB_LT_BG_PASSIVE_ACCENT_2: str       = LT_BG_S2
+RGB_LT_BG_PASSIVE_ACCENT_3: str       = LT_BG_S3
+RGB_LT_FG_PASSIVE:          str       = LT_FG
 
-RGB_DK_BG_PASSIVE:         str = DK_BG
-RGB_DK_BG_PASSIVE_ACCENT:  str = DK_BG_T1
-RGB_DK_FG_PASSIVE:         str = DK_FG
+RGB_DK_BG_PASSIVE:          str       = DK_BG
+RGB_DK_BG_PASSIVE_ACCENT_1: str       = DK_BG_T1
+RGB_DK_BG_PASSIVE_ACCENT_2: str       = DK_BG_T2
+RGB_DK_BG_PASSIVE_ACCENT_3: str       = DK_BG_T3
+RGB_DK_FG_PASSIVE:          str       = DK_FG
 
 # Light/dark mode color scheme.
 #
-RGB_LT_BG_ACTIVE_BTN:      str = LT_BG_S2
-RGB_LT_FG_ACTIVE_BTN:      str = LT_FG
+RGB_LT_BG_ACTIVE_BTN:       str       = LT_BG_S2
+RGB_LT_FG_ACTIVE_BTN:       str       = LT_FG
 
-RGB_DK_BG_ACTIVE_BTN:      str = DK_BG_T2
-RGB_DK_FG_ACTIVE_BTN:      str = DK_FG_S1
+RGB_DK_BG_ACTIVE_BTN:       str       = DK_BG_T2
+RGB_DK_FG_ACTIVE_BTN:       str       = DK_FG_S1
 
 # Drop shadows and transparent overlay opacities.
 #
-RGBA_DIMMING:              str = 'rgba(0, 0, 0, 0.60)'
-
+RGBA_DIMMING:               str       = 'rgba(0, 0, 0, 0.60)'
 
 # Layout and sizing (toplevel).
 #
-SIZE_ZERO:                 str = '0rem'
-SIZE_FULL:                 str = '100%'
-FONT:                      str = 'sans-serif'
-RADIUS_BTN:                str = '0.5rem'
-PADDING_TOPLEVEL:          str = '0.5rem'
-MARGIN_TOPLEVEL:           str = '0.0rem'
-
-# Layout and sizing (Menu bar).
-#
-SIZE_MENUBAR:              str = '3.5rem'
-SIZE_MENUBAR_BTN:          str = '2.5rem'
+SIZE_ZERO:                  str       = '0rem'
+SIZE_FULL:                  str       = '100%'
+FONT:                       str       = 'sans-serif'
+RADIUS_BTN:                 str       = '0.5rem'
+PADDING_TOPLEVEL:           str       = '0.5rem'
+MARGIN_TOPLEVEL:            str       = '0.0rem'
+WIDTH_RESPONSIVE_TOPLEVEL:  list[str] = ['100%',
+                                         '100%',
+                                         '100%',
+                                         '100%',
+                                         '150rem']
+SPACE_RESPONSIVE_TOPLEVEL:  list[str] = ['none',
+                                         'none',
+                                         'none',
+                                         'none',
+                                         'flex']
 
 # Layout and sizing (Main menu).
 #
-SIZE_MAINMENU:             str = '12.5rem'
-SIZE_MAINMENU_BTN:         str = '3.5rem'
-SIZE_MAINMENU_ICON:        str = '2.5rem'
-SIZE_MAINMENU_PAD_LEFT:    str = '0.5rem'
+SIZE_MAINMENU_BTN:          str       = '3.5rem'
+SIZE_MAINMENU_ICON:         str       = '2.5rem'
+SIZE_MAINMENU_ITEM:         str       = '4'
+SIZE_MAINMENU_ITEM_LPAD:    str       = '1.5rem'
+SIZE_MAINMENU_ITEM_ICON:    str       = '1.0rem'
+SIZE_RESPONSIVE_MAINMENU:   list[str] = ['10rem',
+                                         '15rem',
+                                         '15rem',
+                                         '15rem',
+                                         '15rem']
+
+# Layout and sizing (Menu bar).
+#
+SIZE_MENUBAR:               str       = '3.5rem'
+SIZE_MENUBAR_BTN:           str       = '2.5rem'
 
 # Layout and sizing (Navigation bar).
 #
-SIZE_NAV_BAR:              str = '2.5rem'
-SIZE_NAV_BTN:              str = '2.5rem'
-WIDTH_NAV_SELECT:          str = '7rem'
-STROKE_BTN_ICON:           int = 2
+SIZE_NAV_BAR:               str       = '2.5rem'
+SIZE_NAV_BTN:               str       = '2.5rem'
+WIDTH_NAV_SELECT:           str       = '7rem'
+STROKE_BTN_ICON:            int       = 2
 
 # Layout and sizing (Monthview).
 #
-RADIUS_CARD:               str = '0.5rem'
-STROKE_CARD_ICON:          int = 3
-RGB_CARD_ICON:             str = 'red' # RGB_LT_FG_ACTIVE_BTN  # !!!!!!!!!!
+RADIUS_CARD:                str       = '0.5rem'
+STROKE_CARD_ICON:           int       = 3
+RGB_CARD_ICON:              str       = RGB_LT_FG_ACTIVE_BTN
 
 # Layout and sizing (Day overlay).
 #
-GUTTTER_DAY:               str = '1.0rem'
-GUTTTER_DAY_BOTTOM:        str = '1.6rem'
-WIDTH_DAY_DONE_BTN:        str = '8rem'
-HEIGHT_DAY_DONE_BTN:       str = '3rem'
+TITLE_DAY:                 str       = 'Tasks'
+HEIGHT_DAY:                str       = '96%'
+WIDTH_RESPONSIVE_DAY:      list[str] = ['22rem',
+                                        '29rem',
+                                        '47rem',
+                                        '61rem',
+                                        '80rem']
+WIDTH_DAY_DONE_BTN:        str       = '8rem'
+HEIGHT_DAY_DONE_BTN:       str       = '3rem'
 
+# Layout and sizing (Settings).
+#
+HEIGHT_SETTINGS:           str       = '96%'
+WIDTH_RESPONSIVE_SETTINGS: list[str] = ['20rem',
+                                        '25rem',
+                                        '30rem',
+                                        '45rem',
+                                        '65rem']

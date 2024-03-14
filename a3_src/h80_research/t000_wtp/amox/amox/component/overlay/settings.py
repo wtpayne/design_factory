@@ -83,9 +83,12 @@ def panel(**kwargs) -> reflex.Component:
                                             amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_BG_PASSIVE,
                                             amox.const.RGB_DK_BG_PASSIVE),
-                    width        = '22rem',
-                    height       = '90%',
-                    border_color = 'black',
+                    width        = amox.const.WIDTH_RESPONSIVE_SETTINGS,
+                    height       = amox.const.HEIGHT_SETTINGS,
+                    border_color = reflex.cond(
+                                            amox.state.App.is_ena_lightmode,
+                                            amox.const.RGB_LT_FG_PASSIVE,
+                                            amox.const.RGB_DK_FG_PASSIVE),
                     border       = 'thin'),
                 style = { 'margin': '0 auto' },
                 **kwargs)

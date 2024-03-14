@@ -7,21 +7,32 @@ import collections
 import itertools
 import os
 
+import openai
+
 import dspy
 import dspy.primitives
 import dspy.teleprompt
 import joblib
-import seaborn
 import matplotlib
 import ruamel.yaml
+import seaborn
 
 import key
+
 
 
 # -----------------------------------------------------------------------------
 def main():
     """
     """
+
+    print('HELLO3')
+
+
+
+# -----------------------------------------------------------------------------
+def _backup():
+
 
     list_example = _generate_list_example()
 
@@ -241,6 +252,8 @@ def _language_model(id_model):
     Return the language model.
 
     """
+
+    openai.organization = 'org-NHeev4fzi596aHqgtgqUTahT'
 
     return dspy.OpenAI(model      = id_model,
                        max_tokens = 350,
