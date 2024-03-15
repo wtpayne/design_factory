@@ -94,10 +94,64 @@ class App(reflex.State):
     iter_tup_menuitem:  list[tuple[str]] = [('settings',  'Settings'),
                                             ('plus',      'New Note')]
 
-    list_str_item:      list[str]   = ['10:00',
-                                       '13:00',
-                                       '15:30']
-    list_str_setting:   list[str]  = ['darkmode']
+    list_str_item:      list[str]        = ['10:00',
+                                            '13:00',
+                                            '15:30']
+    list_str_setting:   list[str]        = ['darkmode']
+
+    ###########################################################################
+    # PAGE
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def handle_page_index_on_load(self):
+        """
+        Handle the on_load event on the index page.
+
+        """
+
+        date_today          = datetime.date.today()
+        self.year_selected  = date_today.year
+        self.month_selected = date_today.month
+        self._update_state_monthview()
+
+    ###########################################################################
+    # NAVIGATION BAR
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    @reflex.var
+    def str_year_selected(self) -> str:
+        """
+        Return the human readable string representation of the selected year.
+
+        """
+
+        return str(self.year_selected)
+
+    # -------------------------------------------------------------------------
+    @reflex.var
+    def str_month_selected(self) -> str:
+        """
+        Return the human readable string representation of the selected month.
+
+        """
+
+        return calendar.month_name[self.month_selected]
+
+    # -------------------------------------------------------------------------
+    @reflex.var
+    def iter_str_year_nav(self) -> list[str]:
+        """
+        Return an iterable over year strings for navigation.
+
+        """
+
+        count_year_each_way = 3
+        year_start          = self.year_selected - count_year_each_way
+        year_end            = self.year_selected + count_year_each_way + 1
+
+        return [str(year) for year in range(year_start, year_end)]
 
     # -------------------------------------------------------------------------
     def on_click_nav_month_prev(self):
@@ -147,153 +201,6 @@ class App(reflex.State):
         some_day_in_next_month = first_of_month + datetime.timedelta(days = 31)
         self.month_selected    = some_day_in_next_month.month
         self.year_selected     = some_day_in_next_month.year
-        self._update_state_monthview()
-
-    # -------------------------------------------------------------------------
-    def on_click_mv_day_past(self, idx):
-        """
-        Handle when a past day is clicked in the monthview component.
-
-        """
-
-        print('PAST')
-
-    # -------------------------------------------------------------------------
-    def on_click_mv_today(self, idx):
-        """
-        Handle when today is clicked in the monthview component.
-
-        """
-
-        self.idx_day_selected = idx
-        self._update_state_overlay_day()
-        self.str_type_overlay = 'day'
-
-    # -------------------------------------------------------------------------
-    def on_click_mv_day_future(self, idx):
-        """
-        Handle when a future day is clicked in the monthview component.
-
-        """
-
-        print('FUTURE')
-
-    # -------------------------------------------------------------------------
-    def on_click_mainmenu(self):
-        """
-        """
-
-        self.is_ena_mainmenu = not self.is_ena_mainmenu
-
-    # -------------------------------------------------------------------------
-    def on_click_mainmenu_item(self, str_item):
-        """
-        """
-
-        if str_item.lower() == 'settings':
-            self.on_settings_open()
-        self.is_ena_mainmenu = False
-
-    # -------------------------------------------------------------------------
-    def on_click_settings_item(self, str_item):
-        """
-        """
-
-        if str_item.lower() == 'darkmode':
-            self.on_toggle_color_mode()
-
-    # -------------------------------------------------------------------------
-    def on_settings_open(self):
-        """
-        Open the settings overlay.
-
-        """
-
-        self.str_type_overlay = 'settings'
-
-    # -------------------------------------------------------------------------
-    def on_settings_close(self):
-        """
-        Close the settings overlay.
-
-        """
-
-        self.str_type_overlay = 'none'
-
-    # -------------------------------------------------------------------------
-    def on_click_daily_item(self, str_item):
-        """
-        Handle when an item is clicked in the day overlay component.
-
-        """
-
-        print(str_item)
-
-    # -------------------------------------------------------------------------
-    def on_toggle_overlay_day(self):
-        """
-        Toggle the day overlay.
-
-        """
-
-        if self.str_type_overlay == 'day':
-            self.str_type_overlay = 'none'
-        else:
-            self.str_type_overlay = 'day'
-
-    # -------------------------------------------------------------------------
-    def on_toggle_color_mode(self):
-        """
-        Toggle lightmode and darkmode.
-
-        """
-
-        self.is_ena_lightmode = not self.is_ena_lightmode
-
-    # -------------------------------------------------------------------------
-    @reflex.var
-    def iter_str_year_nav(self) -> list[str]:
-        """
-        Return an iterable over year strings for navigation.
-
-        """
-
-        count_year_each_way = 1
-        year_start          = self.year_selected - count_year_each_way
-        year_end            = self.year_selected + count_year_each_way + 1
-
-        return [str(year) for year in range(year_start, year_end)]
-
-    # -------------------------------------------------------------------------
-    @reflex.var
-    def str_year_selected(self) -> str:
-        """
-        Return the human readable string representation of the selected year.
-
-        """
-
-        return str(self.year_selected)
-
-    # -------------------------------------------------------------------------
-    @reflex.var
-    def str_month_selected(self) -> str:
-        """
-        Return the human readable string representation of the selected month.
-
-        """
-
-        return calendar.month_name[self.month_selected]
-
-    # -------------------------------------------------------------------------
-    def handle_page_index_on_load(self):
-        """
-        Handle the on_load event on the index page.
-
-        """
-
-        date_today          = datetime.date.today()
-        self.year_selected  = date_today.year
-        self.month_selected = date_today.month
         self._update_state_monthview()
 
     # -------------------------------------------------------------------------
@@ -355,9 +262,130 @@ class App(reflex.State):
 
                 idx += 1
 
+    ###########################################################################
+    # MONTHVIEW
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_day_past(self, idx):
+        """
+        Handle when a past day is clicked in the monthview component.
+
+        """
+
+        print('PAST')
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_today(self, idx):
+        """
+        Handle when today is clicked in the monthview component.
+
+        """
+
+        self.idx_day_selected = idx
+        self._update_state_overlay_day()
+        self.str_type_overlay = 'day'
+
+    # -------------------------------------------------------------------------
+    def on_click_mv_day_future(self, idx):
+        """
+        Handle when a future day is clicked in the monthview component.
+
+        """
+
+        print('FUTURE')
+
+    ###########################################################################
+    # DAY
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def on_click_daily_item(self, str_item):
+        """
+        Handle when an item is clicked in the day overlay component.
+
+        """
+
+        print(str_item)
+
+    # -------------------------------------------------------------------------
+    def on_toggle_overlay_day(self):
+        """
+        Toggle the day overlay.
+
+        """
+
+        if self.str_type_overlay == 'day':
+            self.str_type_overlay = 'none'
+        else:
+            self.str_type_overlay = 'day'
+
     # -------------------------------------------------------------------------
     def _update_state_overlay_day(self):
         """
         """
 
         pass
+
+    ###########################################################################
+    # MENU BAR
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def on_click_mainmenu(self):
+        """
+        """
+
+        self.is_ena_mainmenu = not self.is_ena_mainmenu
+
+    ###########################################################################
+    # MAIN MENU
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def on_click_mainmenu_item(self, str_item):
+        """
+        """
+
+        if str_item.lower() == 'settings':
+            self.on_settings_open()
+        self.is_ena_mainmenu = False
+
+    ###########################################################################
+    # SETTINGS
+    ###########################################################################
+
+    # -------------------------------------------------------------------------
+    def on_settings_open(self):
+        """
+        Open the settings overlay.
+
+        """
+
+        self.str_type_overlay = 'settings'
+
+    # -------------------------------------------------------------------------
+    def on_settings_close(self):
+        """
+        Close the settings overlay.
+
+        """
+
+        self.str_type_overlay = 'none'
+
+    # -------------------------------------------------------------------------
+    def on_click_settings_item(self, str_item):
+        """
+        """
+
+        if str_item.lower() == 'darkmode':
+            self.on_toggle_color_mode()
+
+    # -------------------------------------------------------------------------
+    def on_toggle_color_mode(self):
+        """
+        Toggle lightmode and darkmode.
+
+        """
+
+        self.is_ena_lightmode = not self.is_ena_lightmode
