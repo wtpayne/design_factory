@@ -3,16 +3,14 @@
 ---
 
 title:
-    "Telegram bot logging utilities module."
+    "dm010_harmonica2 demo commands."
 
 description:
-    "This module contains logging utility
-    functions to help with configuring
-    and running a Telegram bot using the
-    python-telegram-bot library."
+    "This module defines commands for the
+    dm010_harmonica2 demonstration."
 
 id:
-    "3faff4d4-3057-43e8-99f1-37d35978aa32"
+    "d738f591-f2a9-4f9a-b2d5-5e625e883e5c"
 
 type:
     dt003_python_module
@@ -47,25 +45,23 @@ license:
 """
 
 
-import functools
-import logging
+import getpass
+import os
+import sys
 
 
 # -----------------------------------------------------------------------------
-def trace(fcn_wrapped):
+def tg():
     """
-    Add trace logging calls to the wrapped function.
+    Run dm010 telegram bot.
 
     """
 
-    @functools.wraps(fcn_wrapped)
-    def fcn_wrapper(*args, **kwargs):
-        """
-        Trace logging wrapper.
+    # Load environment variables from .env file.
+    #
+    import key
+    key.load_all(do_load = True)
 
-        """
-
-        logging.debug('Call: %s()', fcn_wrapped.__name__)
-        return fcn_wrapped(*args, **kwargs)
-
-    return fcn_wrapper
+    import da.env.run
+    return da.env.run.python_module(module = 't000_wtp.harmonica.telegram',
+                                    id_env = 'e009_telegram')

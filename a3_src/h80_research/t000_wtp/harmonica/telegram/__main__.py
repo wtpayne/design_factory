@@ -55,9 +55,9 @@ import dotenv
 import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
-import t000_wtp.tgbot.interaction as tgbot_interaction
-import t000_wtp.tgbot.logutil     as tgbot_logutil
-import t000_wtp.tgbot.runtime     as tgbot_runtime
+import t000_wtp.harmonica.telegram.interaction
+import t000_wtp.harmonica.telegram.logutil
+import t000_wtp.harmonica.telegram.runtime
 
 
 NAME_PACKAGE = 't000_wtp.tgbot'
@@ -67,12 +67,22 @@ except importlib.metadata.PackageNotFoundError:
     __version__ = '0.0.1'
 
 
-KEY_TOKEN         = 'TOKEN_TELEGRAM_PAIDEIA_ROBOT'
-STR_TOPIC_ZUZALU  = ('What software principles should we follow for Zuzalu '
-                     'technologies? Should anything be added? What should be '
-                     'done first? What are the highest priorities?')
-STR_TOPIC_VITALEA = ('Ask a controversial and creative question about '
-                     'longevity that is not about ethics.')
+# Different bot versions
+#
+# DEV: Name:     Harmonica (dev)
+#      UserName: HarmonicaDevBot
+#
+# UAT: Name:     Harmonica (uat)
+#      UserName: HarmonicaUatBot
+#
+# PRD: Name:     Harmonica
+#      UserName: HarmonicaGroupBot
+
+STR_ENV       = 'DEV'
+MAP_KEY_TOKEN = { 'DEV': 'TOKEN_TELEGRAM_HARMONICA_DEV',
+                  'UAT': 'TOKEN_TELEGRAM_HARMONICA_UAT',
+                  'PRD': 'TOKEN_TELEGRAM_HARMONICA_PRD' }
+KEY_TOKEN     = MAP_KEY_TOKEN[STR_ENV]
 
 
 # -----------------------------------------------------------------------------
@@ -83,7 +93,9 @@ def main():
     """
 
     dotenv.load_dotenv()
-    with tgbot_runtime.Context(os.getenv(KEY_TOKEN)) as bot:
+    t000_wtp.harmonica.telegram.logutil.setup()
+    with t000_wtp.harmonica.telegram.runtime.Context(
+                                                os.getenv(KEY_TOKEN)) as bot:
         bot.handle_command(_start)
         bot.handle_command(_help)
         bot.handle_command(_about)
@@ -91,29 +103,28 @@ def main():
 
 
 # -----------------------------------------------------------------------------
-@tgbot_logutil.trace
+@t000_wtp.harmonica.telegram.logutil.trace
 async def _start(
-            bot:     tgbot_runtime.Context,
+            bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
-    Welcome the user to the Paideia copilot.
-
-    Called at the beginning of an interaction with the bot.
+    Welcome the user to Harmonica.
 
     """
 
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
+    with t000_wtp.harmonica.telegram.interaction.Context(
+                                            bot     = bot,
+                                            update  = update,
+                                            context = context) as interaction:
 
         await interaction.reset()
 
 
 # -----------------------------------------------------------------------------
-@tgbot_logutil.trace
+@t000_wtp.harmonica.telegram.logutil.trace
 async def _help(
-            bot:     tgbot_runtime.Context,
+            bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
@@ -121,17 +132,18 @@ async def _help(
 
     """
 
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
+    with t000_wtp.harmonica.telegram.interaction.Context(
+                                            bot     = bot,
+                                            update  = update,
+                                            context = context) as interaction:
 
         await interaction.telegram_msg(bot.help_text())
 
 
 # -----------------------------------------------------------------------------
-@tgbot_logutil.trace
+@t000_wtp.harmonica.telegram.logutil.trace
 async def _about(
-            bot:     tgbot_runtime.Context,
+            bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
@@ -139,17 +151,18 @@ async def _about(
 
     """
 
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
+    with t000_wtp.harmonica.telegram.interaction.Context(
+                                            bot     = bot,
+                                            update  = update,
+                                            context = context) as interaction:
 
         await interaction.telegram_msg(f'Paideia bot version {__version__}')
 
 
 # -----------------------------------------------------------------------------
-@tgbot_logutil.trace
+@t000_wtp.harmonica.telegram.logutil.trace
 async def _msg(
-            bot:     tgbot_runtime.Context,
+            bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
@@ -157,9 +170,10 @@ async def _msg(
 
     """
 
-    with tgbot_interaction.Context(bot     = bot,
-                                   update  = update,
-                                   context = context) as interaction:
+    with t000_wtp.harmonica.telegram.interaction.Context(
+                                            bot     = bot,
+                                            update  = update,
+                                            context = context) as interaction:
 
         await interaction.step()
 

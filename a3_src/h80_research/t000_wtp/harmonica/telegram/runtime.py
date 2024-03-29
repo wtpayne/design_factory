@@ -95,11 +95,6 @@ class Context():
         """
 
         self.str_token = str_token
-
-        str_format     = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(format = str_format,
-                            level  = logging.INFO)
-
         dirpath_self   = os.path.dirname(os.path.realpath(__file__))
         filename_db    = 'bot.db'
         filepath_db    = os.path.join(dirpath_self, filename_db)

@@ -61,101 +61,9 @@ import requests
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.tgbot.logutil as tgbot_logutil
-import t000_wtp.tgbot.runtime as tgbot_runtime
-
-
-URL_CHATSERVER     = 'https://chatserver.paideia.ai'
-TIMEOUT_CHATSERVER = 60
-
-# Read topic config.
-#
-MAP_CFG_TOPIC = None
-DIRPATH_SELF  = os.path.dirname(os.path.realpath(__file__))
-FILENAME_CFG  = 'topic.cfg.yaml'
-FILEPATH_CFG  = os.path.join(DIRPATH_SELF, FILENAME_CFG)
-with open(FILEPATH_CFG, 'rt', encoding = 'utf-8') as file:
-    MAP_CFG_TOPIC = yaml.safe_load(file)
-
-
-# -----------------------------------------------------------------------------
-async def _chat(queue,
-                fcn_tg_msg,
-                fcn_tg_reply,
-                fcn_tg_options,
-                fcn_new_conv,
-                fcn_reply):  # pylint: disable=too-many-arguments
-    """
-    Chat coroutine.
-
-    This asynchronous coroutine is responsible
-    for defining the chat lifecycle from
-    initiation through to conclusion.
-
-    All dependencies are injected so that the
-    chat logic can be tested in isolation.
-
-    """
-
-    # Conversation initiation.
-    #
-    cursor = MAP_CFG_TOPIC
-    state  = await queue.get()
-
-    while state.str_topic == '':
-
-        # Termination criterion. We have found the
-        # topic of conversation so we can move on.
-        #
-        if isinstance(cursor, str):
-            state.str_topic = cursor
-            break
-
-        # Sanity checking.
-        #
-        if not isinstance(cursor, dict):
-            str_err = 'Bad configuration (Expected a nested dict)'
-            fcn_tg_msg(str_err)
-            logging.error(str_err)
-            raise RuntimeError(str_err)
-        if '_txt' not in cursor:
-            str_err = 'Bad configuration (Expected a _txt field)'
-            fcn_tg_msg(str_err)
-            logging.error(str_err)
-            raise RuntimeError(str_err)
-
-        # Present the next set of options to the
-        # user.
-        #
-        set_str_opt  = set(cursor.keys()) - {'_txt'}
-        list_str_opt = sorted(set_str_opt)
-        await fcn_tg_options(str_text     = cursor['_txt'],
-                             iter_str_opt = list_str_opt)
-        state     = await queue.get()
-        selection = state.str_message_last
-
-        # Sanity checking.
-        #
-        if selection not in set_str_opt:
-            await fcn_tg_reply('Selection not recognized.')
-            continue
-
-        # Descend to the next level of the tree.
-        #
-        cursor = cursor[selection]
-        continue
-
-    question = await fcn_new_conv(state.str_topic)
-    await fcn_tg_reply(question)
-
-    # Carry out the conversation.
-    #
-    while True:
-
-        state   = await queue.get()
-        message = await fcn_reply(state.str_message_last)
-        if message:
-            await fcn_tg_reply(message)
+import t000_wtp.harmonica.telegram.logutil
+import t000_wtp.harmonica.telegram.runtime
+import t000_wtp.harmonica.logic
 
 
 # =============================================================================
@@ -189,14 +97,14 @@ class Context():
     """
 
     id_chat: int
-    bot:     tgbot_runtime.Context
+    bot:     t000_wtp.harmonica.telegram.runtime.Context
     update:  typing.Any
     context: typing.Any
     state:   InteractionState
 
     # -------------------------------------------------------------------------
     def __init__(self,
-                 bot:     tgbot_runtime.Context,
+                 bot:     t000_wtp.harmonica.telegram.runtime.Context,
                  update:  typing.Any,
                  context: typing.Any):
         """
@@ -239,7 +147,7 @@ class Context():
         self.bot.db.commit()
 
     # -------------------------------------------------------------------------
-    @tgbot_logutil.trace
+    @t000_wtp.harmonica.telegram.logutil.trace
     async def reset(self, str_topic = ''):
         """
         Reset the interaction state.
@@ -251,16 +159,17 @@ class Context():
         self.state.str_message_last      = ''
         self.bot.map_queue[self.id_chat] = asyncio.Queue()
         self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-            _chat(queue          = self.bot.map_queue[self.id_chat],
-                  fcn_tg_msg     = self.telegram_msg,
-                  fcn_tg_reply   = self.telegram_reply,
-                  fcn_tg_options = self.telegram_options,
-                  fcn_new_conv   = self._new_conv,
-                  fcn_reply      = self._reply))
+            tgbot_logic.coro(
+                    queue              = self.bot.map_queue[self.id_chat],
+                    fcn_chat_msg       = self.telegram_msg,
+                    fcn_chat_reply     = self.telegram_reply,
+                    fcn_chat_options   = self.telegram_options,
+                    fcn_session_create = self._new_conv,
+                    fcn_session_update = self._reply))
         await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @tgbot_logutil.trace
+    @t000_wtp.harmonica.telegram.logutil.trace
     async def step(self):
         """
         Single step the logic coroutine, creating it if necessary.
@@ -276,16 +185,17 @@ class Context():
                  'Recreating chat coroutine from saved state.'))
             self.bot.map_queue[self.id_chat] = asyncio.Queue()
             self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-                _chat(queue          = self.bot.map_queue[self.id_chat],
-                      fcn_tg_msg     = self.telegram_msg,
-                      fcn_tg_reply   = self.telegram_reply,
-                      fcn_tg_options = self.telegram_options,
-                      fcn_new_conv   = self._new_conv,
-                      fcn_reply      = self._reply))
+                tgbot_logic.coro(
+                        queue              = self.bot.map_queue[self.id_chat],
+                        fcn_chat_msg       = self.telegram_msg,
+                        fcn_chat_reply     = self.telegram_reply,
+                        fcn_chat_options   = self.telegram_options,
+                        fcn_session_create = self._new_conv,
+                        fcn_session_update = self._reply))
             await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @tgbot_logutil.trace
+    @t000_wtp.harmonica.telegram.logutil.trace
     async def telegram_msg(self, str_text, **kwargs):
         """
         Utility function to send a message to the user via telegram.
@@ -297,7 +207,7 @@ class Context():
                                             **kwargs)
 
     # -------------------------------------------------------------------------
-    @tgbot_logutil.trace
+    @t000_wtp.harmonica.telegram.logutil.trace
     async def telegram_reply(self, str_text, **kwargs):
         """
         Utility function to send a reply message to the user via telegram.
@@ -308,7 +218,7 @@ class Context():
                                              **kwargs)
 
     # -------------------------------------------------------------------------
-    @tgbot_logutil.trace
+    @t000_wtp.harmonica.telegram.logutil.trace
     async def telegram_options(self, str_text, iter_str_opt, **kwargs):
         """
         Utility function to present options to the user via telegram.
@@ -330,16 +240,7 @@ class Context():
 
         """
 
-        response = requests.post(**self._post_params('new'),
-                                 json = { 'name':    'dfs_v1',
-                                          'request': { 'topic': topic }})
-        if response.status_code != http.HTTPStatus.OK:
-            return self._error_message(response)
-
-        payload = response.json()
-        self.state.id_conversation = payload['conversation_id']
-        self.state.id_message_last = payload['message_id']
-        return payload['message']
+        pass
 
     # -------------------------------------------------------------------------
     async def _reply(self, reply):
@@ -348,43 +249,4 @@ class Context():
 
         """
 
-        id_conversation = self.state.id_conversation
-        id_message_last = self.state.id_message_last
-        response = requests.post(**self._post_params('reply'),
-                                 json = { 'conversation_id': id_conversation,
-                                          'message_id':      id_message_last,
-                                          'message':         reply })
-        if response.status_code != http.HTTPStatus.OK:
-            return self._error_message(response)
-
-        payload = response.json()
-        self.state.id_message_last = payload['id']
-        return payload['message']
-
-    # -------------------------------------------------------------------------
-    def _post_params(self, endpoint):
-        """
-        Return standard requests.post parameters.
-
-        """
-
-        uuid_bearer = os.getenv("UUID_BEARER_CHATSERVER")
-        return { 'url':     urllib.parse.urljoin(URL_CHATSERVER, endpoint),
-                 'headers': { 'accept':        'application/json',
-                              'Content-Type':  'application/json',
-                              'Authorization': f'Bearer {uuid_bearer}'},
-                 'timeout': TIMEOUT_CHATSERVER }
-
-    # -------------------------------------------------------------------------
-    def _error_message(self, response):
-        """
-        Log an error and return a suitable user-facing error message.
-
-        """
-
-        logging.error('Error: %s - %s', response.status_code, response.text)
-        is_not_found = response.status_code == http.HTTPStatus.NOT_FOUND  # 404
-        if is_not_found:
-            return ('We have encountered an error. '
-                    'Please restart the conversation.')
-        return f'Internal error: {response.status_code}'
+        pass
