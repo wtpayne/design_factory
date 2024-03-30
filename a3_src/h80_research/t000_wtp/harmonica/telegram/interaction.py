@@ -83,11 +83,12 @@ class Context():
 
     """
 
-    id_chat: int
-    cfg:     tg_config
-    update:  typing.Any
-    context: typing.Any
-    state:   track.State
+    id_chat:            int
+    cfg:                tg_config
+    update:             typing.Any
+    context:            typing.Any
+    state:              track.State
+    track_dependencies: track.RuntimeDependencies
 
     # -------------------------------------------------------------------------
     def __init__(self,
@@ -104,13 +105,21 @@ class Context():
         self.id_chat = update.effective_chat.id
 
         try:
-            self.state   = track.State(**cfg.db[self.id_chat])
+            self.state   = track.State(**cfg.db_track[self.id_chat])
         except KeyError:
             self.state   = track.State()
         finally:
             self.cfg     = cfg
             self.update  = update
             self.context = context
+            self.track_dependencies = track.RuntimeDependencies(
+                chat_msg             = self.chat_msg,
+                chat_reply           = self.chat_reply,
+                chat_group_options   = self.chat_group_options,
+                chat_private_options = self.chat_private_options,
+                session_ensure       = session.ensure,
+                session_update       = session.update)
+
 
     # -------------------------------------------------------------------------
     def __enter__(self):
@@ -130,8 +139,8 @@ class Context():
 
         """
 
-        self.cfg.db[self.id_chat] = self.state.dict()
-        self.cfg.db.commit()
+        self.cfg.db_track[self.id_chat] = self.state.dict()
+        self.cfg.db_track.commit()
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -142,18 +151,14 @@ class Context():
         """
 
         logging.info('Reset/restart chat.')
-        self.state.str_topic             = str_topic
-        self.state.str_message_last      = ''
-        self.cfg.map_queue[self.id_chat] = asyncio.Queue()
-        self.cfg.map_chat[self.id_chat]  = asyncio.create_task(
+        self.state.str_topic                   = str_topic
+        self.state.str_message_last            = ''
+        self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
+        self.cfg.map_track[self.id_chat]       = asyncio.create_task(
             track.coro(
-                queue              = self.cfg.map_queue[self.id_chat],
-                fcn_chat_msg       = self.chat_msg,
-                fcn_chat_reply     = self.chat_reply,
-                fcn_chat_options   = self.chat_options,
-                fcn_session_ensure = session.ensure,
-                fcn_session_update = session.update))
-        await self.cfg.map_queue[self.id_chat].put(self.state)
+                queue        = self.cfg.map_queue_track[self.id_chat],
+                dependencies = self.track_dependencies))
+        await self.cfg.map_queue_track[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -165,21 +170,17 @@ class Context():
 
         self.state.str_message_last = self.update.message.text
         try:
-            await self.cfg.map_queue[self.id_chat].put(self.state)
+            await self.cfg.map_queue_track[self.id_chat].put(self.state)
         except KeyError:
             logging.warning(
                 ('Possible server restart? '
-                 'Recreating chat coroutine from saved state.'))
-            self.cfg.map_queue[self.id_chat] = asyncio.Queue()
-            self.cfg.map_chat[self.id_chat]  = asyncio.create_task(
+                 'Recreating sessions and tracks from saved state.'))
+            self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
+            self.cfg.map_track[self.id_chat]       = asyncio.create_task(
                 track.coro(
-                    queue              = self.cfg.map_queue[self.id_chat],
-                    fcn_chat_msg       = self.chat_msg,
-                    fcn_chat_reply     = self.chat_reply,
-                    fcn_chat_options   = self.chat_options,
-                    fcn_session_ensure = session.ensure,
-                    fcn_session_update = session.update))
-            await self.cfg.map_queue[self.id_chat].put(self.state)
+                    queue        = self.cfg.map_queue_track[self.id_chat],
+                    dependencies = self.track_dependencies))
+            await self.cfg.map_queue_track[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -206,9 +207,25 @@ class Context():
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def chat_options(self, str_text, iter_str_opt, **kwargs):
+    async def chat_group_options(self, str_text, iter_str_opt, **kwargs):
         """
-        Utility function to present options to the user via telegram.
+        Utility function to present options to the group via telegram.
+
+        """
+
+        keyboard = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
+        markup   = telegram.ReplyKeyboardMarkup(keyboard,
+                                                resize_keyboard   = True,
+                                                one_time_keyboard = True)
+        await self.update.message.reply_text(text         = str_text,
+                                             reply_markup = markup,
+                                             **kwargs)
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def chat_private_options(self, str_text, iter_str_opt, **kwargs):
+        """
+        Utility function to present options to the sender via telegram.
 
         """
 

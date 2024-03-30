@@ -46,10 +46,13 @@ license:
 
 
 import logging
+import typing
+
+import pydantic
 
 
 # =============================================================================
-class TrackState(pydantic.BaseModel):
+class State(pydantic.BaseModel):
     """
     Session track state.
 
@@ -63,12 +66,23 @@ class TrackState(pydantic.BaseModel):
 
 
 # -----------------------------------------------------------------------------
+class RuntimeDependencies(pydantic.BaseModel):
+    """
+    Runtime dependencies for dependency injection.
+
+    """
+
+    chat_msg:             typing.Any = None
+    chat_reply:           typing.Any = None
+    chat_group_options:   typing.Any = None
+    chat_private_options: typing.Any = None
+    session_ensure:       typing.Any = None
+    session_update:       typing.Any = None
+
+
+# -----------------------------------------------------------------------------
 async def coro(queue,
-               fcn_chat_msg,
-               fcn_chat_reply,
-               fcn_chat_options,
-               fcn_session_create,
-               fcn_session_update):  # pylint: disable=too-many-arguments
+               dependencies: RuntimeDependencies):
     """
     Chat business logic coroutine.
 
@@ -83,8 +97,7 @@ async def coro(queue,
 
     # Session initiation.
     #
-
-    await fcn_chat_options(
+    await dependencies.chat_group_options(
                 str_text     = 'Foo',
                 iter_str_opt = ['One', 'Two'])
 
@@ -131,7 +144,7 @@ async def coro(queue,
     #     cursor = cursor[selection]
     #     continue
 
-    # question = await fcn_session_create(state.str_topic)
+    # question = await fcn_session_ensure(state.str_topic)
     # await fcn_chat_reply(question)
 
     # Carry out the conversation.

@@ -151,7 +151,7 @@ async def _help(cfg:     tg_config.Context,
                                 update  = update,
                                 context = context) as interaction:
 
-        await interaction.chat_msg(bot.help_text())
+        await interaction.chat_msg(cfg.help_text())
 
 
 # -----------------------------------------------------------------------------

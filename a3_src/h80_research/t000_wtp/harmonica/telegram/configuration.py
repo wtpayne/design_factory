@@ -75,15 +75,16 @@ class Context():
     The role of this context manager is to
     hold configuration information and to
     ensure that transactions are committed
-    and that the database is closed on
+    and that all databases are closed on
     program termination.
 
     """
 
-    str_token: str
-    app:       typing.Any
-    db:        sqlitedict.SqliteDict
-    list_cmd:  list[tuple[str, str]] = []
+    str_token:  str
+    app:        typing.Any
+    db_track:   sqlitedict.SqliteDict
+    db_session: sqlitedict.SqliteDict
+    list_cmd:   list[tuple[str, str]] = []
 
     # -------------------------------------------------------------------------
     def __init__(self, str_token):
@@ -92,27 +93,33 @@ class Context():
 
         """
 
-        self.str_token = str_token
-        dirpath_self   = os.path.dirname(os.path.realpath(__file__))
-        filename_db    = 'bot.db'
-        filepath_db    = os.path.join(dirpath_self, filename_db)
-        self.db        = sqlitedict.SqliteDict(filepath_db,
-                                               encode = dill.dumps,
-                                               decode = dill.loads)
+        self.str_token      = str_token
+        dirpath_self        = os.path.dirname(os.path.realpath(__file__))
+        filename_db_track   = 'track.db'
+        filepath_db_track   = os.path.join(dirpath_self, filename_db_track)
+        filename_db_session = 'session.db'
+        filepath_db_session = os.path.join(dirpath_self, filename_db_session)
+        self.db_track       = sqlitedict.SqliteDict(filepath_db_track,
+                                                    encode = dill.dumps,
+                                                    decode = dill.loads)
+        self.db_session     = sqlitedict.SqliteDict(filepath_db_session,
+                                                    encode = dill.dumps,
+                                                    decode = dill.loads)
 
-        app_builder    = telegram.ext.ApplicationBuilder().token(str_token)
-        self.app       = app_builder.build()
+
+        app_builder = telegram.ext.ApplicationBuilder().token(str_token)
+        self.app    = app_builder.build()
 
         # [(str_command, str_doc)], for help text.
         self.list_cmd  = []
 
-        # id_chat -> coroutine
+        # id_track -> track coroutine
         #
-        self.map_chat  = {}
+        self.map_track = {}
 
-        # id_chat -> asyncio.queue
+        # id_track -> asyncio.queue
         #
-        self.map_queue = {}
+        self.map_queue_track = {}
 
     # -------------------------------------------------------------------------
     def __enter__(self):
@@ -136,7 +143,8 @@ class Context():
         # thrown while configuring the bot.
         #
         if type_exc is not None:
-            self.db.close()
+            self.db_track.close()
+            self.db_session.close()
             raise type_exc(value_exc)
 
         # If the bot has been configured
@@ -147,9 +155,12 @@ class Context():
         try:
             self.app.run_polling()
         finally:
-            self.db.commit()
-            self.db.close()
-            self.db = None
+            self.db_track.commit()
+            self.db_session.commit()
+            self.db_track.close()
+            self.db_session.close()
+            self.db_track   = None
+            self.db_session = None
 
     # -------------------------------------------------------------------------
     def add_member_update_handler(self, fcn_callback):
