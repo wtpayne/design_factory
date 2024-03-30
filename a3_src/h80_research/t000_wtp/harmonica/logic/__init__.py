@@ -67,10 +67,13 @@ async def coro(queue,
 
     """
 
-    # Conversation initiation.
+    # Session initiation.
     #
-    # cursor = MAP_CFG_TOPIC
-    # state  = await queue.get()
+
+    await fcn_chat_options(
+                str_text     = 'Foo',
+                iter_str_opt = ['One', 'Two'])
+
 
     # while state.str_topic == '':
 
@@ -123,7 +126,12 @@ async def coro(queue,
     while True:
 
         state   = await queue.get()
-        message = await fcn_session_update(state.str_message_last)
-        if message:
-            await fcn_chat_reply(message)
+        # message = await fcn_session_update(state.str_message_last)
+
+        import pprint
+        pprint.pprint(state.dict())
+
+        # if message:
+        #     print('--- ' + message)
+        #     await fcn_chat_reply(message)
 

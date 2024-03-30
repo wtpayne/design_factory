@@ -56,33 +56,15 @@ import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
 import t000_wtp.harmonica.telegram.interaction
-import t000_wtp.harmonica.telegram.logutil
 import t000_wtp.harmonica.telegram.runtime
+import t000_wtp.harmonica.util.log
 
-
-NAME_PACKAGE = 't000_wtp.tgbot'
+NAME_APP     = 'Harmonica'
+NAME_PACKAGE = f't000_wtp.{NAME_APP.lower()}'
 try:
     __version__ = importlib.metadata.version(NAME_PACKAGE)
 except importlib.metadata.PackageNotFoundError:
     __version__ = '0.0.1'
-
-
-# Different bot versions
-#
-# DEV: Name:     Harmonica (dev)
-#      UserName: HarmonicaDevBot
-#
-# UAT: Name:     Harmonica (uat)
-#      UserName: HarmonicaUatBot
-#
-# PRD: Name:     Harmonica
-#      UserName: HarmonicaGroupBot
-
-STR_ENV       = 'DEV'
-MAP_KEY_TOKEN = { 'DEV': 'TOKEN_TELEGRAM_HARMONICA_DEV',
-                  'UAT': 'TOKEN_TELEGRAM_HARMONICA_UAT',
-                  'PRD': 'TOKEN_TELEGRAM_HARMONICA_PRD' }
-KEY_TOKEN     = MAP_KEY_TOKEN[STR_ENV]
 
 
 # -----------------------------------------------------------------------------
@@ -92,24 +74,43 @@ def main():
 
     """
 
-    dotenv.load_dotenv()
-    t000_wtp.harmonica.telegram.logutil.setup()
-    with t000_wtp.harmonica.telegram.runtime.Context(
-                                                os.getenv(KEY_TOKEN)) as bot:
+    t000_wtp.harmonica.util.log.setup()
+    token = _token_telegram()
+    with t000_wtp.harmonica.telegram.runtime.Context(token) as bot:
         bot.handle_command(_start)
+        bot.handle_command(_join)
         bot.handle_command(_help)
         bot.handle_command(_about)
         bot.handle_messages(_msg)
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.telegram.logutil.trace
+def _token_telegram():
+    """
+    Return the telegram API token in the environment.
+
+    """
+
+    dotenv.load_dotenv()
+    stage_deployment  = os.getenv(f'HARMONICA_STAGE_DEPLOYMENT',
+                                  default = 'DEV')
+    map_key_token_api = { 'DEV': f'HARMONICA_TOKEN_TELEGRAM_DEV',
+                          'UAT': f'HARMONICA_TOKEN_TELEGRAM_UAT',
+                          'PRD': f'HARMONICA_TOKEN_TELEGRAM_PRD' }
+    key_token_api     = map_key_token_api[stage_deployment]
+    token_api         = os.getenv(key_token_api)
+
+    return token_api
+
+
+# -----------------------------------------------------------------------------
+@t000_wtp.harmonica.util.log.trace
 async def _start(
             bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
             context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
-    Welcome the user to Harmonica.
+    Start a new session.
 
     """
 
@@ -122,7 +123,26 @@ async def _start(
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.telegram.logutil.trace
+@t000_wtp.harmonica.util.log.trace
+async def _join(
+            bot:     t000_wtp.harmonica.telegram.runtime.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+    """
+    Join an existing session.
+
+    """
+
+    with t000_wtp.harmonica.telegram.interaction.Context(
+                                            bot     = bot,
+                                            update  = update,
+                                            context = context) as interaction:
+
+        await interaction.step()
+
+
+# -----------------------------------------------------------------------------
+@t000_wtp.harmonica.util.log.trace
 async def _help(
             bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
@@ -137,11 +157,11 @@ async def _help(
                                             update  = update,
                                             context = context) as interaction:
 
-        await interaction.telegram_msg(bot.help_text())
+        await interaction.chat_msg(bot.help_text())
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.telegram.logutil.trace
+@t000_wtp.harmonica.util.log.trace
 async def _about(
             bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,
@@ -156,11 +176,11 @@ async def _about(
                                             update  = update,
                                             context = context) as interaction:
 
-        await interaction.telegram_msg(f'Paideia bot version {__version__}')
+        await interaction.chat_msg(f'{NAME_APP} bot version {__version__}')
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.telegram.logutil.trace
+@t000_wtp.harmonica.util.log.trace
 async def _msg(
             bot:     t000_wtp.harmonica.telegram.runtime.Context,
             update:  telegram.Update,

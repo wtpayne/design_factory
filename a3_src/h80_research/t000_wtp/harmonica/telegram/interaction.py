@@ -61,9 +61,9 @@ import requests
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.harmonica.telegram.logutil
-import t000_wtp.harmonica.telegram.runtime
 import t000_wtp.harmonica.logic
+import t000_wtp.harmonica.telegram.runtime
+import t000_wtp.harmonica.util.log
 
 
 # =============================================================================
@@ -147,7 +147,7 @@ class Context():
         self.bot.db.commit()
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.telegram.logutil.trace
+    @t000_wtp.harmonica.util.log.trace
     async def reset(self, str_topic = ''):
         """
         Reset the interaction state.
@@ -159,17 +159,17 @@ class Context():
         self.state.str_message_last      = ''
         self.bot.map_queue[self.id_chat] = asyncio.Queue()
         self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-            tgbot_logic.coro(
+            t000_wtp.harmonica.logic.coro(
                     queue              = self.bot.map_queue[self.id_chat],
-                    fcn_chat_msg       = self.telegram_msg,
-                    fcn_chat_reply     = self.telegram_reply,
-                    fcn_chat_options   = self.telegram_options,
+                    fcn_chat_msg       = self.chat_msg,
+                    fcn_chat_reply     = self.chat_reply,
+                    fcn_chat_options   = self.chat_options,
                     fcn_session_create = self._new_conv,
                     fcn_session_update = self._reply))
         await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.telegram.logutil.trace
+    @t000_wtp.harmonica.util.log.trace
     async def step(self):
         """
         Single step the logic coroutine, creating it if necessary.
@@ -185,18 +185,18 @@ class Context():
                  'Recreating chat coroutine from saved state.'))
             self.bot.map_queue[self.id_chat] = asyncio.Queue()
             self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-                tgbot_logic.coro(
+                t000_wtp.harmonica.logic.coro(
                         queue              = self.bot.map_queue[self.id_chat],
-                        fcn_chat_msg       = self.telegram_msg,
-                        fcn_chat_reply     = self.telegram_reply,
-                        fcn_chat_options   = self.telegram_options,
+                        fcn_chat_msg       = self.chat_msg,
+                        fcn_chat_reply     = self.chat_reply,
+                        fcn_chat_options   = self.chat_options,
                         fcn_session_create = self._new_conv,
                         fcn_session_update = self._reply))
             await self.bot.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.telegram.logutil.trace
-    async def telegram_msg(self, str_text, **kwargs):
+    @t000_wtp.harmonica.util.log.trace
+    async def chat_msg(self, str_text, **kwargs):
         """
         Utility function to send a message to the user via telegram.
 
@@ -207,8 +207,8 @@ class Context():
                                             **kwargs)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.telegram.logutil.trace
-    async def telegram_reply(self, str_text, **kwargs):
+    @t000_wtp.harmonica.util.log.trace
+    async def chat_reply(self, str_text, **kwargs):
         """
         Utility function to send a reply message to the user via telegram.
 
@@ -218,8 +218,8 @@ class Context():
                                              **kwargs)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.telegram.logutil.trace
-    async def telegram_options(self, str_text, iter_str_opt, **kwargs):
+    @t000_wtp.harmonica.util.log.trace
+    async def chat_options(self, str_text, iter_str_opt, **kwargs):
         """
         Utility function to present options to the user via telegram.
 
