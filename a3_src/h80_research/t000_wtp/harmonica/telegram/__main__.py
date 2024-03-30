@@ -55,9 +55,9 @@ import dotenv
 import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
-import t000_wtp.harmonica.telegram.interaction
-import t000_wtp.harmonica.telegram.runtime
-import t000_wtp.harmonica.util.log
+import t000_wtp.harmonica.telegram.interaction   as tg_interaction
+import t000_wtp.harmonica.telegram.configuration as tg_config
+import t000_wtp.harmonica.util.log               as log_util
 
 NAME_APP     = 'Harmonica'
 NAME_PACKAGE = f't000_wtp.{NAME_APP.lower()}'
@@ -74,14 +74,14 @@ def main():
 
     """
 
-    t000_wtp.harmonica.util.log.setup()
+    log_util.setup()
     token = _token_telegram()
-    with t000_wtp.harmonica.telegram.runtime.Context(token) as bot:
-        bot.handle_command(_start)
-        bot.handle_command(_join)
-        bot.handle_command(_help)
-        bot.handle_command(_about)
-        bot.handle_messages(_msg)
+    with tg_config.Context(token) as cfg:
+        cfg.add_command_handler(_start)
+        cfg.add_command_handler(_join)
+        cfg.add_command_handler(_help)
+        cfg.add_command_handler(_about)
+        cfg.add_message_handler(_msg)
 
 
 # -----------------------------------------------------------------------------
@@ -104,96 +104,86 @@ def _token_telegram():
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.util.log.trace
-async def _start(
-            bot:     t000_wtp.harmonica.telegram.runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+@log_util.trace
+async def _start(cfg:     tg_config.Context,
+                 update:  telegram.Update,
+                 context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Start a new session.
 
     """
 
-    with t000_wtp.harmonica.telegram.interaction.Context(
-                                            bot     = bot,
-                                            update  = update,
-                                            context = context) as interaction:
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
 
         await interaction.reset()
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.util.log.trace
-async def _join(
-            bot:     t000_wtp.harmonica.telegram.runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+@log_util.trace
+async def _join(cfg:     tg_config.Context,
+                update:  telegram.Update,
+                context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Join an existing session.
 
     """
 
-    with t000_wtp.harmonica.telegram.interaction.Context(
-                                            bot     = bot,
-                                            update  = update,
-                                            context = context) as interaction:
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
 
         await interaction.step()
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.util.log.trace
-async def _help(
-            bot:     t000_wtp.harmonica.telegram.runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+@log_util.trace
+async def _help(cfg:     tg_config.Context,
+                update:  telegram.Update,
+                context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Print a list of commands.
 
     """
 
-    with t000_wtp.harmonica.telegram.interaction.Context(
-                                            bot     = bot,
-                                            update  = update,
-                                            context = context) as interaction:
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
 
         await interaction.chat_msg(bot.help_text())
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.util.log.trace
-async def _about(
-            bot:     t000_wtp.harmonica.telegram.runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+@log_util.trace
+async def _about(cfg:     tg_config.Context,
+                 update:  telegram.Update,
+                 context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Print information about the bot.
 
     """
 
-    with t000_wtp.harmonica.telegram.interaction.Context(
-                                            bot     = bot,
-                                            update  = update,
-                                            context = context) as interaction:
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
 
         await interaction.chat_msg(f'{NAME_APP} bot version {__version__}')
 
 
 # -----------------------------------------------------------------------------
-@t000_wtp.harmonica.util.log.trace
-async def _msg(
-            bot:     t000_wtp.harmonica.telegram.runtime.Context,
-            update:  telegram.Update,
-            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+@log_util.trace
+async def _msg(cfg:     tg_config.Context,
+               update:  telegram.Update,
+               context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Handler function for non-command messages.
 
     """
 
-    with t000_wtp.harmonica.telegram.interaction.Context(
-                                            bot     = bot,
-                                            update  = update,
-                                            context = context) as interaction:
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
 
         await interaction.step()
 

@@ -3,13 +3,14 @@
 ---
 
 title:
-    "Telegram bot runtime context module."
+    "Telegram bot configuration and runtime lifecycle context module."
 
 description:
     "This module contains a class based context
-    manager to help manage the runtime life cycle
-    of a Telegram bot that is implemented using
-    the python-telegram-bot library."
+    manager to help manage the configuration and
+    runtime lifecycle of a Telegram bot that is
+    implemented using the python-telegram-bot
+    library."
 
 id:
     "9ed01adb-c72d-4255-a0ef-9e283c3e684e"
@@ -61,7 +62,7 @@ import telegram.ext  # pylint: disable=import-error,no-name-in-module
 # =============================================================================
 class Context():
     """
-    Runtime context for a telegram bot.
+    Configuration and runtime lifecycle context for a telegram bot.
 
     Enter this context before any configuration
     commands are called on it.
@@ -72,13 +73,10 @@ class Context():
     when the program instance terminates.
 
     The role of this context manager is to
+    hold configuration information and to
     ensure that transactions are committed
     and that the database is closed on
     program termination.
-
-    Convenience functions are also provided
-    to support adding command handlers and
-    message handlers.
 
     """
 
@@ -90,7 +88,7 @@ class Context():
     # -------------------------------------------------------------------------
     def __init__(self, str_token):
         """
-        Return an instance of BotRuntimeContext.
+        Return an instance of the telegram bot configuration Context.
 
         """
 
@@ -119,7 +117,7 @@ class Context():
     # -------------------------------------------------------------------------
     def __enter__(self):
         """
-        Enter the run-time context for the telegram bot instance.
+        Enter the configuration context for the telegram bot instance.
 
         """
 
@@ -128,7 +126,9 @@ class Context():
     # -------------------------------------------------------------------------
     def __exit__(self, type_exc, value_exc, tb_exc):
         """
-        Exit the run-time context for the telegram bot instance.
+        Exit the configuration context for the telegram bot instance.
+
+        This also runs the bot event loop.
 
         """
 
@@ -152,7 +152,7 @@ class Context():
             self.db = None
 
     # -------------------------------------------------------------------------
-    def handle_member_update(self, fcn_callback):
+    def add_member_update_handler(self, fcn_callback):
         """
         Add a new chat member update handler to the bot.
 
@@ -165,7 +165,7 @@ class Context():
                 block             = True))
 
     # -------------------------------------------------------------------------
-    def handle_command(self, fcn_callback):
+    def add_command_handler(self, fcn_callback):
         """
         Add a new command handler to the bot.
 
@@ -184,7 +184,7 @@ class Context():
                         callback = functools.partial(fcn_callback, self)))
 
     # -------------------------------------------------------------------------
-    def handle_messages(self, fcn_callback):
+    def add_message_handler(self, fcn_callback):
         """
         Add a new message handler to the bot.
 

@@ -61,23 +61,10 @@ import requests
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.harmonica.logic
-import t000_wtp.harmonica.telegram.runtime
-import t000_wtp.harmonica.util.log
-
-
-# =============================================================================
-class InteractionState(pydantic.BaseModel):
-    """
-    Bot interaction state.
-
-    """
-
-    version:          int  = 1
-    id_conversation:  str  = ''
-    id_message_last:  str  = ''
-    str_message_last: str  = ''
-    str_topic:        str  = ''
+import t000_wtp.harmonica.session                as session
+import t000_wtp.harmonica.track                  as track
+import t000_wtp.harmonica.telegram.configuration as tg_config
+import t000_wtp.harmonica.util.log               as log_util
 
 
 # =============================================================================
@@ -97,14 +84,14 @@ class Context():
     """
 
     id_chat: int
-    bot:     t000_wtp.harmonica.telegram.runtime.Context
+    cfg:     tg_config
     update:  typing.Any
     context: typing.Any
-    state:   InteractionState
+    state:   track.State
 
     # -------------------------------------------------------------------------
     def __init__(self,
-                 bot:     t000_wtp.harmonica.telegram.runtime.Context,
+                 cfg:     tg_config,
                  update:  typing.Any,
                  context: typing.Any):
         """
@@ -117,11 +104,11 @@ class Context():
         self.id_chat = update.effective_chat.id
 
         try:
-            self.state   = InteractionState(**bot.db[self.id_chat])
+            self.state   = track.State(**cfg.db[self.id_chat])
         except KeyError:
-            self.state   = InteractionState()
+            self.state   = track.State()
         finally:
-            self.bot     = bot
+            self.cfg     = cfg
             self.update  = update
             self.context = context
 
@@ -143,11 +130,11 @@ class Context():
 
         """
 
-        self.bot.db[self.id_chat] = self.state.dict()
-        self.bot.db.commit()
+        self.cfg.db[self.id_chat] = self.state.dict()
+        self.cfg.db.commit()
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.util.log.trace
+    @log_util.trace
     async def reset(self, str_topic = ''):
         """
         Reset the interaction state.
@@ -157,19 +144,19 @@ class Context():
         logging.info('Reset/restart chat.')
         self.state.str_topic             = str_topic
         self.state.str_message_last      = ''
-        self.bot.map_queue[self.id_chat] = asyncio.Queue()
-        self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-            t000_wtp.harmonica.logic.coro(
-                    queue              = self.bot.map_queue[self.id_chat],
-                    fcn_chat_msg       = self.chat_msg,
-                    fcn_chat_reply     = self.chat_reply,
-                    fcn_chat_options   = self.chat_options,
-                    fcn_session_create = self._new_conv,
-                    fcn_session_update = self._reply))
-        await self.bot.map_queue[self.id_chat].put(self.state)
+        self.cfg.map_queue[self.id_chat] = asyncio.Queue()
+        self.cfg.map_chat[self.id_chat]  = asyncio.create_task(
+            track.coro(
+                queue              = self.cfg.map_queue[self.id_chat],
+                fcn_chat_msg       = self.chat_msg,
+                fcn_chat_reply     = self.chat_reply,
+                fcn_chat_options   = self.chat_options,
+                fcn_session_ensure = session.ensure,
+                fcn_session_update = session.update))
+        await self.cfg.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.util.log.trace
+    @log_util.trace
     async def step(self):
         """
         Single step the logic coroutine, creating it if necessary.
@@ -178,24 +165,24 @@ class Context():
 
         self.state.str_message_last = self.update.message.text
         try:
-            await self.bot.map_queue[self.id_chat].put(self.state)
+            await self.cfg.map_queue[self.id_chat].put(self.state)
         except KeyError:
             logging.warning(
                 ('Possible server restart? '
                  'Recreating chat coroutine from saved state.'))
-            self.bot.map_queue[self.id_chat] = asyncio.Queue()
-            self.bot.map_chat[self.id_chat]  = asyncio.create_task(
-                t000_wtp.harmonica.logic.coro(
-                        queue              = self.bot.map_queue[self.id_chat],
-                        fcn_chat_msg       = self.chat_msg,
-                        fcn_chat_reply     = self.chat_reply,
-                        fcn_chat_options   = self.chat_options,
-                        fcn_session_create = self._new_conv,
-                        fcn_session_update = self._reply))
-            await self.bot.map_queue[self.id_chat].put(self.state)
+            self.cfg.map_queue[self.id_chat] = asyncio.Queue()
+            self.cfg.map_chat[self.id_chat]  = asyncio.create_task(
+                track.coro(
+                    queue              = self.cfg.map_queue[self.id_chat],
+                    fcn_chat_msg       = self.chat_msg,
+                    fcn_chat_reply     = self.chat_reply,
+                    fcn_chat_options   = self.chat_options,
+                    fcn_session_ensure = session.ensure,
+                    fcn_session_update = session.update))
+            await self.cfg.map_queue[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.util.log.trace
+    @log_util.trace
     async def chat_msg(self, str_text, **kwargs):
         """
         Utility function to send a message to the user via telegram.
@@ -207,7 +194,7 @@ class Context():
                                             **kwargs)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.util.log.trace
+    @log_util.trace
     async def chat_reply(self, str_text, **kwargs):
         """
         Utility function to send a reply message to the user via telegram.
@@ -218,7 +205,7 @@ class Context():
                                              **kwargs)
 
     # -------------------------------------------------------------------------
-    @t000_wtp.harmonica.util.log.trace
+    @log_util.trace
     async def chat_options(self, str_text, iter_str_opt, **kwargs):
         """
         Utility function to present options to the user via telegram.
@@ -232,21 +219,3 @@ class Context():
         await self.update.message.reply_text(text         = str_text,
                                              reply_markup = markup,
                                              **kwargs)
-
-    # -------------------------------------------------------------------------
-    async def _new_conv(self, topic):
-        """
-        Utility function to create a new conversation on the chatserver.
-
-        """
-
-        pass
-
-    # -------------------------------------------------------------------------
-    async def _reply(self, reply):
-        """
-        Utility function to add a reply to a conversation on the chatserver.
-
-        """
-
-        pass

@@ -3,10 +3,10 @@
 ---
 
 title:
-    "Harmonica bot business logic module."
+    "Track logic module."
 
 description:
-    "This module contains business logic for
+    "This module contains track logic for
     the harmonica bot."
 
 id:
@@ -48,6 +48,20 @@ license:
 import logging
 
 
+# =============================================================================
+class TrackState(pydantic.BaseModel):
+    """
+    Session track state.
+
+    """
+
+    version:          int  = 1
+    id_conversation:  str  = ''
+    id_message_last:  str  = ''
+    str_message_last: str  = ''
+    str_topic:        str  = ''
+
+
 # -----------------------------------------------------------------------------
 async def coro(queue,
                fcn_chat_msg,
@@ -73,7 +87,6 @@ async def coro(queue,
     await fcn_chat_options(
                 str_text     = 'Foo',
                 iter_str_opt = ['One', 'Two'])
-
 
     # while state.str_topic == '':
 
