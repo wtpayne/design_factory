@@ -113,13 +113,14 @@ class Context():
             self.update  = update
             self.context = context
             self.track_dependencies = track.RuntimeDependencies(
-                chat_msg             = self.chat_msg,
+                chat_message         = self.chat_message,
                 chat_reply           = self.chat_reply,
                 chat_group_options   = self.chat_group_options,
                 chat_private_options = self.chat_private_options,
-                session_ensure       = session.ensure,
-                session_update       = session.update)
-
+                session_create       = self.session_create,
+                session_join         = self.session_join,
+                session_update       = self.session_update,
+                session_summary      = self.session_summary)
 
     # -------------------------------------------------------------------------
     def __enter__(self):
@@ -154,11 +155,32 @@ class Context():
         self.state.str_topic                   = str_topic
         self.state.str_message_last            = ''
         self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
-        self.cfg.map_track[self.id_chat]       = asyncio.create_task(
+        self.cfg.map_track[self.id_chat]       = self.cfg.app.create_task(
             track.coro(
                 queue        = self.cfg.map_queue_track[self.id_chat],
                 dependencies = self.track_dependencies))
         await self.cfg.map_queue_track[self.id_chat].put(self.state)
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def _step_impl(self):
+        """
+        Single step the logic coroutine, creating it if necessary.
+
+        """
+
+        try:
+            await self.cfg.map_queue_track[self.id_chat].put(self.state)
+        except KeyError:
+            logging.warning(
+                ('Possible server restart? '
+                 'Recreating sessions and tracks from saved state.'))
+            self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
+            self.cfg.map_track[self.id_chat]       = self.cfg.app.create_task(
+                track.coro(
+                    queue        = self.cfg.map_queue_track[self.id_chat],
+                    dependencies = self.track_dependencies))
+            await self.cfg.map_queue_track[self.id_chat].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -169,22 +191,34 @@ class Context():
         """
 
         self.state.str_message_last = self.update.message.text
-        try:
-            await self.cfg.map_queue_track[self.id_chat].put(self.state)
-        except KeyError:
-            logging.warning(
-                ('Possible server restart? '
-                 'Recreating sessions and tracks from saved state.'))
-            self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
-            self.cfg.map_track[self.id_chat]       = asyncio.create_task(
-                track.coro(
-                    queue        = self.cfg.map_queue_track[self.id_chat],
-                    dependencies = self.track_dependencies))
-            await self.cfg.map_queue_track[self.id_chat].put(self.state)
+        await self._step_impl()
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def chat_msg(self, str_text, **kwargs):
+    async def handle_callback_query(self):
+        """
+        Handle a callback query.
+
+        """
+
+        self.update.callback_query.answer()
+        await self._step_impl()
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def chat_edit_query(self, str_text, **kwargs):
+        """
+        Utility function to edit a query via telegram.
+
+        """
+
+        query = self.update.callback_query
+        await query.edit_message_text(text=f"Selected option: {query.data}")
+
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def chat_message(self, str_text, **kwargs):
         """
         Utility function to send a message to the user via telegram.
 
@@ -213,10 +247,10 @@ class Context():
 
         """
 
-        keyboard = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
-        markup   = telegram.ReplyKeyboardMarkup(keyboard,
-                                                resize_keyboard   = True,
-                                                one_time_keyboard = True)
+        keys   = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
+        markup = telegram.ReplyKeyboardMarkup(keys,
+                                              resize_keyboard   = True,
+                                              one_time_keyboard = True)
         await self.update.message.reply_text(text         = str_text,
                                              reply_markup = markup,
                                              **kwargs)
@@ -229,10 +263,53 @@ class Context():
 
         """
 
-        keyboard = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
-        markup   = telegram.ReplyKeyboardMarkup(keyboard,
-                                                resize_keyboard   = True,
-                                                one_time_keyboard = True)
+        keys = [[
+            telegram.InlineKeyboardButton(opt, callback_data = opt)
+                                                    for opt in iter_str_opt]]
+
+        markup = telegram.InlineKeyboardMarkup(keys)
+
         await self.update.message.reply_text(text         = str_text,
                                              reply_markup = markup,
                                              **kwargs)
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def session_create(self):
+        """
+        Utility function to ensure a new session exists.
+
+        """
+
+        print('>>> SESSION CREATE')
+
+        return 0
+
+    # -------------------------------------------------------------------------
+    async def session_join(self, id_session, id_track):
+        """
+        Utility function to add a track to an existing session.
+
+        """
+
+        print('>>> SESSION JOIN')
+
+    # -------------------------------------------------------------------------
+    async def session_update(self, id_session, id_track, transcript_track):
+        """
+        Utility function to add an update to an existing session.
+
+        """
+
+        print('>>> SESSION UPDATE')
+
+    # -------------------------------------------------------------------------
+    async def session_summary(self, id_session, id_track, transcript_track):
+        """
+        Utility function to get a summary from a session.
+
+        """
+
+        print('>>> SESSION SUMMARY')
+
+        return ''

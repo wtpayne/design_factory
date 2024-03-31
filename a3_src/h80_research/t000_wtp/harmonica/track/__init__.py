@@ -72,12 +72,14 @@ class RuntimeDependencies(pydantic.BaseModel):
 
     """
 
-    chat_msg:             typing.Any = None
+    chat_message:         typing.Any = None
     chat_reply:           typing.Any = None
     chat_group_options:   typing.Any = None
     chat_private_options: typing.Any = None
-    session_ensure:       typing.Any = None
+    session_create:       typing.Any = None
+    session_join:         typing.Any = None
     session_update:       typing.Any = None
+    session_summary:      typing.Any = None
 
 
 # -----------------------------------------------------------------------------
@@ -95,11 +97,16 @@ async def coro(queue,
 
     """
 
-    # Session initiation.
-    #
-    await dependencies.chat_group_options(
-                str_text     = 'Foo',
-                iter_str_opt = ['One', 'Two'])
+
+    while True:
+
+        await dependencies.chat_private_options(
+                        str_text     = 'Please choose:',
+                        iter_str_opt = ['CHOICE A', 'CHOICE B'])
+
+        state = await queue.get()
+
+        await dependencies.chat_message('FOO')
 
     # while state.str_topic == '':
 
@@ -114,12 +121,12 @@ async def coro(queue,
     #     #
     #     if not isinstance(cursor, dict):
     #         str_err = 'Bad configuration (Expected a nested dict)'
-    #         fcn_chat_msg(str_err)
+    #         fcn_send_message(str_err)
     #         logging.error(str_err)
     #         raise RuntimeError(str_err)
     #     if '_txt' not in cursor:
     #         str_err = 'Bad configuration (Expected a _txt field)'
-    #         fcn_chat_msg(str_err)
+    #         fcn_send_message(str_err)
     #         logging.error(str_err)
     #         raise RuntimeError(str_err)
 
@@ -136,7 +143,7 @@ async def coro(queue,
     #     # Sanity checking.
     #     #
     #     if selection not in set_str_opt:
-    #         await fcn_chat_reply('Selection not recognized.')
+    #         await fcn_send_reply('Selection not recognized.')
     #         continue
 
     #     # Descend to the next level of the tree.
@@ -145,7 +152,7 @@ async def coro(queue,
     #     continue
 
     # question = await fcn_session_ensure(state.str_topic)
-    # await fcn_chat_reply(question)
+    # await fcn_send_reply(question)
 
     # Carry out the conversation.
     #
@@ -159,5 +166,5 @@ async def coro(queue,
 
         # if message:
         #     print('--- ' + message)
-        #     await fcn_chat_reply(message)
+        #     await fcn_send_reply(message)
 

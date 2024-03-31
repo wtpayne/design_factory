@@ -45,24 +45,4 @@ license:
 """
 
 
-import logging
-
-
-# -----------------------------------------------------------------------------
-async def ensure(self, topic):
-    """
-    Utility function to ensure a new session exists.
-
-    """
-
-    print('>>> CREATE NEW SESSION')
-
-
-# -----------------------------------------------------------------------------
-async def update(self, reply):
-    """
-    Utility function to add an update to an existing session.
-
-    """
-
-    print('>>> UPDATE SESSION')
+pass

@@ -82,6 +82,7 @@ def main():
         cfg.add_command_handler(_help)
         cfg.add_command_handler(_about)
         cfg.add_message_handler(_msg)
+        cfg.add_callback_query_handler(_handle_callback_query)
 
 
 # -----------------------------------------------------------------------------
@@ -151,7 +152,7 @@ async def _help(cfg:     tg_config.Context,
                                 update  = update,
                                 context = context) as interaction:
 
-        await interaction.chat_msg(cfg.help_text())
+        await interaction.chat_message(cfg.help_text())
 
 
 # -----------------------------------------------------------------------------
@@ -168,7 +169,7 @@ async def _about(cfg:     tg_config.Context,
                                 update  = update,
                                 context = context) as interaction:
 
-        await interaction.chat_msg(f'{NAME_APP} bot version {__version__}')
+        await interaction.chat_message(f'{NAME_APP} bot version {__version__}')
 
 
 # -----------------------------------------------------------------------------
@@ -186,6 +187,21 @@ async def _msg(cfg:     tg_config.Context,
                                 context = context) as interaction:
 
         await interaction.step()
+
+
+# -----------------------------------------------------------------------------
+@log_util.trace
+async def _handle_callback_query(cfg, update, context):
+    """
+    Generic callback query handler.
+
+    """
+
+    with tg_interaction.Context(cfg     = cfg,
+                                update  = update,
+                                context = context) as interaction:
+
+        await interaction.handle_callback_query()
 
 
 # -----------------------------------------------------------------------------

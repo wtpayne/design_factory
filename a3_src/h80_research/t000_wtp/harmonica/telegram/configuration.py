@@ -48,6 +48,7 @@ license:
 """
 
 
+import asyncio
 import functools
 import logging
 import os.path
@@ -153,8 +154,11 @@ class Context():
         # ensure we close the db at the end.
         #
         try:
+
             self.app.run_polling()
+
         finally:
+
             self.db_track.commit()
             self.db_session.commit()
             self.db_track.close()
@@ -192,6 +196,17 @@ class Context():
         self.app.add_handler(
             telegram.ext.CommandHandler(
                         command  = str_command,
+                        callback = functools.partial(fcn_callback, self)))
+
+    # -------------------------------------------------------------------------
+    def add_callback_query_handler(self, fcn_callback):
+        """
+        Add a new callback query handler to the bot.
+
+        """
+
+        self.app.add_handler(
+            telegram.ext.CallbackQueryHandler(
                         callback = functools.partial(fcn_callback, self)))
 
     # -------------------------------------------------------------------------
