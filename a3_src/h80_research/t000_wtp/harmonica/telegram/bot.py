@@ -167,6 +167,33 @@ class Context():
             self.db_session = None
 
     # -------------------------------------------------------------------------
+    def add_message_handler(self, fcn_callback):
+        """
+        Add a new message handler to the bot.
+
+        """
+
+        filter_txt        = telegram.ext.filters.TEXT
+        filter_cmd        = telegram.ext.filters.COMMAND
+        select_if_not_cmd = filter_txt & ~filter_cmd
+
+        self.app.add_handler(
+            telegram.ext.MessageHandler(
+                        filters  = select_if_not_cmd,
+                        callback = functools.partial(fcn_callback, self)))
+
+    # -------------------------------------------------------------------------
+    def add_callback_query_handler(self, fcn_callback):
+        """
+        Add a new callback query handler to the bot.
+
+        """
+
+        self.app.add_handler(
+            telegram.ext.CallbackQueryHandler(
+                        callback = functools.partial(fcn_callback, self)))
+
+    # -------------------------------------------------------------------------
     def add_member_update_handler(self, fcn_callback):
         """
         Add a new chat member update handler to the bot.
@@ -196,33 +223,6 @@ class Context():
         self.app.add_handler(
             telegram.ext.CommandHandler(
                         command  = str_command,
-                        callback = functools.partial(fcn_callback, self)))
-
-    # -------------------------------------------------------------------------
-    def add_callback_query_handler(self, fcn_callback):
-        """
-        Add a new callback query handler to the bot.
-
-        """
-
-        self.app.add_handler(
-            telegram.ext.CallbackQueryHandler(
-                        callback = functools.partial(fcn_callback, self)))
-
-    # -------------------------------------------------------------------------
-    def add_message_handler(self, fcn_callback):
-        """
-        Add a new message handler to the bot.
-
-        """
-
-        filter_txt        = telegram.ext.filters.TEXT
-        filter_cmd        = telegram.ext.filters.COMMAND
-        select_if_not_cmd = filter_txt & ~filter_cmd
-
-        self.app.add_handler(
-            telegram.ext.MessageHandler(
-                        filters  = select_if_not_cmd,
                         callback = functools.partial(fcn_callback, self)))
 
     # -------------------------------------------------------------------------

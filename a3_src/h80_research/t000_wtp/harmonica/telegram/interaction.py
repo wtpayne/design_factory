@@ -61,10 +61,10 @@ import requests
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.harmonica.session                as session
-import t000_wtp.harmonica.track                  as track
-import t000_wtp.harmonica.telegram.configuration as tg_config
-import t000_wtp.harmonica.util.log               as log_util
+import t000_wtp.harmonica.session      as session
+import t000_wtp.harmonica.track        as track
+import t000_wtp.harmonica.telegram.bot as tg_bot
+import t000_wtp.harmonica.util.log     as log_util
 
 
 # =============================================================================
@@ -83,8 +83,8 @@ class Context():
 
     """
 
-    id_chat:            int
-    cfg:                tg_config
+    id_track:           str
+    bot:                tg_bot
     update:             typing.Any
     context:            typing.Any
     state:              track.State
@@ -92,7 +92,7 @@ class Context():
 
     # -------------------------------------------------------------------------
     def __init__(self,
-                 cfg:     tg_config,
+                 bot:     tg_bot,
                  update:  typing.Any,
                  context: typing.Any):
         """
@@ -102,14 +102,15 @@ class Context():
 
         """
 
-        self.id_chat = update.effective_chat.id
+
+        self.id_track = g'tg.{update.effective_chat.id}'
 
         try:
-            self.state   = track.State(**cfg.db_track[self.id_chat])
+            self.state   = track.State(**bot.db_track[self.id_track])
         except KeyError:
             self.state   = track.State()
         finally:
-            self.cfg     = cfg
+            self.bot     = bot
             self.update  = update
             self.context = context
             self.track_dependencies = track.RuntimeDependencies(
@@ -140,69 +141,84 @@ class Context():
 
         """
 
-        self.cfg.db_track[self.id_chat] = self.state.dict()
-        self.cfg.db_track.commit()
+        self.bot.db_track[self.id_track] = self.state.dict()
+        self.bot.db_track.commit()
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def reset(self, str_topic = ''):
+    async def reset(self):
         """
         Reset the interaction state.
 
         """
 
         logging.info('Reset/restart chat.')
-        self.state.str_topic                   = str_topic
-        self.state.str_message_last            = ''
-        self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
-        self.cfg.map_track[self.id_chat]       = self.cfg.app.create_task(
+        self.state.type_input                   = ''
+        self.state.str_input                    = ''
+        self.bot.map_queue_track[self.id_track] = asyncio.Queue()
+        self.bot.map_track[self.id_track]       = self.bot.app.create_task(
             track.coro(
-                queue        = self.cfg.map_queue_track[self.id_chat],
+                queue        = self.bot.map_queue_track[self.id_track],
                 dependencies = self.track_dependencies))
-        await self.cfg.map_queue_track[self.id_chat].put(self.state)
+        await self.bot.map_queue_track[self.id_track].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def _step_impl(self):
+    async def handle_message(self):
+        """
+        Handle a new message from the user.
+
+        """
+
+        self.state.type_input = 'message'
+        self.state.str_input  = update.message.text
+        await self._step()
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def handle_callback_query(self):
+        """
+        Handle a new callback query.
+
+        """
+
+        self.update.callback_query.answer()
+        self.state.type_input = 'callback_query'
+        self.state.str_input  = update.callback_query.data
+        await self._step()
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def handle_command(self):
+        """
+        Handle a new command.
+
+        """
+
+        self.state.type_input = 'command'
+        self.state.str_input  = update.message.text
+        await self._step()
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def _step(self):
         """
         Single step the logic coroutine, creating it if necessary.
 
         """
 
         try:
-            await self.cfg.map_queue_track[self.id_chat].put(self.state)
+            await self.bot.map_queue_track[self.id_track].put(self.state)
         except KeyError:
             logging.warning(
                 ('Possible server restart? '
                  'Recreating sessions and tracks from saved state.'))
-            self.cfg.map_queue_track[self.id_chat] = asyncio.Queue()
-            self.cfg.map_track[self.id_chat]       = self.cfg.app.create_task(
+            self.bot.map_queue_track[self.id_track] = asyncio.Queue()
+            self.bot.map_track[self.id_track]       = self.bot.app.create_task(
                 track.coro(
-                    queue        = self.cfg.map_queue_track[self.id_chat],
+                    queue        = self.bot.map_queue_track[self.id_track],
                     dependencies = self.track_dependencies))
-            await self.cfg.map_queue_track[self.id_chat].put(self.state)
-
-    # -------------------------------------------------------------------------
-    @log_util.trace
-    async def step(self):
-        """
-        Single step the logic coroutine, creating it if necessary.
-
-        """
-
-        self.state.str_message_last = self.update.message.text
-        await self._step_impl()
-
-    # -------------------------------------------------------------------------
-    @log_util.trace
-    async def handle_callback_query(self):
-        """
-        Handle a callback query.
-
-        """
-
-        self.update.callback_query.answer()
-        await self._step_impl()
+            await self.bot.map_queue_track[self.id_track].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -212,8 +228,8 @@ class Context():
 
         """
 
-        query = self.update.callback_query
-        await query.edit_message_text(text=f"Selected option: {query.data}")
+        query_data = self.update.callback_query.data
+        await query.edit_message_text(text = f"Selected option: {query_data}")
 
 
     # -------------------------------------------------------------------------
@@ -224,7 +240,7 @@ class Context():
 
         """
 
-        await self.context.bot.send_message(chat_id = self.id_chat,
+        await self.context.bot.send_message(chat_id = self.id_track,
                                             text    = str_text,
                                             **kwargs)
 
@@ -247,10 +263,14 @@ class Context():
 
         """
 
-        keys   = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
+        keys   = [[
+            telegram.KeyboardButton(opt)
+                            for opt in iter_str_opt]]
+
         markup = telegram.ReplyKeyboardMarkup(keys,
                                               resize_keyboard   = True,
                                               one_time_keyboard = True)
+
         await self.update.message.reply_text(text         = str_text,
                                              reply_markup = markup,
                                              **kwargs)

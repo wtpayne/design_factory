@@ -3,7 +3,7 @@
 ---
 
 title:
-    "Telegram bot script."
+    "Telegram bot entry point script."
 
 description:
     "This script contains functionality for
@@ -55,9 +55,9 @@ import dotenv
 import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
-import t000_wtp.harmonica.telegram.interaction   as tg_interaction
-import t000_wtp.harmonica.telegram.configuration as tg_config
-import t000_wtp.harmonica.util.log               as log_util
+import t000_wtp.harmonica.telegram.interaction as tg_interaction
+import t000_wtp.harmonica.telegram.bot         as tg_bot
+import t000_wtp.harmonica.util.log             as log_util
 
 NAME_APP     = 'Harmonica'
 NAME_PACKAGE = f't000_wtp.{NAME_APP.lower()}'
@@ -75,20 +75,21 @@ def main():
     """
 
     log_util.setup()
-    token = _token_telegram()
-    with tg_config.Context(token) as cfg:
-        cfg.add_command_handler(_start)
-        cfg.add_command_handler(_join)
-        cfg.add_command_handler(_help)
-        cfg.add_command_handler(_about)
-        cfg.add_message_handler(_msg)
-        cfg.add_callback_query_handler(_handle_callback_query)
+    with tg_bot.Context(_token_telegram()) as bot:
+        bot.add_message_handler(_msg)
+        bot.add_callback_query_handler(_callback_query)
+        bot.add_command_handler(_start)
+        bot.add_command_handler(_join)
+        bot.add_command_handler(_help)
+        bot.add_command_handler(_about)
 
 
 # -----------------------------------------------------------------------------
 def _token_telegram():
     """
-    Return the telegram API token in the environment.
+    Return the telegram API token.
+
+    This is obtained from environment variables.
 
     """
 
@@ -106,102 +107,105 @@ def _token_telegram():
 
 # -----------------------------------------------------------------------------
 @log_util.trace
-async def _start(cfg:     tg_config.Context,
-                 update:  telegram.Update,
-                 context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Start a new session.
-
-    """
-
-    with tg_interaction.Context(cfg     = cfg,
-                                update  = update,
-                                context = context) as interaction:
-
-        await interaction.reset()
-
-
-# -----------------------------------------------------------------------------
-@log_util.trace
-async def _join(cfg:     tg_config.Context,
-                update:  telegram.Update,
-                context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Join an existing session.
-
-    """
-
-    with tg_interaction.Context(cfg     = cfg,
-                                update  = update,
-                                context = context) as interaction:
-
-        await interaction.step()
-
-
-# -----------------------------------------------------------------------------
-@log_util.trace
-async def _help(cfg:     tg_config.Context,
-                update:  telegram.Update,
-                context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Print a list of commands.
-
-    """
-
-    with tg_interaction.Context(cfg     = cfg,
-                                update  = update,
-                                context = context) as interaction:
-
-        await interaction.chat_message(cfg.help_text())
-
-
-# -----------------------------------------------------------------------------
-@log_util.trace
-async def _about(cfg:     tg_config.Context,
-                 update:  telegram.Update,
-                 context: telegram.ext.ContextTypes.DEFAULT_TYPE):
-    """
-    Print information about the bot.
-
-    """
-
-    with tg_interaction.Context(cfg     = cfg,
-                                update  = update,
-                                context = context) as interaction:
-
-        await interaction.chat_message(f'{NAME_APP} bot version {__version__}')
-
-
-# -----------------------------------------------------------------------------
-@log_util.trace
-async def _msg(cfg:     tg_config.Context,
-               update:  telegram.Update,
-               context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+async def _msg(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Handler function for non-command messages.
 
     """
 
-    with tg_interaction.Context(cfg     = cfg,
+    with tg_interaction.Context(bot     = bot,
                                 update  = update,
                                 context = context) as interaction:
-
-        await interaction.step()
+        await interaction.handle_message()
 
 
 # -----------------------------------------------------------------------------
 @log_util.trace
-async def _handle_callback_query(cfg, update, context):
+async def _callback_query(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
     """
     Generic callback query handler.
 
     """
 
-    with tg_interaction.Context(cfg     = cfg,
+    with tg_interaction.Context(bot     = bot,
                                 update  = update,
                                 context = context) as interaction:
-
         await interaction.handle_callback_query()
+
+
+# -----------------------------------------------------------------------------
+@log_util.trace
+async def _start(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+    """
+    Start a new session.
+
+    """
+
+    with tg_interaction.Context(bot     = bot,
+                                update  = update,
+                                context = context) as interaction:
+        await interaction.reset()
+
+
+# -----------------------------------------------------------------------------
+@log_util.trace
+async def _join(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+    """
+    Join an existing session.
+
+    """
+
+    with tg_interaction.Context(bot     = bot,
+                                update  = update,
+                                context = context) as interaction:
+        await interaction.handle_command()
+
+
+# -----------------------------------------------------------------------------
+@log_util.trace
+async def _help(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+    """
+    Print a list of commands.
+
+    """
+
+    with tg_interaction.Context(bot     = bot,
+                                update  = update,
+                                context = context) as interaction:
+        await interaction.chat_message(str_text = bot.help_text())
+
+
+# -----------------------------------------------------------------------------
+@log_util.trace
+async def _about(
+            bot:     tg_bot.Context,
+            update:  telegram.Update,
+            context: telegram.ext.ContextTypes.DEFAULT_TYPE):
+    """
+    Print information about the bot.
+
+    """
+
+    with tg_interaction.Context(bot     = bot,
+                                update  = update,
+                                context = context) as interaction:
+        str_about = f'{NAME_APP} bot version {__version__}'
+        await interaction.chat_message(str_text = str_about)
 
 
 # -----------------------------------------------------------------------------
