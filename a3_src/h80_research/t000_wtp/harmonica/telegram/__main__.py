@@ -47,9 +47,11 @@ license:
 
 
 import importlib.metadata
+import logging
 import os
 import os.path
 import sys
+import time
 
 import dotenv
 import telegram

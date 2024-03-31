@@ -61,10 +61,9 @@ import requests
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.harmonica.session      as session
-import t000_wtp.harmonica.track        as track
-import t000_wtp.harmonica.telegram.bot as tg_bot
-import t000_wtp.harmonica.util.log     as log_util
+import t000_wtp.harmonica.telegram.track as tg_track
+import t000_wtp.harmonica.telegram.bot   as tg_bot
+import t000_wtp.harmonica.util.log       as log_util
 
 
 # =============================================================================
@@ -83,12 +82,13 @@ class Context():
 
     """
 
+    id_chat:            int
     id_track:           str
     bot:                tg_bot
     update:             typing.Any
     context:            typing.Any
-    state:              track.State
-    track_dependencies: track.RuntimeDependencies
+    state:              tg_track.State
+    track_dependencies: tg_track.RuntimeDependencies
 
     # -------------------------------------------------------------------------
     def __init__(self,
@@ -102,22 +102,23 @@ class Context():
 
         """
 
-
-        self.id_track = g'tg.{update.effective_chat.id}'
+        self.id_chat  = update.effective_chat.id
+        self.id_track = f'tg.{self.id_chat}'
 
         try:
-            self.state   = track.State(**bot.db_track[self.id_track])
+            self.state   = tg_track.State(**bot.db_track[self.id_track])
         except KeyError:
-            self.state   = track.State()
+            self.state   = tg_track.State()
         finally:
             self.bot     = bot
             self.update  = update
             self.context = context
-            self.track_dependencies = track.RuntimeDependencies(
+            self.track_dependencies = tg_track.RuntimeDependencies(
                 chat_message         = self.chat_message,
                 chat_reply           = self.chat_reply,
                 chat_group_options   = self.chat_group_options,
                 chat_private_options = self.chat_private_options,
+                chat_query_edit_text = self.chat_query_edit_text,
                 session_create       = self.session_create,
                 session_join         = self.session_join,
                 session_update       = self.session_update,
@@ -146,32 +147,15 @@ class Context():
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def reset(self):
-        """
-        Reset the interaction state.
-
-        """
-
-        logging.info('Reset/restart chat.')
-        self.state.type_input                   = ''
-        self.state.str_input                    = ''
-        self.bot.map_queue_track[self.id_track] = asyncio.Queue()
-        self.bot.map_track[self.id_track]       = self.bot.app.create_task(
-            track.coro(
-                queue        = self.bot.map_queue_track[self.id_track],
-                dependencies = self.track_dependencies))
-        await self.bot.map_queue_track[self.id_track].put(self.state)
-
-    # -------------------------------------------------------------------------
-    @log_util.trace
     async def handle_message(self):
         """
         Handle a new message from the user.
 
         """
 
+        self.state.type_chat  = update.message.chat.type
         self.state.type_input = 'message'
-        self.state.str_input  = update.message.text
+        self.state.str_input  = self.update.message.text
         await self._step()
 
     # -------------------------------------------------------------------------
@@ -183,8 +167,9 @@ class Context():
         """
 
         self.update.callback_query.answer()
-        self.state.type_input = 'callback_query'
-        self.state.str_input  = update.callback_query.data
+        self.state.type_input          = 'callback_query'
+        self.state.str_input           = self.update.callback_query.data
+        self.state.callback_query_last = self.update.callback_query
         await self._step()
 
     # -------------------------------------------------------------------------
@@ -195,8 +180,9 @@ class Context():
 
         """
 
+        self.state.type_chat  = update.message.chat.type
         self.state.type_input = 'command'
-        self.state.str_input  = update.message.text
+        self.state.str_input  = self.update.message.text
         await self._step()
 
     # -------------------------------------------------------------------------
@@ -215,22 +201,26 @@ class Context():
                  'Recreating sessions and tracks from saved state.'))
             self.bot.map_queue_track[self.id_track] = asyncio.Queue()
             self.bot.map_track[self.id_track]       = self.bot.app.create_task(
-                track.coro(
-                    queue        = self.bot.map_queue_track[self.id_track],
-                    dependencies = self.track_dependencies))
+                tg_track.coro(queue = self.bot.map_queue_track[self.id_track],
+                              fcn   = self.track_dependencies))
             await self.bot.map_queue_track[self.id_track].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def chat_edit_query(self, str_text, **kwargs):
+    async def reset(self):
         """
-        Utility function to edit a query via telegram.
+        Reset the interaction state.
 
         """
 
-        query_data = self.update.callback_query.data
-        await query.edit_message_text(text = f"Selected option: {query_data}")
-
+        logging.info('Reset/restart chat.')
+        self.state.type_input                   = ''
+        self.state.str_input                    = ''
+        self.bot.map_queue_track[self.id_track] = asyncio.Queue()
+        self.bot.map_track[self.id_track]       = self.bot.app.create_task(
+            tg_track.coro(queue = self.bot.map_queue_track[self.id_track],
+                          fcn   = self.track_dependencies))
+        await self.bot.map_queue_track[self.id_track].put(self.state)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -240,7 +230,7 @@ class Context():
 
         """
 
-        await self.context.bot.send_message(chat_id = self.id_track,
+        await self.context.bot.send_message(chat_id = self.id_chat,
                                             text    = str_text,
                                             **kwargs)
 
@@ -263,10 +253,7 @@ class Context():
 
         """
 
-        keys   = [[
-            telegram.KeyboardButton(opt)
-                            for opt in iter_str_opt]]
-
+        keys   = [[telegram.KeyboardButton(opt) for opt in iter_str_opt]]
         markup = telegram.ReplyKeyboardMarkup(keys,
                                               resize_keyboard   = True,
                                               one_time_keyboard = True)
@@ -292,6 +279,28 @@ class Context():
         await self.update.message.reply_text(text         = str_text,
                                              reply_markup = markup,
                                              **kwargs)
+
+    # -------------------------------------------------------------------------
+    @log_util.trace
+    async def chat_query_edit_text(
+                                self,
+                                query,
+                                str_text,
+                                opt_inline = None,
+                                **kwargs):
+        """
+        Utility function to edit message text from a telegram callback_query.
+
+        """
+
+        markup = None
+        if opt_inline is not None:
+            markup = telegram.InlineKeyboardMarkup([[
+                telegram.InlineKeyboardButton(opt, callback_data = opt)
+                                                    for opt in opt_inline]])
+
+        await query.edit_message_text(text         = str_text,
+                                      reply_markup = markup)
 
     # -------------------------------------------------------------------------
     @log_util.trace

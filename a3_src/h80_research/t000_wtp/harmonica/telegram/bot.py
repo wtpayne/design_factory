@@ -48,15 +48,12 @@ license:
 """
 
 
-import asyncio
 import functools
-import logging
 import os.path
 import typing
 
 import dill
 import sqlitedict
-import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
 
@@ -179,8 +176,9 @@ class Context():
 
         self.app.add_handler(
             telegram.ext.MessageHandler(
-                        filters  = select_if_not_cmd,
-                        callback = functools.partial(fcn_callback, self)))
+                filters  = select_if_not_cmd,
+                callback = functools.partial(fcn_callback, self),
+                block    = True))
 
     # -------------------------------------------------------------------------
     def add_callback_query_handler(self, fcn_callback):
@@ -191,7 +189,8 @@ class Context():
 
         self.app.add_handler(
             telegram.ext.CallbackQueryHandler(
-                        callback = functools.partial(fcn_callback, self)))
+                callback = functools.partial(fcn_callback, self),
+                block    = True))
 
     # -------------------------------------------------------------------------
     def add_member_update_handler(self, fcn_callback):
@@ -222,8 +221,9 @@ class Context():
 
         self.app.add_handler(
             telegram.ext.CommandHandler(
-                        command  = str_command,
-                        callback = functools.partial(fcn_callback, self)))
+                command  = str_command,
+                callback = functools.partial(fcn_callback, self),
+                block    = True))
 
     # -------------------------------------------------------------------------
     def help_text(self):
