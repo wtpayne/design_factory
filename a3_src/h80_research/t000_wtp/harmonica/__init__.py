@@ -3,17 +3,17 @@
 ---
 
 title:
-    "dm010_harmonica2 demo commands."
+    "Harmonica package."
 
 description:
-    "This module defines commands for the
-    dm010_harmonica2 demonstration."
+    "This package contains functionality for
+    the Harmonica system."
 
 id:
-    "d738f591-f2a9-4f9a-b2d5-5e625e883e5c"
+    "831dad01-9128-46bd-ad29-293851d815d8"
 
 type:
-    dt003_python_module
+    dt002_python_package
 
 validation_level:
     v00_minimum
@@ -45,24 +45,12 @@ license:
 """
 
 
-import getpass
-import os
-import sys
+import importlib.metadata
 
 
-# -----------------------------------------------------------------------------
-def tgtest():
-    """
-    Run dm010 telegram bot test.
-
-    """
-
-    # Load environment variables from .env file.
-    #
-    import key
-    key.load_all(do_load = True)
-    import da.env.run
-    return da.env.run.python_module(module     = 't000_wtp.harmonica.telegram',
-                                    id_env     = 'e009_telegram')
-
-# -----------------------------------------------------------------------------
+name_app     = 'Harmonica'
+name_package = f't000_wtp.{name_app.lower()}'
+try:
+    __version__ = importlib.metadata.version(name_package)
+except importlib.metadata.PackageNotFoundError:
+    __version__ = '0.0.1'

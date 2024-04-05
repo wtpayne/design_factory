@@ -56,6 +56,8 @@ import dill
 import sqlitedict
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
+import t000_wtp.harmonica.telegram.session as tg_session
+
 
 # =============================================================================
 class Context():
@@ -85,28 +87,25 @@ class Context():
     list_cmd:   list[tuple[str, str]] = []
 
     # -------------------------------------------------------------------------
-    def __init__(self, str_token):
+    def __init__(self, str_token) -> None:
         """
         Return an instance of the telegram bot configuration Context.
 
         """
 
-        self.str_token      = str_token
-        dirpath_self        = os.path.dirname(os.path.realpath(__file__))
-        filename_db_track   = 'track.db'
-        filepath_db_track   = os.path.join(dirpath_self, filename_db_track)
-        filename_db_session = 'session.db'
-        filepath_db_session = os.path.join(dirpath_self, filename_db_session)
-        self.db_track       = sqlitedict.SqliteDict(filepath_db_track,
-                                                    encode = dill.dumps,
-                                                    decode = dill.loads)
-        self.db_session     = sqlitedict.SqliteDict(filepath_db_session,
-                                                    encode = dill.dumps,
-                                                    decode = dill.loads)
+        self.str_token  = str_token
+        self.db_track   = _connect_to_track_database()
+        self.db_session = _connect_to_session_database()
 
+        # Provision test data iff we are at the
+        # DEV deployment stage.
+        #
+        _provision_test_data_if_dev(db_track    = self.db_track,
+                                    db_session  = self.db_session,
+                                    do_clear_db = True)
 
-        app_builder = telegram.ext.ApplicationBuilder().token(str_token)
-        self.app    = app_builder.build()
+        app_builder     = telegram.ext.ApplicationBuilder().token(str_token)
+        self.app        = app_builder.build()
 
         # [(str_command, str_doc)], for help text.
         self.list_cmd  = []
@@ -120,7 +119,7 @@ class Context():
         self.map_queue_track = {}
 
     # -------------------------------------------------------------------------
-    def __enter__(self):
+    def __enter__(self) -> 'Context':
         """
         Enter the configuration context for the telegram bot instance.
 
@@ -129,7 +128,7 @@ class Context():
         return self
 
     # -------------------------------------------------------------------------
-    def __exit__(self, type_exc, value_exc, tb_exc):
+    def __exit__(self, type_exc, value_exc, tb_exc) -> None:
         """
         Exit the configuration context for the telegram bot instance.
 
@@ -157,14 +156,14 @@ class Context():
         finally:
 
             self.db_track.commit()
-            self.db_session.commit()
             self.db_track.close()
+            self.db_track = None
+            self.db_session.commit()
             self.db_session.close()
-            self.db_track   = None
             self.db_session = None
 
     # -------------------------------------------------------------------------
-    def add_message_handler(self, fcn_callback):
+    def add_message_handler(self, fcn_callback) -> None:
         """
         Add a new message handler to the bot.
 
@@ -181,7 +180,7 @@ class Context():
                 block    = True))
 
     # -------------------------------------------------------------------------
-    def add_callback_query_handler(self, fcn_callback):
+    def add_callback_query_handler(self, fcn_callback) -> None:
         """
         Add a new callback query handler to the bot.
 
@@ -193,7 +192,7 @@ class Context():
                 block    = True))
 
     # -------------------------------------------------------------------------
-    def add_member_update_handler(self, fcn_callback):
+    def add_member_update_handler(self, fcn_callback) -> None:
         """
         Add a new chat member update handler to the bot.
 
@@ -206,7 +205,7 @@ class Context():
                 block             = True))
 
     # -------------------------------------------------------------------------
-    def add_command_handler(self, fcn_callback):
+    def add_command_handler(self, fcn_callback) -> None:
         """
         Add a new command handler to the bot.
 
@@ -226,7 +225,7 @@ class Context():
                 block    = True))
 
     # -------------------------------------------------------------------------
-    def help_text(self):
+    def help_text(self) -> str:
         """
         Return help text for the bot.
 
@@ -236,3 +235,65 @@ class Context():
         for (str_command, str_doc) in self.list_cmd:
             str_help_text += f'/{str_command}: {str_doc}\n'
         return str_help_text
+
+
+# -----------------------------------------------------------------------------
+def _connect_to_track_database() -> sqlitedict.SqliteDict:
+    """
+    Return a connection to the configured track database.
+
+    """
+
+    dirpath_self      = os.path.dirname(os.path.realpath(__file__))
+    filename_db_track = 'track.db'
+    filepath_default  = os.path.join(dirpath_self, filename_db_track)
+    filepath_db_track = os.getenv('HARMONICA_FILEPATH_DB_TRACK',
+                                  default = filepath_default)
+    db_track          = sqlitedict.SqliteDict(filepath_db_track,
+                                              encode = dill.dumps,
+                                              decode = dill.loads)
+    return db_track
+
+
+# -----------------------------------------------------------------------------
+def _connect_to_session_database() -> sqlitedict.SqliteDict:
+    """
+    Return a connection to the configured session database.
+
+    """
+
+    dirpath_self        = os.path.dirname(os.path.realpath(__file__))
+    filename_db_session = 'session.db'
+    filepath_default    = os.path.join(dirpath_self, filename_db_session)
+    filepath_db_session = os.getenv('HARMONICA_FILEPATH_DB_SESSION',
+                                    default = filepath_default)
+    db_session          = sqlitedict.SqliteDict(filepath_db_session,
+                                                encode = dill.dumps,
+                                                decode = dill.loads)
+    return db_session
+
+
+# -----------------------------------------------------------------------------
+def _provision_test_data_if_dev(db_track:    sqlitedict.SqliteDict,
+                                db_session:  sqlitedict.SqliteDict,
+                                do_clear_db: bool = False) -> None:
+    """
+    Clear databases and provision with test data.
+
+    """
+
+    stage_deployment = os.getenv(f'HARMONICA_STAGE_DEPLOYMENT',
+                                 default = 'DEV')
+    if stage_deployment == 'DEV':
+
+        if do_clear_db:
+            db_session.clear()
+            db_track.clear()
+
+        db_session['default_session'] = tg_session.State(
+                                                str_name  = 'Default Session')
+        db_session['test_session_1']  = tg_session.State(
+                                                str_name  = 'Test Session 1')
+        db_session['test_session_2']  = tg_session.State(
+                                                str_name  = 'Test Session 2')
+        db_session.commit()

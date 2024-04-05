@@ -3,14 +3,14 @@
 ---
 
 title:
-    "dm010_harmonica2 demo commands."
+    "Session logic module."
 
 description:
-    "This module defines commands for the
-    dm010_harmonica2 demonstration."
+    "This module contains session logic for
+    the harmonica bot."
 
 id:
-    "d738f591-f2a9-4f9a-b2d5-5e625e883e5c"
+    "af64c9a1-f34b-4396-8249-8db5085b7c68"
 
 type:
     dt003_python_module
@@ -45,24 +45,17 @@ license:
 """
 
 
-import getpass
-import os
-import sys
+import pydantic
 
 
-# -----------------------------------------------------------------------------
-def tgtest():
+# =============================================================================
+class State(pydantic.BaseModel):
     """
-    Run dm010 telegram bot test.
+    Session state.
 
     """
 
-    # Load environment variables from .env file.
-    #
-    import key
-    key.load_all(do_load = True)
-    import da.env.run
-    return da.env.run.python_module(module     = 't000_wtp.harmonica.telegram',
-                                    id_env     = 'e009_telegram')
+    version:   int = 1
+    str_name:  str = 'MySession'
+    set_track: set = set()
 
-# -----------------------------------------------------------------------------

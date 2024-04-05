@@ -53,17 +53,20 @@ import http
 import logging
 import os
 import pprint
+import re
 import typing
 import urllib.parse
 
 import pydantic
 import requests
+import sqlitedict
 import telegram  # pylint: disable=wrong-import-order
 import yaml
 
-import t000_wtp.harmonica.telegram.track as tg_track
-import t000_wtp.harmonica.telegram.bot   as tg_bot
-import t000_wtp.harmonica.util.log       as log_util
+import t000_wtp.harmonica.telegram.bot     as tg_bot
+import t000_wtp.harmonica.telegram.session as tg_session
+import t000_wtp.harmonica.telegram.track   as tg_track
+import t000_wtp.harmonica.util.log         as log_util
 
 
 # =============================================================================
@@ -84,7 +87,7 @@ class Context():
 
     id_chat:            int
     id_track:           str
-    bot:                tg_bot
+    bot:                tg_bot.Context
     update:             typing.Any
     context:            typing.Any
     state:              tg_track.State
@@ -110,19 +113,23 @@ class Context():
         except KeyError:
             self.state   = tg_track.State()
         finally:
-            self.bot     = bot
-            self.update  = update
-            self.context = context
+
+            for (id_session, session) in bot.db_session.items():
+                self.state.map_session[id_session] = session.str_name
+
+            self.bot                = bot
+            self.update             = update
+            self.context            = context
             self.track_dependencies = tg_track.RuntimeDependencies(
-                chat_message         = self.chat_message,
-                chat_reply           = self.chat_reply,
-                chat_group_options   = self.chat_group_options,
-                chat_private_options = self.chat_private_options,
-                chat_query_edit_text = self.chat_query_edit_text,
-                session_create       = self.session_create,
-                session_join         = self.session_join,
-                session_update       = self.session_update,
-                session_summary      = self.session_summary)
+                            chat_message         = self.chat_message,
+                            chat_reply           = self.chat_reply,
+                            chat_options         = self.chat_options,
+                            chat_options_inline  = self.chat_options_inline,
+                            chat_query_edit_text = self.chat_query_edit_text,
+                            session_create       = self.session_create,
+                            session_join         = self.session_join,
+                            session_update       = self.session_update,
+                            session_summary      = self.session_summary)
 
     # -------------------------------------------------------------------------
     def __enter__(self):
@@ -142,8 +149,16 @@ class Context():
 
         """
 
-        self.bot.db_track[self.id_track] = self.state.dict()
-        self.bot.db_track.commit()
+        _ensure_track_database_updated(
+                            db_track = self.bot.db_track,
+                            id_track = self.id_track,
+                            state    = self.state.dict())
+
+        _ensure_session_database_updated(
+                            db_session   = self.bot.db_session,
+                            id_session   = self.state.id_session,
+                            name_session = self.state.name_session,
+                            id_track     = self.id_track)
 
     # -------------------------------------------------------------------------
     @log_util.trace
@@ -153,7 +168,7 @@ class Context():
 
         """
 
-        self.state.type_chat  = update.message.chat.type
+        self.state.type_chat  = str(self.update.message.chat.type)
         self.state.type_input = 'message'
         self.state.str_input  = self.update.message.text
         await self._step()
@@ -166,7 +181,7 @@ class Context():
 
         """
 
-        self.update.callback_query.answer()
+        await self.update.callback_query.answer()
         self.state.type_input          = 'callback_query'
         self.state.str_input           = self.update.callback_query.data
         self.state.callback_query_last = self.update.callback_query
@@ -180,7 +195,7 @@ class Context():
 
         """
 
-        self.state.type_chat  = update.message.chat.type
+        self.state.type_chat  = str(self.update.message.chat.type)
         self.state.type_input = 'command'
         self.state.str_input  = self.update.message.text
         await self._step()
@@ -214,8 +229,9 @@ class Context():
         """
 
         logging.info('Reset/restart chat.')
-        self.state.type_input                   = ''
-        self.state.str_input                    = ''
+        self.state.type_chat  = str(self.update.message.chat.type)
+        self.state.type_input = 'command'
+        self.state.str_input  = self.update.message.text
         self.bot.map_queue_track[self.id_track] = asyncio.Queue()
         self.bot.map_track[self.id_track]       = self.bot.app.create_task(
             tg_track.coro(queue = self.bot.map_queue_track[self.id_track],
@@ -247,7 +263,7 @@ class Context():
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def chat_group_options(self, str_text, iter_str_opt, **kwargs):
+    async def chat_options(self, str_text, iter_str_opt, **kwargs):
         """
         Utility function to present options to the group via telegram.
 
@@ -264,16 +280,22 @@ class Context():
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def chat_private_options(self, str_text, iter_str_opt, **kwargs):
+    async def chat_options_inline(self, str_text, iter_iter_opt, **kwargs):
         """
         Utility function to present options to the sender via telegram.
 
         """
 
-        keys = [[
-            telegram.InlineKeyboardButton(opt, callback_data = opt)
-                                                    for opt in iter_str_opt]]
-
+        keys = []
+        for iter_opt in iter_iter_opt:
+            row = []
+            for tup_opt in iter_opt:
+                (text, callback_data) = tup_opt
+                row.append(
+                    telegram.InlineKeyboardButton(
+                                            text          = text,
+                                            callback_data = callback_data))
+            keys.append(row)
         markup = telegram.InlineKeyboardMarkup(keys)
 
         await self.update.message.reply_text(text         = str_text,
@@ -286,33 +308,51 @@ class Context():
                                 self,
                                 query,
                                 str_text,
-                                opt_inline = None,
+                                iter_iter_opt = None,
                                 **kwargs):
         """
         Utility function to edit message text from a telegram callback_query.
 
         """
 
-        markup = None
-        if opt_inline is not None:
-            markup = telegram.InlineKeyboardMarkup([[
-                telegram.InlineKeyboardButton(opt, callback_data = opt)
-                                                    for opt in opt_inline]])
+        if iter_iter_opt is not None:
+            keys = []
+            for iter_opt in iter_iter_opt:
+                row = []
+                for opt in iter_opt:
+                    (text, callback_data) = opt
+                    row.append(
+                        telegram.InlineKeyboardButton(
+                                                text          = text,
+                                                callback_data = callback_data))
+                keys.append(row)
+            markup = telegram.InlineKeyboardMarkup(keys)
+        else:
+            markup = None
 
         await query.edit_message_text(text         = str_text,
                                       reply_markup = markup)
 
     # -------------------------------------------------------------------------
     @log_util.trace
-    async def session_create(self):
+    async def session_create(self, name_session):
         """
         Utility function to ensure a new session exists.
 
         """
 
-        print('>>> SESSION CREATE')
-
-        return 0
+        # id_session is name_session in lowercase
+        # with any sequence of non-alphanumeric
+        # characters replaced with a single
+        # underscore
+        #
+        id_session = re.sub('[^a-zA-Z0-9]+', '_', name_session.lower())
+        self.state.id_session = id_session
+        self.state.map_session[id_session] = name_session
+        self.bot.db_session[id_session]    = tg_session.State(
+                                                    str_name  = name_session)
+        self.bot.db_session.commit()
+        return id_session
 
     # -------------------------------------------------------------------------
     async def session_join(self, id_session, id_track):
@@ -342,3 +382,46 @@ class Context():
         print('>>> SESSION SUMMARY')
 
         return ''
+
+
+# -----------------------------------------------------------------------------
+def _ensure_track_database_updated(db_track: sqlitedict.SqliteDict,
+                                   id_track: str,
+                                   state:    dict) -> None:
+    """
+    Update session database.
+
+    """
+
+    db_track[id_track] = state
+    db_track.commit()
+
+
+# -----------------------------------------------------------------------------
+def _ensure_session_database_updated(db_session:   sqlitedict.SqliteDict,
+                                     id_session:   str,
+                                     name_session: str,
+                                     id_track:     str) -> None:
+    """
+    Update session database.
+
+    """
+
+    is_dirty = False
+    try:
+        session = db_session[id_session]
+    except KeyError:
+        session = tg_session.State()
+        is_dirty = True
+
+    if session.str_name != name_session:
+        session.str_name = name_session
+        is_dirty = True
+
+    if id_track not in session.set_track:
+        session.set_track.add(id_track)
+        is_dirty = True
+
+    if is_dirty:
+        db_session[id_session] = session
+        db_session.commit()

@@ -46,12 +46,15 @@ license:
 
 
 import asyncio
+import collections
 import logging
 import pprint
 import typing
 
 import pydantic
 import telegram
+
+import t000_wtp.harmonica as harmonica
 
 
 # =============================================================================
@@ -61,13 +64,15 @@ class State(pydantic.BaseModel):
 
     """
 
-    version:             int        = 1
-    id_session:          str        = ''
-    type_chat:           str        = ''
-    type_input:          str        = ''
-    str_input:           str        = ''
-    id_message_last:     str        = ''
-    callback_query_last: typing.Any = None
+    version:              int        = 1
+    id_session:           str        = 'default_session'
+    name_session:         str        = 'Default Session'
+    map_session:          dict       = dict()   # id_session -> name_session
+    type_chat:            str        = ''
+    type_input:           str        = ''
+    str_input:            str        = ''
+    id_message_last:      str        = ''
+    callback_query_last:  typing.Any = None
 
 
 # -----------------------------------------------------------------------------
@@ -79,8 +84,8 @@ class RuntimeDependencies(pydantic.BaseModel):
 
     chat_message:         typing.Any = None
     chat_reply:           typing.Any = None
-    chat_group_options:   typing.Any = None
-    chat_private_options: typing.Any = None
+    chat_options:         typing.Any = None
+    chat_options_inline:  typing.Any = None
     chat_query_edit_text: typing.Any = None
     session_create:       typing.Any = None
     session_join:         typing.Any = None
@@ -91,56 +96,129 @@ class RuntimeDependencies(pydantic.BaseModel):
 # -----------------------------------------------------------------------------
 async def coro(queue: asyncio.Queue, fcn: RuntimeDependencies):
     """
-    Chat business logic coroutine.
+    Session track coroutine.
 
     This asynchronous coroutine is responsible
-    for defining the chat lifecycle from
-    initiation through to conclusion.
+    for defining the track lifecycle from
+    initiation through to termination.
 
-    All dependencies are injected so that the
-    chat logic can be tested in isolation.
+    Two inputs are provided. The first is the
+    asyncio queue that is used to recieve state
+    updates from the rest of the system and
+    the second is a set of runtime dependencies
+    used for dependency injection, allowing this
+    track logic to be tested in isolation.
+
 
     """
 
-    await _display_greeting(queue, fcn)
-    await _loop_forever(queue, fcn)
+    map_transcript = collections.defaultdict(list)
 
-
-# -----------------------------------------------------------------------------
-async def _display_greeting(queue, fcn):
-    """
-    Display greetings.
-
-    """
-    await fcn.chat_message('Hello world')
-
-
-# -----------------------------------------------------------------------------
-async def _loop_forever(queue, fcn):
-    """
-    Loop forever noop holding pattern.
-
-    """
     while True:
+
         state = await queue.get()
-        pprint.pprint(state)
+
+        is_command        = state.type_input == 'command'
+        is_callback_query = state.type_input == 'callback_query'
+        is_message        = state.type_input == 'message'
+        is_private        = state.type_chat  == 'private'
+
+        if is_message and is_private:
+            map_transcript[state.id_session].append(state.str_input)
+            continue
+
+        if is_command and state.str_input.startswith('/start'):
+            maybe_id_session = await _handle_start(queue, fcn, state)
+        if is_command and state.str_input.startswith('/join'):
+            maybe_id_session = await _handle_join(queue, fcn, state)
+        if is_callback_query:
+            maybe_id_session = await _handle_callback_query(queue, fcn, state)
+        if maybe_id_session is not None:
+            id_session = maybe_id_session
 
 
-# # -----------------------------------------------------------------------------
-# async def _session_setup(queue, fcn):
-#     """
-#     Create or join session.
+# ----------------------------------------------------------------------------
+async def _handle_start(queue: asyncio.Queue,
+                        fcn:   RuntimeDependencies,
+                        state: State):
+    """
+    Return id_session after a /start command.
 
-#     """
+    """
 
-#     await fcn.chat_private_options(str_text     = str_text,
-#                                    iter_str_opt = iter_str_opt)
-#     while True:
-#         state = await queue.get()
-#         if state.type_input == 'callback_query':
-#             str_opt = state.str_input
-#             await fcn.chat_query_edit_text(
-#                                     query    = state.callback_query_last,
-#                                     str_text = f'Next question',
-#                                     opt_inline = ['CHOICE C', 'CHOICE D'])
-#             return str_opt
+    try:
+        (str_cmd, str_param) = state.str_input.split(maxsplit = 1)
+    except ValueError:
+        await fcn.chat_reply('Please choose a name for your session:')
+        state        = await queue.get()
+        name_session = state.str_input
+    else:
+        name_session = str_param
+
+    id_session = await fcn.session_create(name_session)
+    await fcn.chat_reply(f'Started session: "{name_session}"')
+    return id_session
+
+
+# -----------------------------------------------------------------------------
+async def _handle_join(queue: asyncio.Queue,
+                       fcn:   RuntimeDependencies,
+                       state: State):
+    """
+    Return id_session or None after a /join command.
+
+    """
+
+    try:
+        (str_cmd, str_param) = state.str_input.split(maxsplit = 1)
+    except ValueError:
+        await fcn.chat_options_inline(
+                                'Which session do you want to join?',
+                                _opt_id_session(state.map_session, '/join'))
+        return None
+
+    assert state.type_input == 'command'
+    assert str_cmd          == '/join'
+
+    for (id_session, name_session) in state.map_session.items():
+
+        if str_param == name_session:
+            await fcn.chat_reply(f'User joined session: "{name_session}"')
+            return id_session
+
+    await fcn.chat_options_inline(
+                            ('Invalid session.\n'
+                             'Which session do you want to join?'),
+                            _opt_id_session(state.map_session, '/join'))
+    return None
+
+
+# -----------------------------------------------------------------------------
+async def _handle_callback_query(queue: asyncio.Queue,
+                                 fcn:   RuntimeDependencies,
+                                 state: State):
+    """
+    Return id_session or None after a /join command.
+
+    """
+
+    (str_cmd, id_session) = state.str_input.split(maxsplit = 1)
+    name_session = state.map_session[id_session]
+    await fcn.chat_reply(f'User joined session: "{name_session}"')
+    assert state.type_input == 'callback_query'
+    assert str_cmd          == '/join'
+    assert id_session in state.map_session
+    return id_session
+
+
+# -----------------------------------------------------------------------------
+def _opt_id_session(map_session: dict,
+                    str_cmd:     str):
+    """
+    Return options to configure a keyboard that lets the user select a session.
+
+    """
+
+    return [[(name_session, ' '.join((str_cmd, id_session)))]
+                                            for (id_session, name_session)
+                                                in sorted(map_session.items())]

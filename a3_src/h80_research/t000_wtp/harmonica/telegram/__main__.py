@@ -46,7 +46,6 @@ license:
 """
 
 
-import importlib.metadata
 import logging
 import os
 import os.path
@@ -57,16 +56,10 @@ import dotenv
 import telegram
 import telegram.ext  # pylint: disable=import-error,no-name-in-module
 
-import t000_wtp.harmonica.telegram.interaction as tg_interaction
+import t000_wtp.harmonica                      as harmonica
 import t000_wtp.harmonica.telegram.bot         as tg_bot
+import t000_wtp.harmonica.telegram.interaction as tg_interaction
 import t000_wtp.harmonica.util.log             as log_util
-
-NAME_APP     = 'Harmonica'
-NAME_PACKAGE = f't000_wtp.{NAME_APP.lower()}'
-try:
-    __version__ = importlib.metadata.version(NAME_PACKAGE)
-except importlib.metadata.PackageNotFoundError:
-    __version__ = '0.0.1'
 
 
 # -----------------------------------------------------------------------------
@@ -77,13 +70,13 @@ def main():
     """
 
     log_util.setup()
-    with tg_bot.Context(_token_telegram()) as bot:
-        bot.add_message_handler(_msg)
-        bot.add_callback_query_handler(_callback_query)
-        bot.add_command_handler(_start)
-        bot.add_command_handler(_join)
-        bot.add_command_handler(_help)
-        bot.add_command_handler(_about)
+    with tg_bot.Context(_token_telegram()) as bot_context:
+        bot_context.add_message_handler(_msg)
+        bot_context.add_callback_query_handler(_callback_query)
+        bot_context.add_command_handler(_start)
+        bot_context.add_command_handler(_join)
+        bot_context.add_command_handler(_help)
+        bot_context.add_command_handler(_about)
 
 
 # -----------------------------------------------------------------------------
@@ -120,8 +113,8 @@ async def _msg(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        await interaction.handle_message()
+                                context = context) as interaction_context:
+        await interaction_context.handle_message()
 
 
 # -----------------------------------------------------------------------------
@@ -137,8 +130,8 @@ async def _callback_query(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        await interaction.handle_callback_query()
+                                context = context) as interaction_context:
+        await interaction_context.handle_callback_query()
 
 
 # -----------------------------------------------------------------------------
@@ -154,8 +147,8 @@ async def _start(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        await interaction.reset()
+                                context = context) as interaction_context:
+        await interaction_context.reset()
 
 
 # -----------------------------------------------------------------------------
@@ -171,8 +164,8 @@ async def _join(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        await interaction.handle_command()
+                                context = context) as interaction_context:
+        await interaction_context.handle_command()
 
 
 # -----------------------------------------------------------------------------
@@ -188,8 +181,8 @@ async def _help(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        await interaction.chat_message(str_text = bot.help_text())
+                                context = context) as interaction_context:
+        await interaction_context.chat_message(str_text = bot.help_text())
 
 
 # -----------------------------------------------------------------------------
@@ -205,9 +198,11 @@ async def _about(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction:
-        str_about = f'{NAME_APP} bot version {__version__}'
-        await interaction.chat_message(str_text = str_about)
+                                context = context) as interaction_context:
+        str_name    = f'{harmonica.name_app}'
+        str_version = f'{harmonica.__version__}'
+        str_about   = f'{str_name} bot version {str_version}'
+        await interaction_context.chat_message(str_text = str_about)
 
 
 # -----------------------------------------------------------------------------
