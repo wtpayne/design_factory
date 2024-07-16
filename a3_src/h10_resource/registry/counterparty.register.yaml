@@ -16,17 +16,17 @@ register:
   co001_solar:
     name: Paideia.
     desc: >
-      Jidanzai Dashan
+      Jidanzai Dashan.
 
   co002_jasmine:
     name: Harmonica.
     desc: >
-      Artem Zhiganov
+      Artem Zhiganov.
 
   co003_lazarus:
     name: ChimiaDAO.
     desc: >
-      Christina Castro
+      Christina Castro.
 
   co004_orange:
     name:
@@ -36,9 +36,49 @@ register:
   co005_ceramic:
     name: Plus AI Software GMBH.
     desc: >
-      Christian Kramer
+      Christian Kramer.
 
   co006_domino:
     name: CWTECH
     desc: >
       Christopher Small & Will Payne joint venture.
+
+  co007_phoenix:
+    name: Limbic.ai
+    desc: >
+      Limbic.ai
+
+  co008_student:
+    name: CVEDIA/Soeul Robotics
+    desc: >
+      KITTI LIDAR data for CVEDIA / Soeul Robotics
+
+  co009_olympic:
+    name: CVEDIA/FLIR
+    desc: >
+      IR imagery for CVEDIA / FLIR Automotive.
+
+  co010_griffin:
+    name: SmartSensors
+    desc: >
+      Iris imagery for SmartSensors
+
+  co011_legend:
+    name: SmartSurgical
+    desc: >
+      Depth estimation for keyhole surgery
+
+  co012_viking:
+    name: L3 Harris ASV
+    desc: >
+      Maritime imagery
+
+  co013_benny:
+    name: WireWax
+    desc: >
+      TV/Film video scene change detection.
+
+  co014_pinball:
+    name: Personal/Forex
+    desc: >
+      Financial time series

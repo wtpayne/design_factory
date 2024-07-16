@@ -21,4 +21,10 @@ register:
     counterparty:
       - co001_solar.
 
+  p0002_rio:
+    name: Project Rio
+    desc: >
+      Crisis detection.
+    counterparty:
+      - co007_phoenix.
 

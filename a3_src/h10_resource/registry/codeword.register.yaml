@@ -17,23 +17,25 @@ register:
     orange:     [co004_orange]
     ceramic:    [co005_ceramic]
     domino:     [co006_domino]
+    phoenix:    [co007_phoenix]
+    student:    [co008_student]
+    olympic:    [co009_olympic]
+    griffin:    [co010_griffin]
+    legend:     [co011_legend]
+    viking:     [co012_viking]
+    benny:      [co013_benny]
+    pinball:    [co014_pinball]
     invicta:    [p0000_invicta]
     dublin:     [p0001_dublin]
+    rio:        [p0002_rio]
     atlas:      [z0001_atlas]
     golem:      [z0002_golem]
     tictac:     [z0003_tictac]
-    student:    Null
     algebra:    Null
-    poetic:     Null
-    legend:     Null
     chicago:    Null
-    viking:     Null
+    poetic:     Null
     dragon:     Null
     cipher:     Null
-    griffin:    Null
-    pinball:    Null
-    olympic:    Null
-    benny:      Null
     battery:    Null
     size:       Null
     mother:     Null
@@ -323,7 +325,6 @@ register:
     choice:     Null
     totem:      Null
     nissan:     Null
-    phoenix:    Null
     canary:     Null
     mouse:      Null
     mars:       Null
@@ -403,7 +404,6 @@ register:
     slow:       Null
     joshua:     Null
     crystal:    Null
-    rio:        Null
     empty:      Null
     bucket:     Null
     raja:       Null

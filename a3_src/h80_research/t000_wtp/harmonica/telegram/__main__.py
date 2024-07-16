@@ -113,8 +113,8 @@ async def _msg(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
-        await interaction_context.handle_message()
+                                context = context) as interaction:
+        await interaction.handle_message()
 
 
 # -----------------------------------------------------------------------------
@@ -130,8 +130,8 @@ async def _callback_query(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
-        await interaction_context.handle_callback_query()
+                                context = context) as interaction:
+        await interaction.handle_callback_query()
 
 
 # -----------------------------------------------------------------------------
@@ -147,8 +147,8 @@ async def _start(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
-        await interaction_context.reset()
+                                context = context) as interaction:
+        await interaction.handle_command(command = 'start')
 
 
 # -----------------------------------------------------------------------------
@@ -164,8 +164,8 @@ async def _join(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
-        await interaction_context.handle_command()
+                                context = context) as interaction:
+        await interaction.handle_command(command = 'join')
 
 
 # -----------------------------------------------------------------------------
@@ -181,8 +181,8 @@ async def _help(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
-        await interaction_context.chat_message(str_text = bot.help_text())
+                                context = context) as interaction:
+        await interaction.chat.message(str_text = bot.help_text())
 
 
 # -----------------------------------------------------------------------------
@@ -198,11 +198,11 @@ async def _about(
 
     with tg_interaction.Context(bot     = bot,
                                 update  = update,
-                                context = context) as interaction_context:
+                                context = context) as interaction:
         str_name    = f'{harmonica.name_app}'
         str_version = f'{harmonica.__version__}'
         str_about   = f'{str_name} bot version {str_version}'
-        await interaction_context.chat_message(str_text = str_about)
+        await interaction.chat.message(str_text = str_about)
 
 
 # -----------------------------------------------------------------------------
