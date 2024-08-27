@@ -70,7 +70,7 @@ def monthview(**kwargs) -> reflex.Component:
                 reflex.grid(
                     reflex.foreach(
                         amox.state.App.list_idx_day,
-                        _month_card),
+                        _daybox),
 
                     flex    = 'auto',
                     width   = amox.const.SIZE_FULL,
@@ -103,7 +103,12 @@ def _heading_row(tup_heading) -> reflex.Component:
 # -----------------------------------------------------------------------------
 def _heading_text(str_item) -> reflex.Component:
     """
+    Text for the month view heading row.
+
+    This is normally day-of-week column headers.
+
     """
+
     return reflex.text(
                 str_item,
                 color = reflex.cond(amox.state.App.is_ena_lightmode,
@@ -112,28 +117,28 @@ def _heading_text(str_item) -> reflex.Component:
 
 
 # -----------------------------------------------------------------------------
-def _month_card(idx: int) -> reflex.Component:
+def _daybox(idx: int) -> reflex.Component:
     """
-    Month card component.
+    Monthview day-box component.
 
     """
 
     return reflex.match(
                 amox.state.App.list_day_type[idx],
-                ('inactive', _mv_card_day_inactive()),
-                ('past',     _mv_card_day_past(idx)),
-                ('today',    _mv_card_day_today(idx)),
-                ('future',   _mv_card_day_future(idx)))
+                ('inactive', _daybox_inactive()),
+                ('past',     _daybox_past(idx)),
+                ('today',    _daybox_today(idx)),
+                ('future',   _daybox_future(idx)))
 
 
 # -----------------------------------------------------------------------------
-def _mv_card_day_inactive() -> reflex.Component:
+def _daybox_inactive() -> reflex.Component:
     """
-    Month card (in month) component.
+    Inactive, hidden day-box component.
 
     """
 
-    return reflex.card(
+    return reflex.box(
                 background    = reflex.cond(amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_BG_PASSIVE,
                                             amox.const.RGB_DK_BG_PASSIVE),
@@ -142,102 +147,63 @@ def _mv_card_day_inactive() -> reflex.Component:
                                     amox.const.RGB_LT_FG_PASSIVE,
                                     amox.const.RGB_DK_FG_PASSIVE),
                 border        = 'thin',
+                border_radius = amox.const.RADIUS_DAYBOX,
                 width         = amox.const.SIZE_FULL)
 
 
 # -----------------------------------------------------------------------------
-def _mv_card_day_past(idx: int) -> reflex.Component:
+def _daybox_past(idx: int) -> reflex.Component:
     """
-    Month card (in month) component.
+    A day-box for past dates.
 
     """
 
-    return reflex.card(
-                reflex.text(
-                    amox.state.App.list_day_of_month[idx],
-                    color = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                    size  = '1',
-                    style = { 'position': 'absolute',
-                              'top':      '0.5rem',
-                              'right':    '0.5rem' }),
-
-                    _month_card_icon(
-                        tag_icon = amox.state.App.list_str_icon[idx]),
-
-                on_click      = lambda: amox.state.App.on_click_mv_day_past(idx),
-                background    = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_BG_PASSIVE_ACCENT_1,
-                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_1),
-                border_color  = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                border        = 'thin',
-                width         = amox.const.SIZE_FULL)
+    return _daybox_active_impl(
+                idx,
+                on_click = lambda: amox.state.App.on_click_mv_day_past(idx))
 
 
 # -----------------------------------------------------------------------------
-def _mv_card_day_today(idx: int) -> reflex.Component:
+def _daybox_today(idx: int) -> reflex.Component:
     """
-    Month card (in month) component.
+    The day-box for today's date.
 
     """
 
-    return reflex.card(
-                reflex.text(
-                    amox.state.App.list_day_of_month[idx],
-                    color = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                    size  = '1',
-                    style = { 'position': 'absolute',
-                              'top':      '0.5rem',
-                              'right':    '0.5rem' }),
-
-                    _month_card_icon(
-                        tag_icon = amox.state.App.list_str_icon[idx]),
-
-                on_click      = lambda: amox.state.App.on_click_mv_today(idx),
-                background    = reflex.cond(
+    return _daybox_active_impl(
+                idx,
+                on_click   = lambda: amox.state.App.on_click_mv_today(idx),
+                background = reflex.cond(
                                     amox.state.App.is_ena_lightmode,
                                     amox.const.RGB_LT_BG_PASSIVE_ACCENT_2,
-                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_2),
-                border_color  = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                border        = 'thin',
-                width         = amox.const.SIZE_FULL)
+                                    amox.const.RGB_DK_BG_PASSIVE_ACCENT_2))
 
 
 # -----------------------------------------------------------------------------
-def _mv_card_day_future(idx: int) -> reflex.Component:
+def _daybox_future(idx: int) -> reflex.Component:
     """
-    Month card (in month) component.
+    A day-box for future dates.
 
     """
 
-    return reflex.card(
-                reflex.text(
-                    amox.state.App.list_day_of_month[idx],
-                    color = reflex.cond(
-                                    amox.state.App.is_ena_lightmode,
-                                    amox.const.RGB_LT_FG_PASSIVE,
-                                    amox.const.RGB_DK_FG_PASSIVE),
-                    size  = '1',
-                    style = { 'position': 'absolute',
-                              'top':      '0.5rem',
-                              'right':    '0.5rem' }),
+    return _daybox_active_impl(
+                idx,
+                on_click = lambda: amox.state.App.on_click_mv_day_future(idx))
 
-                    _month_card_icon(
-                        tag_icon = amox.state.App.list_str_icon[idx]),
 
-                on_click      = lambda: amox.state.App.on_click_mv_day_future(idx),
+# -----------------------------------------------------------------------------
+def _daybox_active_impl(idx: int, *args, **kwargs) -> reflex.Component:
+    """
+    The implementation for all active day-box compoennts.
+
+    """
+
+    map_properties = dict(
+                direction     = 'column',
+                justify       = 'start',
+                align         = 'center',
+                flex_grow     = 1,
+                flex_shrink   = 1,
                 background    = reflex.cond(
                                     amox.state.App.is_ena_lightmode,
                                     amox.const.RGB_LT_BG_PASSIVE_ACCENT_1,
@@ -246,28 +212,81 @@ def _mv_card_day_future(idx: int) -> reflex.Component:
                                     amox.state.App.is_ena_lightmode,
                                     amox.const.RGB_LT_FG_PASSIVE,
                                     amox.const.RGB_DK_FG_PASSIVE),
+                position      = 'static',
                 border        = 'thin',
+                border_radius = amox.const.RADIUS_DAYBOX,
+                padding       = amox.const.PADDING_DAYBOX,
                 width         = amox.const.SIZE_FULL)
 
-# -----------------------------------------------------------------------------
-def _month_card_icon(tag_icon: str) -> reflex.Component:
-    """
-    """
-    return reflex.match(
-                tag_icon,
-                ('smile', _specific_month_card_icon('smile')),
-                reflex.spacer())
+    map_properties.update(kwargs)
+
+    return reflex.flex(
+                _daybox_date(idx),
+                _daybox_content(idx),
+                **map_properties)
+
 
 # -----------------------------------------------------------------------------
-def _specific_month_card_icon(tag_icon: str) -> reflex.Component:
+def _daybox_date(idx: int) -> reflex.Component:
     """
+    Date text on a day box.
+
     """
-    return reflex.center(
-                reflex.icon(
-                    tag_icon,
-                    size         = 50,
-                    flex         = '0 1 auto',
-                    stroke_width = amox.const.STROKE_CARD_ICON,
-                    color        = amox.const.RGB_CARD_ICON),
-                width  = '100%',
-                height = '100%')
+
+    return reflex.text(
+                amox.state.App.list_day_of_month[idx],
+                color      = reflex.cond(
+                                amox.state.App.is_ena_lightmode,
+                                amox.const.RGB_LT_FG_PASSIVE,
+                                amox.const.RGB_DK_FG_PASSIVE),
+                text_align = 'right',
+                size       = amox.const.SIZE_TEXT_DAYBOX,
+                width      = amox.const.SIZE_FULL),
+
+
+# -----------------------------------------------------------------------------
+def _daybox_content(idx: int) -> reflex.Component:
+    """
+    Content of a day box.
+
+    https://lucide.dev/icons/categories#files
+
+    """
+
+    return reflex.match(
+                amox.state.App.list_day_icon[idx],
+                ('folder_plus',     _daybox_icon('folder_plus')),
+                ('folder_sync',     _daybox_icon('folder_sync')),
+                ('folder_pen',      _daybox_icon('folder_pen')),
+                ('folder_open',     _daybox_icon('folder_open')),
+                ('folder_open_dot', _daybox_icon('folder_open_dot')),
+                ('folder_closed',   _daybox_icon('folder_closed')),
+                ('folder_key',      _daybox_icon('folder_key')),
+                ('folder_lock',     _daybox_icon('folder_lock')),
+                ('folder_x',        _daybox_icon('folder_x')),
+                ('triangle_alert',  _daybox_icon('triangle_alert')),
+                ('folders',         _daybox_icon('folders')),
+                ('file_stack',      _daybox_icon('file_stack')),
+                ('videotape',       _daybox_icon('videotape')),
+                ('none',            reflex.spacer()),
+                _daybox_icon('circle_help'))
+
+
+
+# -----------------------------------------------------------------------------
+def _daybox_icon(str_tag: str, **kwargs) -> reflex.Component:
+    """
+    Icon on a month card.
+
+    """
+
+    return reflex.icon(
+                    str_tag,
+                    size         = amox.const.SIZE_ICON_DAYBOX,
+                    stroke_width = amox.const.STROKE_ICON_DAYBOX,
+                    color        = reflex.cond(
+                                        amox.state.App.is_ena_lightmode,
+                                        amox.const.RGB_LT_FG_PASSIVE,
+                                        amox.const.RGB_DK_FG_PASSIVE),
+                    flex_grow = 1)
+

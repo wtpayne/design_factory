@@ -43,6 +43,14 @@
 # to be included (unless otherwise specified).
 #
 
+# Amox configuration.
+#
+!*.amox.cfg.ini
+!*.amox.cfg.json
+!*.amox.cfg.toml
+!*.amox.cfg.xml
+!*.amox.cfg.yaml
+
 # Stableflow system configuration design documents.
 #
 !*.stableflow.cfg.ini

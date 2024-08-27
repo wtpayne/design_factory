@@ -62,7 +62,7 @@ def panel(**kwargs) -> reflex.Component:
     """
 
     return reflex.center(
-                reflex.card(
+                reflex.box(
 
                     _panel_content(),
 
@@ -117,7 +117,7 @@ def _daily_item(str_item) -> reflex.Component:
 
     """
 
-    return reflex.card(
+    return reflex.box(
                 reflex.flex(
 
                     amox.component.button.button(

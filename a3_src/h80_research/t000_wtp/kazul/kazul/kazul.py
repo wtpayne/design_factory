@@ -62,8 +62,9 @@ def index() -> reflex.Component:
     Main page.
 
     """
+
     return reflex.fragment(
-                kazul.component.canvas.canvas(),
+                # kazul.component.canvas.canvas(),
                 kazul.component.command.command(),
                 kazul.component.menu.menu())
 

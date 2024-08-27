@@ -62,7 +62,7 @@ def panel(**kwargs) -> reflex.Component:
     """
 
     return reflex.center(
-                reflex.card(
+                reflex.box(
                     reflex.vstack(
                         reflex.heading('Settings'),
                         reflex.foreach(
@@ -101,7 +101,7 @@ def _setting_item(str_item) -> reflex.Component:
 
     """
 
-    return reflex.card(
+    return reflex.box(
                 reflex.flex(
 
                     amox.component.button.button(

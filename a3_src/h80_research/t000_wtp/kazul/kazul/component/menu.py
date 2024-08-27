@@ -94,7 +94,6 @@ def _button(name: str) -> reflex.Component:
 
     return reflex.button(
                     name,
-                    color_scheme = 'whiteAlpha',
                     color         = kazul.const.RGB_ACTIVE_BTN_FG,
                     border_radius = kazul.const.RADIUS_BTN,
                     bg            = kazul.const.RGB_ACTIVE_BTN,

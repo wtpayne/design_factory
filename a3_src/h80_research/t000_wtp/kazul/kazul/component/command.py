@@ -103,9 +103,28 @@ def _visible_input_bar() -> reflex.Component:
 
     """
 
-    icon_submit = reflex.icon(tag = 'chevron_right')
+    icon_submit = reflex.icon(tag = 'plus')
+
+    btn_submit = reflex.button(
+                    icon_submit,
+                    type_               = 'submit',
+                    color_scheme        = 'teal',
+                    color               = kazul.const.RGB_ACTIVE_BTN_FG,
+                    border_radius       = kazul.const.RADIUS_BTN,
+                    bg                  = kazul.const.RGB_ACTIVE_BTN,
+                    width               = kazul.const.WIDTH_BTN_SUBMIT,
+                    height              = kazul.const.HEIGHT_BTN_SUBMIT)
+
+    slot_submit = reflex.input.slot(
+                        btn_submit,
+                        padding             = kazul.const.PADDING_CHAT_INPUT,
+                        spacing             = kazul.const.SPACING_CHAT_INPUT,
+                        width               = kazul.const.WIDTH_RIGHT_ELEMENT,
+                        height              = kazul.const.SIZE_FULL,
+                        padding_right       = kazul.const.PAD_RIGHT_BTN_SUBMIT),
 
     input_usr = reflex.input(
+                    slot_submit,
                     placeholder         = f'Type to search...',
                     name                = 'input',
                     color               = kazul.const.RGB_ACTIVE_FG,
@@ -120,39 +139,23 @@ def _visible_input_bar() -> reflex.Component:
                     height              = kazul.const.SIZE_FULL,
                     style               = kazul.const.STYLE_ACTIVE_PLCHLDR)
 
-    btn_submit = reflex.button(
-                    icon_submit,
-                    type_               = 'submit',
-                    color_scheme        = 'whiteAlpha',
-                    color               = kazul.const.RGB_ACTIVE_BTN_FG,
-                    border_radius       = kazul.const.RADIUS_BTN,
-                    bg                  = kazul.const.RGB_ACTIVE_BTN,
-                    width               = kazul.const.WIDTH_BTN_SUBMIT,
-                    height              = kazul.const.HEIGHT_BTN_SUBMIT)
 
-    elem_right = reflex.InputRightElement(
-                    children            = [btn_submit],
-                    padding             = kazul.const.PADDING_CHAT_INPUT,
-                    spacing             = kazul.const.SPACING_CHAT_INPUT,
-                    width               = kazul.const.WIDTH_RIGHT_ELEMENT,
-                    height              = kazul.const.SIZE_FULL,
-                    padding_right       = kazul.const.PAD_RIGHT_BTN_SUBMIT)
 
-    inputgroup_usr = reflex.InputGroup(
-                    children            = [input_usr, elem_right],
-                    height              = kazul.const.SIZE_FULL,
-                    width               = kazul.const.SIZE_FULL,
-                    padding             = kazul.const.PADDING_CHAT_INPUT,
-                    spacing             = kazul.const.SPACING_CHAT_INPUT,
-                    border_radius       = kazul.const.RADIUS_BDR,
-                    border_width        = kazul.const.BORDER_CHAT_INPUT,
-                    border_color        = kazul.const.RGB_ACTIVE_BORDER,
-                    bg                  = kazul.const.RGB_ACTIVE_BG,
-                    style               = kazul.const.STYLE_ACTIVE_OPACITY,
-                    box_shadow          = kazul.const.CSS_ACTIVE_SHADOW)
+    # inputgroup_usr = reflex.InputGroup(
+    #                 children            = [input_usr, elem_right],
+    #                 height              = kazul.const.SIZE_FULL,
+    #                 width               = kazul.const.SIZE_FULL,
+    #                 padding             = kazul.const.PADDING_CHAT_INPUT,
+    #                 spacing             = kazul.const.SPACING_CHAT_INPUT,
+    #                 border_radius       = kazul.const.RADIUS_BDR,
+    #                 border_width        = kazul.const.BORDER_CHAT_INPUT,
+    #                 border_color        = kazul.const.RGB_ACTIVE_BORDER,
+    #                 bg                  = kazul.const.RGB_ACTIVE_BG,
+    #                 style               = kazul.const.STYLE_ACTIVE_OPACITY,
+    #                 box_shadow          = kazul.const.CSS_ACTIVE_SHADOW)
 
     return reflex.form(
-                    inputgroup_usr,
+                    input_usr,
                     on_submit           = kazul.state.App.handle_btn_cmd_submit,
                     reset_on_submit     = True,
                     height              = kazul.const.SIZE_FULL,

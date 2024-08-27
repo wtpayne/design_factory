@@ -1,0 +1,78 @@
+# Brand configuration.
+#
+NAME_APP:  'ChimiaDAO'
+
+# Colors from https://colors.artyclick.com/
+#
+# Tints and shades for background and foreground.
+#
+
+# Brand light-mode.
+#
+LT_BG_T3:  '#FFFFFF'  # White
+LT_BG_T2:  '#FBFBFC'  # Alabaster
+LT_BG_T1:  '#E4E4F0'  # Mercury
+LT_BG:     '#D1D1E4'  # Geyser
+LT_BG_S1:  '#CBCBE0'  # Periwinkle Grey
+LT_BG_S2:  '#C5C5DD'  # Ghost
+LT_BG_S3:  '#BFBFD8'  # Blue haze
+
+LT_FG_T1:  '#22224E'  # Cloud Burst
+LT_FG:     '#1A1938'  # Haiti
+LT_FG_S1:  '#06050C'  # Jaguar
+
+# Brand darkmode:
+#
+DK_BG_T3:  '#22224E'  # Cloud Burst
+DK_BG_T2:  '#1A1938'  # Haiti
+DK_BG_T1:  '#0F0E20'  # Ebony
+DK_BG:     '#06050C'  # Jaguar
+DK_BG_S1:  '#05040A'  # Jaguar-shade
+DK_BG_S2:  '#030306'  # Off-Black
+DK_BG_S3:  '#010101'  # Black
+
+DK_FG_T1:  '#FFFFFF'  # White
+DK_FG:     '#DBD9E7'  # Gainsboro
+DK_FG_S1:  '#9B97B6'  # Amethyst smoke
+
+# Brand contrast colour 1:
+#
+C1_BG_T3:  '#FFBE74'  # Saffron Mango
+C1_BG_T2:  '#FFB560'  # Texas Rose
+C1_BG_T1:  '#FFAB4C'  # Light Orange
+C1_BG:     '#FFA339'  # Neon Carrot
+C1_BG_S1:  '#E69232'  # Cadmium Orange
+C1_BG_S2:  '#CC822D'  # Brandy Punch
+C1_BG_S3:  '#B37227'  # Bourbon
+
+C1_FG_T1:  '#4D3111'  # Metallic Bronze
+C1_FG:     '#33200B'  # Clinker
+C1_FG_S1:  '#1A1006'  # Creole
+
+# Brand contrast colour 2:
+#
+C2_BG_T3:  '#DE4B4B'  # Pale Red
+C2_BG_T2:  '#DA3737'  # Jasper
+C2_BG_T1:  '#D52525'  # Fire Engine Red
+C2_BG:     '#C12121'  # Chili Pepper
+C2_BG_S1:  '#AB1D1D'  # Cornell Red
+C2_BG_S2:  '#961919'  # Old Brick
+C2_BG_S3:  '#811616'  # Falu Red
+
+C2_FG_T1:  '#400B0B'  # Aubergine
+C2_FG:     '#2B0707'  # Sepia Black
+C2_FG_S1:  '#150404'  # Diesel
+
+# Brand contrast colour 3:
+#
+C3_BG_T3:  '#C2FFFF' # Eggshell Blue
+C3_BG_T2:  '#9DFFFF' # Light Cyan
+C3_BG_T1:  '#91FFFF' # Light Aquamarine
+C3_BG:     '#84FFFF' # Tron Blue
+C3_BG_S1:  '#77E6E6' # Blue Lagoon
+C3_BG_S2:  '#6ACCCC' # Downy
+C3_BG_S3:  '#5DB3B3' # Fountain Blue
+
+C3_FG_T1:  '#284D4D' # Plantation
+C3_FG:     '#1B3333' # Gable Green
+C3_FG_S1:  '#0D1A1A' # Racing Green

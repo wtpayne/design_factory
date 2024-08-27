@@ -1,0 +1,78 @@
+# Brand configuration.
+#
+NAME_APP:  'Treats'
+
+# Colors from https://colors.artyclick.com/
+#
+# Tints and shades for background and foreground.
+#
+
+# Brand light-mode.
+#
+LT_BG_T3:  '#FCFAFB'  #
+LT_BG_T2:  '#F7F1F4'  #
+LT_BG_T1:  '#F2E9EC'  #
+LT_BG:     '#EDE0E5'  #
+LT_BG_S1:  '#E8D7DD'  #
+LT_BG_S2:  '#CFBEC4'  #
+LT_BG_S3:  '#B8A9AE'  #
+
+LT_FG_T1:  '#381A26'  #
+LT_FG:     '#381A26'  #
+LT_FG_S1:  '#13090D'  #
+
+# Brand darkmode:
+#
+DK_BG_T3:  '#896F79'  #
+DK_BG_T2:  '#785E68'  #
+DK_BG_T1:  '#684E58'  #
+DK_BG:     '#563F48'  #
+DK_BG_S1:  '#4E3941'  #
+DK_BG_S2:  '#45333A'  #
+DK_BG_S3:  '#3D2C33'  #
+
+DK_FG_T1:  '#1A1316'  #
+DK_FG:     '#090607'  #
+DK_FG_S1:  '#000000'  #
+
+# Brand contrast colour 1:
+#
+C1_BG_T3:  '#B1D0C6'  # Gum Leaf
+C1_BG_T2:  '#90B9AB'  # Summer Green
+C1_BG_T1:  '#71A191'  # Greyish Teal
+C1_BG:     '#578A79'  # Viridian Green
+C1_BG_S1:  '#4E7C6D'  # Como
+C1_BG_S2:  '#456E61'  # Cadet
+C1_BG_S3:  '#3D6055'  # Mineral Green
+
+C1_FG_T1:  '#1A2924'  # Dark Jungle Green 3
+C1_FG:     '#111C18'  # Racing Green
+C1_FG_S1:  '#090E0C'  # Almost Black
+
+# Brand contrast colour 2:
+#
+C2_BG_T3:  '#DCC2CB'  # Pink Flare
+C2_BG_T2:  '#CBA6B3'  # Pinkish Grey
+C2_BG_T1:  '#BA8D9C'  # Grey Pink
+C2_BG:     '#A87586'  # Turkish Rose
+C2_BG_S1:  '#976A79'  # Opium
+C2_BG_S2:  '#875E6C'  # Falcon
+C2_BG_S3:  '#76525E'  # Dull Purple
+
+C2_FG_T1:  '#322328'  # Thunder
+C2_FG:     '#22181B'  # Gondola
+C2_FG_S1:  '#110C0D'  # Onyx 2
+
+# Brand contrast colour 3:
+#
+C3_BG_T3:  '#FFF0C2'  # Egg White
+C3_BG_T2:  '#FFE8A3'  # Cream Brulee
+C3_BG_T1:  '#FFE085'  # Jasmine
+C3_BG:     '#FFD866'  # Naples Yellow
+C3_BG_S1:  '#E6C35C'  # Saffron Mango
+C3_BG_S2:  '#CCAD52'  # Desert
+C3_BG_S3:  '#B39847'  # Bullet Shell
+
+C3_FG_T1:  '#4D411F'  # Cafe Noir
+C3_FG:     '#332B14'  # Woodrush
+C3_FG_S1:  '#1A160A'  # Acadia

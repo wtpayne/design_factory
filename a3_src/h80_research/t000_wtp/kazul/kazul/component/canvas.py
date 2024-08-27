@@ -83,21 +83,23 @@ def _work_item(work_item: kazul.state.WorkItem) -> reflex.Component:
 
     """
 
-    return reflex.accordion(
-                reflex.accordion_item(
-                    _work_item_summary(work_item),
-                    _work_item_content(work_item)),
-                allow_toggle       = True,
-                color              = kazul.const.RGB_PASSIVE_FG,
-                bg                 = kazul.const.RGB_PASSIVE_BG_ACCENT,
-                padding            = kazul.const.SIZE_ZERO,
-                spacing            = kazul.const.SIZE_ZERO,
-                margin             = '1rem',
-                border_radius      = kazul.const.RADIUS_BDR,
-                border_color       = kazul.const.RGB_PASSIVE_BG_ACCENT,
-                focus_border_color = kazul.const.RGB_PASSIVE_BG_ACCENT,
-                error_border_color = kazul.const.RGB_PASSIVE_BG_ACCENT,
-                box_shadow         = kazul.const.CSS_ACTIVE_SHADOW)
+    return reflex.text('FOO')
+
+    # return reflex.accordion(
+    #             reflex.accordion.item(
+    #                 _work_item_summary(work_item),
+    #                 _work_item_content(work_item)),
+    #             allow_toggle       = True,
+    #             color              = kazul.const.RGB_PASSIVE_FG,
+    #             bg                 = kazul.const.RGB_PASSIVE_BG_ACCENT,
+    #             padding            = kazul.const.SIZE_ZERO,
+    #             spacing            = kazul.const.SIZE_ZERO,
+    #             margin             = '1rem',
+    #             border_radius      = kazul.const.RADIUS_BDR,
+    #             border_color       = kazul.const.RGB_PASSIVE_BG_ACCENT,
+    #             focus_border_color = kazul.const.RGB_PASSIVE_BG_ACCENT,
+    #             error_border_color = kazul.const.RGB_PASSIVE_BG_ACCENT,
+    #             box_shadow         = kazul.const.CSS_ACTIVE_SHADOW)
 
 
 # -----------------------------------------------------------------------------
@@ -107,8 +109,8 @@ def _work_item_summary(work_item: kazul.state.WorkItem) -> reflex.Component:
 
     """
 
-    return reflex.accordion_button(
-                reflex.accordion_icon(),
+    return reflex.accordion.button(
+                reflex.accordion.icon(),
                 reflex.heading(work_item.title, size = 'sm'))
 
 
@@ -119,7 +121,7 @@ def _work_item_content(work_item: kazul.state.WorkItem) -> reflex.Component:
 
     """
 
-    return reflex.accordion_panel(
+    return reflex.accordion.panel(
                 reflex.foreach(
                     work_item.list_field,
                     _work_item_field))

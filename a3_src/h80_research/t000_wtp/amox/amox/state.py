@@ -54,13 +54,14 @@ import reflex
 import amox.const
 
 
-# =============================================================================
-class DayInfo(pydantic.BaseModel):
-    """
-    """
-    do_render:    bool = False
-    has_icon:     bool = True
-    day_of_month: int
+MAP_NAME_ICON = {
+    'none':   'none',
+    'rec':    'folder_pen',
+    'sync':   'folder_sync',
+    'done':   'folder_lock',
+    'error':  'folder_x',
+}
+
 
 
 # =============================================================================
@@ -88,8 +89,13 @@ class App(reflex.State):
     list_idx_day:       list[int]        = list(range(COUNT_IDX))
     list_day_type:      list[str]        = ['inactive'] * COUNT_IDX
     list_day_of_month:  list[int]        = [0]          * COUNT_IDX
-    list_str_icon:      list[list[str]]  = ['none']     * COUNT_IDX
+    list_day_icon:      list[list[str]]  = ['none']     * COUNT_IDX
     idx_day_selected:   int              = 0
+    map_day_state:      dict[str, str]   = {
+        '20240826': 'sync',
+        '20240808': 'error',
+        '20240809': 'done',
+        '20240827': 'rec'}
 
     iter_tup_menuitem:  list[tuple[str]] = [('settings',  'Settings'),
                                             ('plus',      'New Note')]
@@ -212,7 +218,7 @@ class App(reflex.State):
 
         self.list_day_type     = ['inactive'] * self.COUNT_IDX
         self.list_day_of_month = [0]          * self.COUNT_IDX
-        self.list_str_icon     = ['none']     * self.COUNT_IDX
+        self.list_day_icon     = ['none']     * self.COUNT_IDX
 
         date_today             = datetime.date.today()
         is_selected_month      = (     self.year_selected  == date_today.year
@@ -232,6 +238,9 @@ class App(reflex.State):
                     is_future   = date_of_day >  date_today
                     is_past     = date_of_day <  date_today
                     is_today    = date_of_day == date_today
+
+                    name_icon   = self._get_name_icon(date_of_day)
+
                 else:
                     is_future   = False
                     is_past     = False
@@ -239,28 +248,46 @@ class App(reflex.State):
 
                 if not is_valid_day:
                     self.list_day_type[idx]     = 'inactive'
-                    self.list_str_icon[idx]     = 'none'
+                    self.list_day_icon[idx]     = 'none'
                     self.list_day_of_month[idx] = 0
 
                 elif is_past:
                     self.list_day_type[idx]     = 'past'
-                    self.list_str_icon[idx]     = 'none'
+                    self.list_day_icon[idx]     = name_icon
                     self.list_day_of_month[idx] = day
 
                 elif is_today:
                     self.list_day_type[idx]     = 'today'
-                    self.list_str_icon[idx]     = 'smile'
+                    self.list_day_icon[idx]     = name_icon
                     self.list_day_of_month[idx] = day
 
                 elif is_future:
                     self.list_day_type[idx]     = 'future'
-                    self.list_str_icon[idx]     = 'none'
+                    self.list_day_icon[idx]     = 'none'
                     self.list_day_of_month[idx] = day
 
                 else:
                     raise RuntimeError('Something bad went wrong.')
 
                 idx += 1
+
+    # -------------------------------------------------------------------------
+    def _get_name_icon(self, date_of_day):
+        """
+        Get the icon name for the specified date.
+
+        """
+
+        try:
+            state = self.map_day_state[date_of_day.strftime("%Y%m%d")]
+        except KeyError:
+            return 'none'
+
+        try:
+            return MAP_NAME_ICON[state]
+        except KeyError:
+            return 'triangle_alert'
+
 
     ###########################################################################
     # MONTHVIEW

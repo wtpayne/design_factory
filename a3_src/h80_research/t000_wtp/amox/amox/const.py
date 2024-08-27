@@ -72,13 +72,19 @@ RGB_LT_BG_PASSIVE:          str       = LT_BG
 RGB_LT_BG_PASSIVE_ACCENT_1: str       = LT_BG_S1
 RGB_LT_BG_PASSIVE_ACCENT_2: str       = LT_BG_S2
 RGB_LT_BG_PASSIVE_ACCENT_3: str       = LT_BG_S3
-RGB_LT_FG_PASSIVE:          str       = LT_FG
+RGB_LT_FG_PASSIVE:          str       = LT_FG_T1
 
 RGB_DK_BG_PASSIVE:          str       = DK_BG
 RGB_DK_BG_PASSIVE_ACCENT_1: str       = DK_BG_T1
 RGB_DK_BG_PASSIVE_ACCENT_2: str       = DK_BG_T2
 RGB_DK_BG_PASSIVE_ACCENT_3: str       = DK_BG_T3
-RGB_DK_FG_PASSIVE:          str       = DK_FG
+RGB_DK_FG_PASSIVE:          str       = DK_FG_S1
+
+RGB_LT_FG:                  str       = LT_FG
+RGB_DK_FG:                  str       = DK_FG
+
+RGB_LT_FG_ACTIVE:           str       = LT_FG_S1
+RGB_DK_FG_ACTIVE:           str       = DK_FG_T1
 
 # Light/dark mode color scheme.
 #
@@ -136,11 +142,13 @@ SIZE_NAV_BTN:               str       = '2.5rem'
 WIDTH_NAV_SELECT:           str       = '7rem'
 STROKE_BTN_ICON:            int       = 2
 
-# Layout and sizing (Monthview).
+# Layout and sizing (Monthview and dayboxes).
 #
-RADIUS_CARD:                str       = '0.5rem'
-STROKE_CARD_ICON:           int       = 3
-RGB_CARD_ICON:              str       = RGB_LT_FG_ACTIVE_BTN
+RADIUS_DAYBOX:              str       = '0.5rem'
+PADDING_DAYBOX:             str       = '0.5rem'
+SIZE_TEXT_DAYBOX:           str       = '2'
+SIZE_ICON_DAYBOX:           int       = 30
+STROKE_ICON_DAYBOX:         float     = 1
 
 # Layout and sizing (Day overlay).
 #

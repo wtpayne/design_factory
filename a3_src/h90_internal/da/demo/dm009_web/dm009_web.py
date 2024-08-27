@@ -163,7 +163,7 @@ def treats():
     import da.env.run
 
     map_envvar = os.environ.copy()
-    map_envvar['AMOX_CONFIG'] = 'treats.cfg.yaml'
+    map_envvar['AMOX_CONFIG'] = 'treats.amox.cfg.yaml'
     ID_ENV     = 'e004_reflex'
     _path      = da.env.path
     _run       = da.env.run.shell_command
@@ -187,7 +187,7 @@ def chimiadao():
     import da.env.run
 
     map_envvar = os.environ.copy()
-    map_envvar['AMOX_CONFIG'] = 'chimiadao.cfg.yaml'
+    map_envvar['AMOX_CONFIG'] = 'chimiadao.amox.cfg.yaml'
     ID_ENV     = 'e004_reflex'
     _path      = da.env.path
     _run       = da.env.run.shell_command
@@ -211,7 +211,7 @@ def functionary():
     import da.env.run
 
     map_envvar = os.environ.copy()
-    map_envvar['AMOX_CONFIG'] = 'functionary.cfg.yaml'
+    map_envvar['AMOX_CONFIG'] = 'functionary.amox.cfg.yaml'
     ID_ENV     = 'e004_reflex'
     _path      = da.env.path
     _run       = da.env.run.shell_command
