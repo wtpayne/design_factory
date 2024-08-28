@@ -159,6 +159,8 @@ WIDTH_RESPONSIVE_DAY:      list[str] = ['22rem',
                                         '47rem',
                                         '61rem',
                                         '80rem']
+RADIUS_DAY:                 str      = '1.0rem'
+PADDING_DAY:                str      = '0.5rem'
 WIDTH_DAY_DONE_BTN:        str       = '8rem'
 HEIGHT_DAY_DONE_BTN:       str       = '3rem'
 

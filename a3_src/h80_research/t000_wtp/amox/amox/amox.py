@@ -70,7 +70,23 @@ def index() -> reflex.Component:
                 reflex.match(
                     amox.state.App.str_type_overlay,
                     ('none',        reflex.box(display = 'none')),
-                    ('day',         amox.component.overlay.day.panel(
+                    ('past',        amox.component.overlay.day.panel(
+                                        background = amox.const.RGBA_DIMMING,
+                                        position   = 'absolute',
+                                        z_index    = '5',
+                                        left       = amox.const.SIZE_ZERO,
+                                        right      = amox.const.SIZE_ZERO,
+                                        top        = amox.const.SIZE_ZERO,
+                                        bottom     = amox.const.SIZE_MENUBAR)),
+                    ('today',       amox.component.overlay.day.panel(
+                                        background = amox.const.RGBA_DIMMING,
+                                        position   = 'absolute',
+                                        z_index    = '5',
+                                        left       = amox.const.SIZE_ZERO,
+                                        right      = amox.const.SIZE_ZERO,
+                                        top        = amox.const.SIZE_ZERO,
+                                        bottom     = amox.const.SIZE_MENUBAR)),
+                    ('future',      amox.component.overlay.day.panel(
                                         background = amox.const.RGBA_DIMMING,
                                         position   = 'absolute',
                                         z_index    = '5',

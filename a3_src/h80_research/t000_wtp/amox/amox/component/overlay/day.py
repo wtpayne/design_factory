@@ -57,7 +57,7 @@ import amox.state
 # -----------------------------------------------------------------------------
 def panel(**kwargs) -> reflex.Component:
     """
-    Menu component with dark/light mode.
+    Day overlay.
 
     """
 
@@ -69,15 +69,17 @@ def panel(**kwargs) -> reflex.Component:
                     background   = reflex.cond(
                                             amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_BG_PASSIVE,
-                                            amox.const.RGB_DK_BG_PASSIVE),
-
+                                            amox.const.RGB_DK_BG_PASSIVE_ACCENT_1),
                     width        = amox.const.WIDTH_RESPONSIVE_DAY,
                     height       = amox.const.HEIGHT_DAY,
                     border_color = reflex.cond(
                                             amox.state.App.is_ena_lightmode,
                                             amox.const.RGB_LT_FG_PASSIVE,
                                             amox.const.RGB_DK_FG_PASSIVE),
-                    border       = 'thin'),
+                    border_radius = amox.const.RADIUS_DAY,
+                    padding       = amox.const.PADDING_DAY,
+                    border        = 'thin'),
+                on_click      = amox.state.App.on_toggle_overlay_day,
                 **kwargs)
 
 
@@ -87,27 +89,29 @@ def _panel_content() -> reflex.Component:
     """
 
     return reflex.fragment(
+                reflex.text('26', text_align = 'right'),
+                reflex.scroll_area(
+                    reflex.text('Foo bar splat')))
+                # reflex.heading(amox.const.TITLE_DAY),
 
-                reflex.heading(amox.const.TITLE_DAY),
+                # reflex.spacer(
+                #     height = amox.const.PADDING_TOPLEVEL),
 
-                reflex.spacer(
-                    height = amox.const.PADDING_TOPLEVEL),
+                # reflex.center(
+                #     reflex.vstack(
+                #         reflex.foreach(
+                #             amox.state.App.list_str_item,
+                #             _daily_item)))),
 
-                reflex.center(
-                    reflex.vstack(
-                        reflex.foreach(
-                            amox.state.App.list_str_item,
-                            _daily_item))),
-
-                amox.component.button.button(
-                    'Done',
-                    on_click      = amox.state.App.on_toggle_overlay_day,
-                    width         = amox.const.WIDTH_DAY_DONE_BTN,
-                    height        = amox.const.HEIGHT_DAY_DONE_BTN,
-                    border_radius = amox.const.RADIUS_BTN,
-                    position      = 'absolute',
-                    right         = amox.const.PADDING_TOPLEVEL,
-                    bottom        = amox.const.PADDING_TOPLEVEL))
+                # amox.component.button.button(
+                #     'Done',
+                #     on_click      = amox.state.App.on_toggle_overlay_day,
+                #     width         = amox.const.WIDTH_DAY_DONE_BTN,
+                #     height        = amox.const.HEIGHT_DAY_DONE_BTN,
+                #     border_radius = amox.const.RADIUS_BTN,
+                #     position      = 'absolute',
+                #     right         = amox.const.PADDING_TOPLEVEL,
+                #     bottom        = amox.const.PADDING_TOPLEVEL))
 
 
 # -----------------------------------------------------------------------------

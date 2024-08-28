@@ -55,12 +55,34 @@ import amox.const
 
 
 MAP_NAME_ICON = {
-    'none':   'none',
-    'rec':    'folder_pen',
-    'sync':   'folder_sync',
-    'done':   'folder_lock',
-    'error':  'folder_x',
+    'none':           'none',
+    'rec':            'folder_pen',
+    'sync':           'folder_sync',
+    'done':           'folder_lock',
+    'error_sync':     'folder_x',
+    'error_internal': 'triangle_alert'
 }
+
+
+# -----------------------------------------------------------------------------
+def _daystate(date_of_day) -> str:
+    """
+    Return the state of a specific day.
+
+    """
+
+    MAP_DAY_STATE: dict[str, str]  = {
+        '20240826': 'sync',
+        '20240808': 'error',
+        '20240809': 'done',
+        '20240827': 'rec'}
+
+    str_key = date_of_day.strftime("%Y%m%d")
+
+    try:
+        state = MAP_DAY_STATE[str_key]
+    except KeyError:
+        return 'none'
 
 
 
@@ -91,11 +113,6 @@ class App(reflex.State):
     list_day_of_month:  list[int]        = [0]          * COUNT_IDX
     list_day_icon:      list[list[str]]  = ['none']     * COUNT_IDX
     idx_day_selected:   int              = 0
-    map_day_state:      dict[str, str]   = {
-        '20240826': 'sync',
-        '20240808': 'error',
-        '20240809': 'done',
-        '20240827': 'rec'}
 
     iter_tup_menuitem:  list[tuple[str]] = [('settings',  'Settings'),
                                             ('plus',      'New Note')]
@@ -239,7 +256,10 @@ class App(reflex.State):
                     is_past     = date_of_day <  date_today
                     is_today    = date_of_day == date_today
 
-                    name_icon   = self._get_name_icon(date_of_day)
+                    try:
+                        name_icon = MAP_NAME_ICON[_daystate(date_of_day)]
+                    except KeyError:
+                        name_icon = MAP_NAME_ICON['error_internal']
 
                 else:
                     is_future   = False
@@ -271,24 +291,6 @@ class App(reflex.State):
 
                 idx += 1
 
-    # -------------------------------------------------------------------------
-    def _get_name_icon(self, date_of_day):
-        """
-        Get the icon name for the specified date.
-
-        """
-
-        try:
-            state = self.map_day_state[date_of_day.strftime("%Y%m%d")]
-        except KeyError:
-            return 'none'
-
-        try:
-            return MAP_NAME_ICON[state]
-        except KeyError:
-            return 'triangle_alert'
-
-
     ###########################################################################
     # MONTHVIEW
     ###########################################################################
@@ -311,7 +313,7 @@ class App(reflex.State):
 
         self.idx_day_selected = idx
         self._update_state_overlay_day()
-        self.str_type_overlay = 'day'
+        self.str_type_overlay = 'today'
 
     # -------------------------------------------------------------------------
     def on_click_mv_day_future(self, idx):
@@ -342,10 +344,10 @@ class App(reflex.State):
 
         """
 
-        if self.str_type_overlay == 'day':
+        if self.str_type_overlay == 'today':
             self.str_type_overlay = 'none'
         else:
-            self.str_type_overlay = 'day'
+            self.str_type_overlay = 'today'
 
     # -------------------------------------------------------------------------
     def _update_state_overlay_day(self):
