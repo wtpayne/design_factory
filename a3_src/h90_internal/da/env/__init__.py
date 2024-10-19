@@ -259,7 +259,7 @@ def do_update(dirpath_root, id_env):
                                 dirpath_root = dirpath_root,
                                 id_env       = id_env)
 
-    map_filepath_reqs = _create_all_requirements_files(
+    map_filepath_script = _prepare_configuration_scripts(
                                 dirpath_root = dirpath_root,
                                 id_env       = id_env,
                                 envspec      = _load_envspec(filepath_envspec))
@@ -270,10 +270,18 @@ def do_update(dirpath_root, id_env):
     # Install requirements items one phase at
     # a time, in order of ascending id_phase.
     #
-    for (id_phase, filepath_reqs) in sorted(map_filepath_reqs.items()):
-        _install_requirements(dirpath_root  = dirpath_root,
-                              id_env        = id_env,
-                              filepath_reqs = filepath_reqs)
+    for (id_phase, filepath_script) in sorted(map_filepath_script.items()):
+
+        print(f'INSTALLING PHASE {id_phase}')
+        try:
+            _pip_install_requirements(dirpath_root    = dirpath_root,
+                                      id_env          = id_env,
+                                      filepath_script = filepath_script)
+        except Exception as err:
+            print(type(err))
+            print(err)
+            import sys
+            sys.exit(0)
 
 
 # -----------------------------------------------------------------------------
@@ -375,7 +383,7 @@ def _filepath_envspec(dirpath_root, id_env):
 
 
 # -----------------------------------------------------------------------------
-def _create_all_requirements_files(dirpath_root, id_env, envspec):
+def _prepare_configuration_scripts(dirpath_root, id_env, envspec):
     """
     Return temporary requirements.txt filepath after writing envspec data to it.
 
@@ -490,13 +498,16 @@ def _process_requirement_item(dirpath_root, item, _write):
 
         _write(item)
 
+    elif item['type'] == 'shell':
+
+        pass
+
     elif item['type'] == 'pep508':
 
         _write(item['spec'])
 
     elif item['type'] == 'local':
-
-
+        # pip install --use-pep517
         _write('-e {dirpath_dep}'.format(
                     dirpath_dep = os.path.join(dirpath_root, item['relpath'])))
 
@@ -558,7 +569,7 @@ def _touch(filepath, delta_secs = 0):
 
 
 # -----------------------------------------------------------------------------
-def _install_requirements(dirpath_root, id_env, filepath_reqs):
+def _pip_install_requirements(dirpath_root, id_env, filepath_reqs):
     """
     Install the dependencies specified in the given requirements file.
 
@@ -576,24 +587,12 @@ def _install_requirements(dirpath_root, id_env, filepath_reqs):
     cmd_activate       = '. {act}'.format(
                                     act = filepath_activate)
 
-    cmd_pip_self       = '{pip} install pip==22.3.1'.format(
-                                    pip = filepath_pip)
-
-    cmd_pip_wheel      = '{pip} install wheel==0.38.4'.format(
-                                    pip = filepath_pip)
-
-    cmd_pip_setuptools = '{pip} install setuptools==66.1.1'.format(
-                                    pip = filepath_pip)
-
     cmd_pip_reqs       = '{pip} install -r {reqs}'.format(
                                     pip  = filepath_pip,
                                     reqs = filepath_reqs)
 
-    cmd_full           = '{act} && {self} && {whl} && {stls} && {reqs}'.format(
+    cmd_full           = '{act} && {reqs}'.format(
                                     act  = cmd_activate,
-                                    self = cmd_pip_self,
-                                    whl  = cmd_pip_wheel,
-                                    stls = cmd_pip_setuptools,
                                     reqs = cmd_pip_reqs)
 
     subprocess.run(cmd_full, shell = True)

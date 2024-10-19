@@ -275,6 +275,13 @@ if [[ ${do_source_new}     == 1 ]]; then source "${dirpath_venv}/bin/activate"; 
 
 
 # -----------------------------------------------------------------------------
+if [ -z "${PYTHONPATH+x}" ]; then
+    PYTHONPATH=""
+fi
+export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal:${PYTHONPATH}"
+
+
+# -----------------------------------------------------------------------------
 # Update the e000_design_automation_core virtual environment if it is stale.
 #
 # If the virtual environment is stale, this
@@ -283,12 +290,10 @@ if [[ ${do_source_new}     == 1 ]]; then source "${dirpath_venv}/bin/activate"; 
 # e000_design_automation_core.envspec.json.
 #
 if [[ ${is_stale_venv} == 1 ]]; then
-
-    pip3 install -e "${WORKSPACE}/a3_src/h90_internal"
     python3 -m da.env.update "${WORKSPACE}" "${id_env}"
     # TODO: ENSURE da.env.update RETURNS ERROR CODE AND HALT IF A PROBLEM
-
 fi
+
 
 
 # -----------------------------------------------------------------------------
