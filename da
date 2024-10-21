@@ -59,13 +59,38 @@ set -o pipefail  # don't hide errors within pipes
 
 
 # -----------------------------------------------------------------------------
-# Check to ensure that the environment is configured as required.
+# Determine the OS. Only macOS and Linux
+# (including WSL) are supported.
+#
+is_mac=0
+is_linux=0
+if ! command -v uname > /dev/null; then
+    printf "'uname' command not found. Cannot determine OS.\n" 1>&2
+    exit 1
+fi
+if [ "$(uname)" == "Darwin" ]; then
+    is_mac=1
+elif [ "$(uname)" == "Linux" ]; then
+    is_linux=1
+else
+    printf "Unknown operating system: $(uname)\n" 1>&2
+    exit 1
+fi
+
+
+# -----------------------------------------------------------------------------
+# Check to ensure that the environment is
+# configured as required.
 #
 # This section uses 'command' to check that the
-# 'python3', 'pip3', 'git'  and 'sshd' commands
-# exist in the current execution environment.
+# 'pyenv', 'python3', 'pip3', 'git'  and 'sshd'
+# commands exist in the current execution
+# environment.
 #
-# It also checks for the presence of a public SSH
+# It checks the version of python that is active
+# and switches to a defined version if necessary.
+#
+# It checks for the presence of a public SSH
 # key in ~/.ssh/id_rsa.pub and that passwordless
 # SSH to localhost is configured.
 #
@@ -73,58 +98,150 @@ set -o pipefail  # don't hide errors within pipes
 # bash script will be halted with an error code
 # and an error message on stderr.
 #
-has_command_python3=0;
-has_command_pip3=0;
-has_command_git=0;
-has_command_sshd=0;
-has_ssh_key=0;
-has_ssh_nopwd=0;
-if command -v "python3"  > "/dev/null"; then has_command_python3=1;  fi
-if command -v "pip3"     > "/dev/null"; then has_command_pip3=1;     fi
-if command -v "git"      > "/dev/null"; then has_command_git=1;      fi
-if command -v "sshd"     > "/dev/null"; then has_command_sshd=1;     fi
-if [ -f ~/.ssh/id_rsa.pub ];            then has_ssh_key=1;          fi
-if ! ssh -o BatchMode=yes localhost exit 2 > "/dev/null";
-                                        then has_ssh_nopwd=1;        fi
+has_command_aptget=0
+has_command_brew=0
+has_command_curl=0
+has_command_pyenv=0
+has_command_python3=0
+has_command_pip3=0
+has_command_git=0
+has_command_sshd=0
+has_ssh_key=0
+has_ssh_nopwd=0
+if command -v "apt-get"    > "/dev/null";   then has_command_aptget=1;   fi
+if command -v "brew"       > "/dev/null";   then has_command_brew=1;     fi
+if command -v "curl"       > "/dev/null";   then has_command_curl=1;     fi
+if command -v "pyenv"      > "/dev/null";   then has_command_pyenv=1;    fi
+
+if [ ${is_mac} -eq 1 ]; then
+    if [ ${has_command_brew} -eq 0 ]; then
+        printf "The 'brew' command was not found.\n"                       1>&2
+        printf "Try installing brew with:\n"                               1>&2
+        printf "   /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"\n" 1>&2
+        printf "   echo 'eval \"\$(/opt/homebrew/bin/brew shellenv)\"' >> ~/.zprofile\n" 1>&2
+        printf "   eval \"\$(/opt/homebrew/bin/brew shellenv)\"\n"         1>&2
+        printf "   source ~/.zprofile'\n"                                  1>&2
+        exit 1
+    fi
+fi
+if [ ${has_command_curl} -eq 0 ]; then
+    printf "The 'curl' command was not found.\n"                           1>&2
+    if [ ${has_command_aptget} -eq 1 ]; then
+        printf "Try installing curl with:\n"                               1>&2
+        printf "   sudo apt-get update\n"                                  1>&2
+        printf "   sudo apt-get install curl\n"                            1>&2
+    fi
+    exit 1
+fi
+if [ ${has_command_pyenv} -eq 0 ]; then
+    printf "The 'pyenv' command was not found.\n"                          1>&2
+    if [ ${is_mac} -eq 1 ]; then
+        printf "Try installing with:\n"                                    1>&2
+        printf "   brew install pyenv\n"                                   1>&2
+    elif [ ${has_command_aptget} -eq 1 ]; then
+        printf "Try installing pyenv with:\n"                              1>&2
+        printf "   sudo apt-get update\n"                                  1>&2
+        printf "   sudo apt-get install -y make             \\ \n"         1>&2
+        printf "                           build-essential  \\ \n"         1>&2
+        printf "                           libssl-dev       \\ \n"         1>&2
+        printf "                           zlib1g-dev       \\ \n"         1>&2
+        printf "                           libbz2-dev       \\ \n"         1>&2
+        printf "                           libreadline-dev  \\ \n"         1>&2
+        printf "                           libsqlite3-dev   \\ \n"         1>&2
+        printf "                           wget             \\ \n"         1>&2
+        printf "                           curl             \\ \n"         1>&2
+        printf "                           llvm             \\ \n"         1>&2
+        printf "                           libncursesw5-dev \\ \n"         1>&2
+        printf "                           xz-utils         \\ \n"         1>&2
+        printf "                           tk-dev           \\ \n"         1>&2
+        printf "                           libxml2-dev      \\ \n"         1>&2
+        printf "                           libxmlsec1-dev   \\ \n"         1>&2
+        printf "                           libffi-dev       \\ \n"         1>&2
+        printf "                           liblzma-dev\n"                  1>&2
+        printf "   curl https://pyenv.run | bash\n"                        1>&2
+        printf "   echo 'export PATH=\"\${HOME}/.pyenv/bin:\${PATH}\"'"    1>&2
+        printf "   >> ~/.bashrc\n"                                         1>&2
+        printf "   echo 'eval \"\$(pyenv init --path)\"'             "     1>&2
+        printf "   >> ~/.bashrc\n"                                         1>&2
+        printf "   echo 'eval \"\$(pyenv init -)\"'                  "     1>&2
+        printf "   >> ~/.bashrc\n"                                         1>&2
+        printf "   echo 'eval \"\$(pyenv virtualenv-init -)\"'       "     1>&2
+        printf "   >> ~/.bashrc\n"                                         1>&2
+        printf "   source ~/.bashrc'\n"                                    1>&2
+    fi
+    exit 1
+fi
+
+# export PYENV_ROOT="${HOME}/.pyenv"
+# export PATH="${PYENV_ROOT}/bin:${PATH}"
+# if command -v pyenv >/dev/null 2>&1; then
+#     eval "$(pyenv init -)"
+# fi
+
+if command -v "python3.13" > "/dev/null";   then has_command_python3=1;  fi
+if command -v "pip3"       > "/dev/null";   then has_command_pip3=1;     fi
+if command -v "git"        > "/dev/null";   then has_command_git=1;      fi
+
+# We currently need passwordless SSH to localhost
+# because the stableflow system requires it for
+# automatic deploys. If we can work out a better
+# way for stableflow to deploy to workers,
+# then we can (and should) remove this requirement.
+#
+if command -v "sshd" > "/dev/null";            then has_command_sshd=1; fi
+if [ -f ~/.ssh/id_rsa.pub ];                   then has_ssh_key=1;      fi
+if ! ssh -o BatchMode=yes localhost "exit -1"; then has_ssh_nopwd=1;    fi
+
+
 if [ ${has_command_python3} -eq 0 ]; then
-    printf "The 'python3' command was not found.\n"                     1>&2;
-    printf "Try installing python3 with:\n"                             1>&2;
-    printf "   sudo apt-get update\n"                                   1>&2;
-    printf "   sudo apt-get install python3\n"                          1>&2;
-    exit 1;
+    printf "The 'python3.13' command was not found.\n"                     1>&2
+    printf "Try installing python3.13 with:\n"                             1>&2
+    printf "   (cd $(pyenv root) && git pull)\n"                           1>&2
+    printf "   pyenv install 3.13\n"                                       1>&2
+    printf "   pyenv local   3.13\n"                                       1>&2
+    exit 1
 fi
 if [ ${has_command_pip3} -eq 0 ]; then
-    printf "The 'pip3' command was not found.\n"                        1>&2;
-    printf "Try installing python3-pip with:\n"                         1>&2;
-    printf "   sudo apt-get update\n"                                   1>&2;
-    printf "   sudo apt-get install python3-pip\n"                      1>&2;
-    exit 1;
+    printf "The 'pip3' command was not found.\n"                           1>&2
+    printf "Try installing python3-pip with:\n"                            1>&2
+    printf "   python -m ensurepip --upgrade\n"                            1>&2
+    exit 1
 fi
 if [ ${has_command_git} -eq 0 ]; then
-    printf "The 'git' command was not found.\n"                         1>&2;
-    printf "Try installing git with:\n"                                 1>&2;
-    printf "   sudo apt-get update\n"                                   1>&2;
-    printf "   sudo apt-get install git\n"                              1>&2;
-    exit 1;
+    printf "The 'git' command was not found.\n"                            1>&2
+    if [ ${has_command_aptget} -eq 1 ]; then
+        printf "Try installing git with:\n"                                1>&2
+        printf "   sudo apt-get update\n"                                  1>&2
+        printf "   sudo apt-get install git\n"                             1>&2
+    elif [ ${is_mac} -eq 1 ]; then
+        printf "Try installing with:\n"                                    1>&2
+        printf "   brew install git\n"                                     1>&2
+    fi
+    exit 1
 fi
 if [ ${has_command_sshd} -eq 0 ]; then
-    printf "The 'ssh' service was not found.\n"                         1>&2;
-    printf "Try installing ssh with:\n"                                 1>&2;
-    printf "   sudo apt-get update\n"                                   1>&2;
-    printf "   sudo apt-get install openssh-server\n"                   1>&2;
-    exit 1;
+    printf "The 'ssh' service was not found.\n"                            1>&2
+    if [ ${has_command_aptget} -eq 1 ]; then
+        printf "Try installing ssh with:\n"                                1>&2
+        printf "   sudo apt-get update\n"                                  1>&2
+        printf "   sudo apt-get install openssh-server\n"                  1>&2
+    elif [ ${is_mac} -eq 1 ]; then
+        printf "Try installing with:\n"                                    1>&2
+        printf "   sudo systemsetup -setremotelogin on\n"                  1>&2
+    fi
+    exit 1
 fi
 if [ ${has_ssh_key} -eq 0 ]; then
-    printf "A public key was not found at ~/.ssh/id_rsa.pub.\n"         1>&2;
-    printf "Try creating one with:\n"                                   1>&2;
-    printf "   ssh-keygen -t rsa\n"                                     1>&2;
-    exit 1;
+    printf "A public key was not found at ~/.ssh/id_rsa.pub.\n"            1>&2
+    printf "Try creating one with:\n"                                      1>&2
+    printf "   ssh-keygen -t rsa -b 4096 -N \"\" -f ~/.ssh/id_rsa\n"       1>&2
+    exit 1
 fi
 if [ ${has_ssh_nopwd} -eq 0 ]; then
-    printf "Passwordless SSH to localhost was not configured.\n"        1>&2;
-    printf "Try configuring it with:\n"                                 1>&2;
-    printf "   ssh-copy-id ${USER}@localhost\n"                         1>&2;
-    exit 1;
+    printf "Passwordless SSH to localhost was not configured.\n"           1>&2
+    printf "Try configuring it with:\n"                                    1>&2
+    printf "   ssh-copy-id ${USER}@localhost\n"                            1>&2
+    exit 1
 fi
 
 
@@ -140,23 +257,22 @@ fi
 # it can be accessed by any child processes.
 #
 WORKSPACE=$(
-    pushd . > "/dev/null";
-    temp="${BASH_SOURCE[0]}";
-    if ([ -h "${temp}" ]); then
-        while ([ -h "${temp}" ]); do
-            cd "$(dirname "$temp")";
-            temp=$(readlink "${temp}");
+    temp="${BASH_SOURCE[0]}"
+    if [ -h "${temp}" ]; then
+        while [ -h "${temp}" ]; do
+            cd "$(dirname "${temp}")"
+            temp=$(readlink "${temp}")
         done
     fi
-    cd "$(dirname ${temp})" > "/dev/null";
-    pwd;
-    popd > "/dev/null";
-);
-export WORKSPACE;
+    cd "$(dirname "${temp}")" > "/dev/null"
+    pwd
+)
+export WORKSPACE
 
 
 # -----------------------------------------------------------------------------
-# Check for problems with the e000_design_automation_core virtual environment.
+# Check for problems with the e000_design_automation_core
+# virtual environment.
 #
 # We have sometimes run into problems that result
 # in the venv directory being created but not
@@ -166,18 +282,36 @@ export WORKSPACE;
 # the case, then we simply wipe the directory
 # and start again from scratch.
 #
+# Also, we have sometimes run into problems when
+# the python version has changed and the virtual
+# environment was not recreated. We detect this
+# by checking if the site-packages directory is
+# missing and if so, we assume the venv is broken
+# and delete it.
+#
 id_env="e000_design_automation_core"
 dirpath_venv="${WORKSPACE}/a0_env/venv/${id_env}"
 filepath_activate="${dirpath_venv}/bin/activate"
-if [ -d "${dirpath_venv}" ] && [ ! -f "${filepath_activate}" ]; then
-    printf "The venv appears to be broken.\n" 1>&2;
-    printf "The venv will be recreated.\n"    1>&2;
-    rm -r "${dirpath_venv}"
+ver_py="$(python3 -c 'import sys;print("{}.{}".format(*sys.version_info[:2]))')"
+dirname_py3="python${ver_py}"
+dirpath_py3="${dirpath_venv}/lib/${dirname_py3}";
+if [[ -d "${dirpath_venv}" ]]; then
+    if [[ ! -f "${filepath_activate}" ]]; then
+        printf "The venv appears to be broken.\n" 1>&2
+        printf "The venv will be recreated.\n"    1>&2
+        rm -rf "${dirpath_venv}"
+    fi
+    if [[ ! -d "${dirpath_py3}" ]]; then
+        printf "The venv appears to use a different python version.\n" 1>&2
+        printf "The venv will be recreated.\n"    1>&2
+        rm -rf "${dirpath_venv}"
+    fi
 fi
 
 
 # -----------------------------------------------------------------------------
-# Ensure the e000_design_automation_core virtual environment exists.
+# Ensure the e000_design_automation_core virtual
+# environment exists.
 #
 # This section checks if the virtual environment
 # is present and creates it if not. If a new
@@ -185,21 +319,22 @@ fi
 # as stale so that required packages will be
 # installed.
 #
-is_stale_venv=0;
+is_stale_venv=0
 if [ ! -d "${dirpath_venv}" ]; then
-    if python3 -m venv "${dirpath_venv}"; then
-        is_stale_venv=1;
-    else
-        printf "Try installing python3-venv with:\n"     1>&2;
-        printf "   sudo apt-get update\n"                1>&2;
-        printf "   sudo apt-get install python3-venv\n"  1>&2;
+    is_stale_venv=1
+    printf "Creating virtualenv in ${dirpath_venv}\n"    1>&2
+    if ! python3 -m venv "${dirpath_venv}"; then
+        printf "Try installing python3-venv with:\n"     1>&2
+        printf "   sudo apt-get update\n"                1>&2
+        printf "   sudo apt-get install python3-venv\n"  1>&2
         exit 1
     fi
 fi
 
 
 # -----------------------------------------------------------------------------
-# Check to see if e000_design_automation_core virtual environment is stale.
+# Check if the e000_design_automation_core virtual
+# environment is stale.
 #
 # This section checks if the virtual environment
 # is stale, i.e., if the list of requirements in
@@ -214,75 +349,74 @@ fi
 # of these directories, the virtual environment
 # is considered stale.
 #
+get_mtime() {
+    local filepath="$1"
+    local mtime
+    if [ ${is_mac} -eq 1 ]; then
+        mtime=$(stat -f %m "${filepath}")
+        date -r "${mtime}" "+%Y-%m-%d %H:%M:%S"
+    else
+        mtime=$(stat -c %Y "${filepath}")
+        date -d "@${mtime}" "+%Y-%m-%d %H:%M:%S"
+    fi
+}
 dirpath_envspec="${WORKSPACE}/a3_src/h10_resource/envspec"
 filepath_envspec="${dirpath_envspec}/${id_env}.envspec.json"
-dirname_py3="python$(python3 --version | cut -d " " -f2 | cut -d "." -f1,2)"
-dirpath_pkg="${dirpath_venv}/lib/${dirname_py3}/site-packages";
-if [[ ${filepath_envspec} -nt ${dirpath_pkg}       ]]; then
-    is_stale_pkg=1;
-else
-    is_stale_pkg=0;
+dirpath_pkg="${dirpath_venv}/lib/${dirname_py3}/site-packages"
+dirpath_wheel="${dirpath_venv}/share/python-wheels"
+if [[ -d "${dirpath_pkg}" && ${filepath_envspec} -nt ${dirpath_pkg} ]]; then
+    printf "Packages directory is stale.\n"
+    printf " - envspec:  %s\n" "$(get_mtime "${filepath_envspec}")"
+    printf " - packages: %s\n" "$(get_mtime "${dirpath_pkg}")"
+    is_stale_venv=1
 fi
-
-has_dirpath_whl=0;
-dirpath_whl="${dirpath_venv}/share/python-wheels";
-if [ -d "${dirpath_whl}" ]; then
-    if [[ ${filepath_envspec} -nt ${dirpath_whl}       ]]; then
-        is_stale_whl=1;
-    else
-        is_stale_whl=0;
-    fi
-    if [[ ${is_stale_pkg} == 1 && ${is_stale_whl} == 1 ]]; then
-        is_stale_venv=1;
-    fi
-else
-    if [[ ${is_stale_pkg} == 1 ]]; then
-        is_stale_venv=1;
-    fi
+if [[ -d "${dirpath_wheel}" && ${filepath_envspec} -nt ${dirpath_wheel} ]]; then
+    printf "Packages directory is stale.\n"
+    printf " - envspec: %s\n" "$(get_mtime "${filepath_envspec}")"
+    printf " - wheel:   %s\n" "$(get_mtime "${dirpath_wheel}")"
+    is_stale_venv=1
 fi
 
 
 # -----------------------------------------------------------------------------
-# Ensure that the e000_design_automation_core virtual environment is active.
+# Ensure that the e000_design_automation_core
+# virtual environment is active.
 #
 # This section ensures that the e000_design_automation_core
 # virtual environment is active, deactivating the
 # old environment if necessary and activating the
 # new one.
 #
-is_active_none=0;
-is_active_old=0;
-is_active_new=0;
-
-if   [[ "${VIRTUAL_ENV-none}" == "none"       ]]; then is_active_none=1;
-elif [[ "${VIRTUAL_ENV}" != "${dirpath_venv}" ]]; then is_active_old=1;
-elif [[ "${VIRTUAL_ENV}" == "${dirpath_venv}" ]]; then is_active_new=1;
-else
-    printf "Logic implementation error.\n";
-    exit 1;
+if [ "${VIRTUAL_ENV:-}" != "${dirpath_venv}" ]; then
+    [ -n "${VIRTUAL_ENV:-}" ] && deactivate
+    . "${dirpath_venv}/bin/activate"
 fi
-
-if   [[ ${is_active_none} == 1 ]]; then do_deactivate_old=0 do_source_new=1
-elif [[ ${is_active_old}  == 1 ]]; then do_deactivate_old=1 do_source_new=1
-elif [[ ${is_active_new}  == 1 ]]; then do_deactivate_old=0 do_source_new=0
-else
-    printf "Logic implementation error.\n";
-    exit 1;
-fi
-
-if [[ ${do_deactivate_old} == 1 ]]; then deactivate; fi
-if [[ ${do_source_new}     == 1 ]]; then source "${dirpath_venv}/bin/activate"; fi
 
 
 # -----------------------------------------------------------------------------
-if [ -z "${PYTHONPATH+x}" ]; then
-    PYTHONPATH=""
-fi
-export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal:${PYTHONPATH}"
+# Add the PYTHONPATH for each of the design factory
+# source code directories. Originally, we were
+# installing these as editable installs using
+# pip, but changes to the python packaging
+# ecosystem made this less practical, so until
+# such time as new PEPs for editable installs
+# are finalized, we will just take the approach
+# of munging the PYTHONPATH "manually".
+#
+export PYTHONPATH="${WORKSPACE}/a3_src/h10_resource${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h20_functionality${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h30_platform${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h40_component${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h50_subsystem${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h60_system${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h70_bespoke${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h80_research${PYTHONPATH:+":$PYTHONPATH"}"
+export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal${PYTHONPATH:+":$PYTHONPATH"}"
 
 
 # -----------------------------------------------------------------------------
-# Update the e000_design_automation_core virtual environment if it is stale.
+# Update the e000_design_automation_core virtual
+# environment if it is stale.
 #
 # If the virtual environment is stale, this
 # section updates it by installing all of the
@@ -290,10 +424,11 @@ export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal:${PYTHONPATH}"
 # e000_design_automation_core.envspec.json.
 #
 if [[ ${is_stale_venv} == 1 ]]; then
-    python3 -m da.env.update "${WORKSPACE}" "${id_env}"
-    # TODO: ENSURE da.env.update RETURNS ERROR CODE AND HALT IF A PROBLEM
+    if ! python3 -m da.env.update "${WORKSPACE}" "${id_env}"; then
+        printf "Failed to update the virtual environment.\n" 1>&2
+        exit 1
+    fi
 fi
-
 
 
 # -----------------------------------------------------------------------------

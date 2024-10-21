@@ -124,25 +124,26 @@ def _iter_name_deps(cfg_env):
     for item in cfg_env['list_item']:
 
         try:
-            type_item = item['type']
+            id_type = item['type']
         except (KeyError, TypeError):
             continue
 
-        if type_item == 'local':
+        if id_type in {'legacy-editable', 'pep580-editable', 'shell'}:
             continue
 
-        elif type_item == 'pep508':
+        elif id_type in {'legacy-pip', 'pep580-pip'}:
             yield re.split(pattern  = r'<=|<|!=|==|>=|>|~=|===',
                            string   = item['spec'],
                            maxsplit = 1)[0]
 
-        elif type_item == 'github':
+        elif id_type in {'legacy-git', 'pep580-git'}:
             yield item['remote'].rsplit(sep      = '/',
                                         maxsplit = 1)[1].split(sep      = '.',
                                                                maxsplit = 1)[0]
 
         else:
-            raise RuntimeError('envspec line-item type not recognised.')
+            raise RuntimeError(
+                    f'envspec item type not recognised ({id_type}).')
 
 
 # -----------------------------------------------------------------------------
