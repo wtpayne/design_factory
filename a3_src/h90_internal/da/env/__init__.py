@@ -446,6 +446,8 @@ def _prepare_cfg_pack(dirpath_root, id_env, envspec):
         match id_type:
             case 'shell':
                 id_method = 'cfg-script-shell'
+            case 'pth-file':
+                id_method = 'cfg-pth-file'
             case _ if id_type in set_type_req_legacy:
                 id_method = 'cfg-pip-legacy'
             case _ if id_type in set_type_req_pep517:
@@ -456,13 +458,14 @@ def _prepare_cfg_pack(dirpath_root, id_env, envspec):
         map_map_list_item[id_phase][id_method].append(item)
 
 
-    # Create a directory to hold all of the
+    # Ensure that we have an empty cfgpack
+    # directory to hold all of the
     # scripts and requirements.txt files
     # needed to configure this environment.
     #
     dirpath_cfgpack = _dirpath_cfgpack(dirpath_root, id_env)
-    if not os.path.exists(dirpath_cfgpack):
-        os.makedirs(dirpath_cfgpack)
+    shutil.rmtree(dirpath_cfgpack, ignore_errors=True)
+    os.makedirs(dirpath_cfgpack)
 
     # Create configuration scripts and
     # requirements.txt files for each
@@ -474,6 +477,13 @@ def _prepare_cfg_pack(dirpath_root, id_env, envspec):
             match id_method:
                 case 'cfg-script-shell':
                     filepath = _prepare_shell_script(
+                                            dirpath_root    = dirpath_root,
+                                            dirpath_cfgpack = dirpath_cfgpack,
+                                            id_phase        = id_phase,
+                                            list_item       = list_item)
+
+                case 'cfg-pth-file':
+                    filepath = _prepare_pth_file(
                                             dirpath_root    = dirpath_root,
                                             dirpath_cfgpack = dirpath_cfgpack,
                                             id_phase        = id_phase,
@@ -547,6 +557,22 @@ def _prepare_shell_script_line_item(dirpath_root, item, file_script):
             str_spec_lineitem = str_spec_lineitem.format(
                                                 dirpath_root = dirpath_root)
         print(str_spec_lineitem, file = file_script)
+
+
+# -----------------------------------------------------------------------------
+def _prepare_pth_file(dirpath_root, dirpath_cfgpack, id_phase, list_item):
+    """
+    Create a .pth file for the specified list of configuration items.
+
+    """
+
+    filename_pth = f'configure_{id_phase:02d}.pth'
+    filepath_pth = os.path.join(dirpath_cfgpack, filename_pth)
+    with open(filepath_pth, 'wt') as file_pth:
+        for item in list_item:
+            dirpath_item = os.path.join(dirpath_root, item['relpath'])
+            print(dirpath_item, file = file_pth)
+    return filepath_pth
 
 
 # -----------------------------------------------------------------------------
@@ -656,6 +682,11 @@ def _apply_cfgpack(dirpath_root, id_env, map_map_filepath):
             match id_method:
                 case 'cfg-script-shell':
                     command = f'{activate} && {filepath}'
+                case 'cfg-pth-file':
+                    set_site = 'import site; print(site.getsitepackages()[0])'
+                    filename = os.path.basename(filepath)
+                    dst_path = f'$(python -c "{set_site}")/{filename}'
+                    command  = f'{activate} && cp {filepath} {dst_path}'
                 case 'cfg-pip-legacy':
                     command = f'{activate} && {pip_legacy} {filepath}'
                 case 'cfg-pip-pep517':

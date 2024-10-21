@@ -128,15 +128,19 @@ def _iter_name_deps(cfg_env):
         except (KeyError, TypeError):
             continue
 
-        if id_type in {'legacy-editable', 'pep580-editable', 'shell'}:
+
+        if id_type in {'legacy-editable',
+                       'pep517-editable',
+                       'shell',
+                       'pth-file'}:
             continue
 
-        elif id_type in {'legacy-pip', 'pep580-pip'}:
+        elif id_type in {'legacy-pip', 'pep517-pip'}:
             yield re.split(pattern  = r'<=|<|!=|==|>=|>|~=|===',
                            string   = item['spec'],
                            maxsplit = 1)[0]
 
-        elif id_type in {'legacy-git', 'pep580-git'}:
+        elif id_type in {'legacy-git', 'pep517-git'}:
             yield item['remote'].rsplit(sep      = '/',
                                         maxsplit = 1)[1].split(sep      = '.',
                                                                maxsplit = 1)[0]

@@ -53,7 +53,32 @@
     { "phase": 1, "type":   "legacy-pip", "spec": "watchdog==2.3.1"           },
     { "phase": 1, "type":   "legacy-pip", "spec": "pdf2image==1.16.3"         },
     { "phase": 1, "type":   "legacy-pip", "spec": "python-poppler==0.4.1"     },
-    { "phase": 1, "type":   "legacy-pip", "spec": "deepdoctection==0.28"      }
+    { "phase": 1, "type":   "legacy-pip", "spec": "deepdoctection==0.28"      },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Local workspace directories - path file.",
+    "#",
+
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h10_resource"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h20_functionality"                       },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h30_platform"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h40_component"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h50_subsystem"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h60_system"                              },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h70_bespoke"                             },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h80_research"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h90_internal"                            }
 
   ]
 }

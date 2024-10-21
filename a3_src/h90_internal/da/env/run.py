@@ -393,21 +393,22 @@ def _update_env(id_env,
 
     # Local or remote via SSH?
     #
-    is_remote = (acct is not None) and (host is not None)
+    is_remote = acct and host
     if is_remote:
         str_fmt = "{ssh} {acct}@{host} '. {activ} && {py3} -m {mod} {root} {env}'"
     else:
         str_fmt = '. {activ} && {py3} -m {mod} {root} {env}'
 
-    return _run(str_fmt = str_fmt,
-                ssh     = 'ssh',
-                acct    = acct,
-                host    = host,
-                activ   = os.path.join(bootenv, 'bin/activate'),
-                py3     = os.path.join(bootenv, 'bin/python3'),
-                mod     = 'da.env.ensure_updated',
-                root    = da.env.rootpath(),
-                env     = id_env)
+    return _run(str_fmt     = str_fmt,
+                debug_print = False,
+                ssh         = 'ssh',
+                acct        = acct,
+                host        = host,
+                activ       = os.path.join(bootenv, 'bin/activate'),
+                py3         = os.path.join(bootenv, 'bin/python3'),
+                mod         = 'da.env.ensure_updated',
+                root        = da.env.rootpath(),
+                env         = id_env)
 
 
 # -----------------------------------------------------------------------------
@@ -417,15 +418,12 @@ def _apply_defaults(id_env_boot, acct, host):
 
     """
 
-    if id_env_boot is None:
+    if not id_env_boot:
         id_env_boot = 'e000_design_automation_core'
 
-    if acct is not None or host is not None:
-        if acct is None:
-            acct = os.getlogin()
-
-        if host is None:
-            host = 'localhost'
+    if acct or host:
+        acct = acct if acct else os.getlogin()
+        host = host if host else 'localhost'
 
     return (id_env_boot, acct, host)
 
@@ -442,6 +440,7 @@ def _run(str_fmt, debug_print = False, map_envvar = None, **kwargs):
     """
 
     str_command = str_fmt.format(**kwargs)
+
     if debug_print:
         print(str_command)
     try:

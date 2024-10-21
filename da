@@ -394,27 +394,6 @@ fi
 
 
 # -----------------------------------------------------------------------------
-# Add the PYTHONPATH for each of the design factory
-# source code directories. Originally, we were
-# installing these as editable installs using
-# pip, but changes to the python packaging
-# ecosystem made this less practical, so until
-# such time as new PEPs for editable installs
-# are finalized, we will just take the approach
-# of munging the PYTHONPATH "manually".
-#
-export PYTHONPATH="${WORKSPACE}/a3_src/h10_resource${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h20_functionality${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h30_platform${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h40_component${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h50_subsystem${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h60_system${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h70_bespoke${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h80_research${PYTHONPATH:+":$PYTHONPATH"}"
-export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal${PYTHONPATH:+":$PYTHONPATH"}"
-
-
-# -----------------------------------------------------------------------------
 # Update the e000_design_automation_core virtual
 # environment if it is stale.
 #
@@ -424,6 +403,8 @@ export PYTHONPATH="${WORKSPACE}/a3_src/h90_internal${PYTHONPATH:+":$PYTHONPATH"}
 # e000_design_automation_core.envspec.json.
 #
 if [[ ${is_stale_venv} == 1 ]]; then
+    DIR_H90="${WORKSPACE}/a3_src/h90_internal"
+    export PYTHONPATH="${DIR_H90}${PYTHONPATH:+":$PYTHONPATH"}"
     if ! python3 -m da.env.update "${WORKSPACE}" "${id_env}"; then
         printf "Failed to update the virtual environment.\n" 1>&2
         exit 1

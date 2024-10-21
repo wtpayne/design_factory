@@ -10,9 +10,9 @@
     { "phase": 1, "type":   "shell", 
                   "spec":   [ "python -m ensurepip --upgrade" ]               },
 
-    { "phase": 2, "type":   "legacy-pip", "spec": "pip==24.2"                 },
-    { "phase": 2, "type":   "legacy-pip", "spec": "wheel==0.44.0"             },
-    { "phase": 2, "type":   "legacy-pip", "spec": "setuptools==75.2.0"        },
+    { "phase": 2, "type":   "pep517-pip", "spec": "pip==24.2"                 },
+    { "phase": 2, "type":   "pep517-pip", "spec": "wheel==0.44.0"             },
+    { "phase": 2, "type":   "pep517-pip", "spec": "setuptools==75.2.0"        },
 
     "",
     "",
@@ -20,9 +20,9 @@
     "# Packages required by the 'da' command line interface.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "click==8.1.7"              },
-    { "phase": 3, "type":   "legacy-pip", "spec": "loguru==0.7.2"             },
-    { "phase": 3, "type":   "legacy-pip", "spec": "pudb==2024.1.3"            },
+    { "phase": 3, "type":   "pep517-pip", "spec": "click==8.1.7"              },
+    { "phase": 3, "type":   "pep517-pip", "spec": "loguru==0.7.2"             },
+    { "phase": 3, "type":   "pep517-pip", "spec": "pudb==2024.1.3"            },
 
     "",
     "",
@@ -30,13 +30,24 @@
     "# Packages required by stableflow systems.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "Cython==3.0.11"            },
-    { "phase": 3, "type":   "legacy-pip", "spec": "dill==0.3.9"               },
-    { "phase": 3, "type":   "legacy-pip", "spec": "jsonschema==4.23.0"        },
-    { "phase": 3, "type":   "legacy-pip", "spec": "numpy==2.1.2"              },
-    { "phase": 3, "type":   "legacy-pip", "spec": "psutil==6.1.0"             },
-    { "phase": 3, "type":   "legacy-pip", "spec": "pyzmq==26.2.0"             },
-    { "phase": 3, "type":   "legacy-pip", "spec": "setproctitle==1.3.3"       },
+    { "phase": 3, "type":   "pep517-pip", "spec": "Cython==3.0.11"            },
+    { "phase": 3, "type":   "pep517-pip", "spec": "dill==0.3.9"               },
+    { "phase": 3, "type":   "pep517-pip", "spec": "jsonschema==4.23.0"        },
+    { "phase": 3, "type":   "pep517-pip", "spec": "numpy==2.1.2"              },
+    { "phase": 3, "type":   "pep517-pip", "spec": "psutil==6.1.0"             },
+    { "phase": 3, "type":   "pep517-pip", "spec": "pyzmq==26.2.0"             },
+    { "phase": 3, "type":   "pep517-pip", "spec": "setproctitle==1.3.3"       },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required for serialization/deserialization.",
+    "#",
+
+    { "phase": 2, "type":   "pep517-pip", "spec": "PyYAML==6.0.2"             },
+    { "phase": 2, "type":   "pep517-pip", "spec": "ruamel.yaml==0.18.6 "      },
+    { "phase": 2, "type":   "pep517-pip", "spec": "toml==0.10.2"              },
+    { "phase": 2, "type":   "pep517-pip", "spec": "xmltodict==0.14.2"         },
 
     "",
     "",
@@ -44,9 +55,9 @@
     "# Packages required by the 'da service process_assistant start' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "pycodestyle==2.12.1"       },
-    { "phase": 3, "type":   "legacy-pip", "spec": "python-dotenv==1.0.1"      },
-    { "phase": 3, "type":   "legacy-pip", "spec": "discord.py==2.4.0"         },
+    { "phase": 3, "type":   "pep517-pip", "spec": "pycodestyle==2.12.1"       },
+    { "phase": 3, "type":   "pep517-pip", "spec": "python-dotenv==1.0.1"      },
+    { "phase": 3, "type":   "pep517-pip", "spec": "discord.py==2.4.0"         },
 
     "",
     "",
@@ -54,8 +65,8 @@
     "# Packages required by the 'da interact bpy' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "prompt-toolkit==3.0.48"    },
-    { "phase": 3, "type":   "legacy-pip", "spec": "bpython==0.24"             },
+    { "phase": 3, "type":   "pep517-pip", "spec": "prompt-toolkit==3.0.48"    },
+    { "phase": 3, "type":   "pep517-pip", "spec": "bpython==0.24"             },
 
     "",
     "",
@@ -63,7 +74,7 @@
     "# Packages required by the 'da interact ptpy' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "ptpython==3.0.29"          },
+    { "phase": 3, "type":   "pep517-pip", "spec": "ptpython==3.0.29"          },
 
     "",
     "",
@@ -71,7 +82,7 @@
     "# Packages required by the 'da interact ipy' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "ipython==8.28.0"           },
+    { "phase": 3, "type":   "pep517-pip", "spec": "ipython==8.28.0"           },
 
     "",
     "",
@@ -79,8 +90,8 @@
     "# Packages required by the 'da interact direpl' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "pycozo==0.7.6"             },
-    { "phase": 3, "type":   "legacy-pip", "spec": "cozo-embedded==0.7.6"      },
+    { "phase": 3, "type":   "pep517-pip", "spec": "pycozo==0.7.6"             },
+    { "phase": 3, "type":   "pep517-pip", "spec": "cozo-embedded==0.7.6"      },
 
     "",
     "",
@@ -88,8 +99,8 @@
     "# Packages required by the 'da interact browse' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "rich==13.9.2"              },
-    { "phase": 3, "type":   "legacy-pip", "spec": "textual==0.83.0"           },
+    { "phase": 3, "type":   "pep517-pip", "spec": "rich==13.9.2"              },
+    { "phase": 3, "type":   "pep517-pip", "spec": "textual==0.83.0"           },
 
     "",
     "",
@@ -97,7 +108,7 @@
     "# Packages required by the 'da interact bash' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "pyte==0.8.2"               },
+    { "phase": 3, "type":   "pep517-pip", "spec": "pyte==0.8.2"               },
     { "phase": 3, "type":   "legacy-git",
                   "remote": "git@github.com:wtpayne/ptterm.git",
                   "tag":    "v0.1",
@@ -109,7 +120,32 @@
     "# Packages required by the 'da util uuid' command.",
     "#",
 
-    { "phase": 3, "type":   "legacy-pip", "spec": "pyclip==0.7.0"             }
+    { "phase": 3, "type":   "pep517-pip", "spec": "pyclip==0.7.0"             },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Local workspace directories - path file.",
+    "#",
+
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h10_resource"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h20_functionality"                       },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h30_platform"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h40_component"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h50_subsystem"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h60_system"                              },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h70_bespoke"                             },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h80_research"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h90_internal"                            }
 
   ]
 }

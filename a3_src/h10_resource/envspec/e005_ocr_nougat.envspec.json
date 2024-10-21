@@ -77,7 +77,32 @@
     "# Packages required for generating web components with reflex.",
     "#",
 
-    { "phase": 1, "type":   "legacy-pip", "spec": "reflex==0.3.2"             }
+    { "phase": 1, "type":   "legacy-pip", "spec": "reflex==0.3.2"             },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Local workspace directories - path file.",
+    "#",
+
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h10_resource"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h20_functionality"                       },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h30_platform"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h40_component"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h50_subsystem"                           },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h60_system"                              },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h70_bespoke"                             },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h80_research"                            },
+    { "phase": 3, "type":    "pth-file",
+                  "relpath": "a3_src/h90_internal"                            }
 
   ]
 }
