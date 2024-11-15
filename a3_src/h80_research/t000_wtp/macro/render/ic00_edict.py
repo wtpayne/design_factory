@@ -116,9 +116,10 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             # the SSE topic for the page.
             #
             id_topic = id_page + '_topic'
-            map_res  = _add_sse_topic(map_list_child, 
+            map_res  = _add_sse_topic(map_res,
+                                      map_list_child, 
+                                      map_com_cache,
                                       id_page,
-                                      map_res,
                                       id_topic)
 
             # Generate page markup.
@@ -237,14 +238,15 @@ def _render_recursive(map_list_child, id_parent, map_res):
 
 
 # -----------------------------------------------------------------------------
-def _add_sse_topic(map_list_child, id_page, map_res, id_topic):
+def _add_sse_topic(map_res, map_list_child, map_com_cache, id_page, id_topic):
     """
     Add SSE topic resources for the specified page.
 
     """
 
-    list_id_com = sorted(_get_descendent_recursive(map_list_child, id_page))
-    map_res.sse(**{id_topic: list_id_com})
+    set_id_com = _get_descendent_recursive(map_list_child, id_page)
+    set_id_com.update(_get_orphan_components(map_com_cache, id_page))
+    map_res.sse(**{id_topic: sorted(set_id_com)})
     return map_res
 
 
@@ -264,6 +266,17 @@ def _get_descendent_recursive(map_list_child, id_parent, set_id_com = None):
         set_id_com = _get_descendent_recursive(
                                         map_list_child, id_com, set_id_com)
     return set_id_com
+
+
+# -----------------------------------------------------------------------------
+def _get_orphan_components(map_com_cache, id_page):
+    """
+    Return the set of orphan components for the specified page.
+
+    """
+
+    return (id_com for (id_com, com) in map_com_cache.items() 
+                                            if id_page in com.list_id_page)
 
 
 # -----------------------------------------------------------------------------

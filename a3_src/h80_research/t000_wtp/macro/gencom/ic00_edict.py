@@ -95,9 +95,10 @@ class ComData(pydantic.BaseModel):
     """
 
     id_com:         str
-    list_id_parent: list[str] = []
-    is_valid:       bool      = True   # set to False to delete the component.
-    is_dyn_sse:     bool      = False  # Is dynamic using SSE.
+    list_id_parent: list[str] = []    # Defines the containment hierarchy.
+    list_id_page:   list[str] = []    # Used for SSE topics.
+    is_valid:       bool      = True  # set to False to delete the component.
+    is_dyn_sse:     bool      = False # Is dynamic using SSE.
     media_type:     str       = 'text/html'
 
 
@@ -211,7 +212,7 @@ def _gencom() -> typing.Generator[Com, None, None]:
              list_id_parent = ['app'],
              is_dyn_sse     = True) as com_1:
 
-        html.div('[COMPONENT 01] - A', 
+        html.div('[COMPONENT 01] - AB', 
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_1',
                  data_hx_get     = '/com_2',
@@ -220,9 +221,10 @@ def _gencom() -> typing.Generator[Com, None, None]:
 
     with Com(id_com         = 'com_2',
              list_id_parent = [],
+             list_id_page   = ['app'],
              is_dyn_sse     = True) as com_2:
 
-        html.div('[COMPONENT 02] - B',
+        html.div('[COMPONENT 02] - B7',
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_2',
                  data_hx_get     = '/com_1',
@@ -230,10 +232,15 @@ def _gencom() -> typing.Generator[Com, None, None]:
         yield com_2
 
     with Com(id_com         = 'com_3',
-             list_id_parent = ['com_2'],
+             list_id_parent = ['com_1'],
              is_dyn_sse     = True) as com_3:
 
-        html.div('[COMPONENT 03] - C')
+        with html.div('[COMPONENT 03] - D'):
+            with html.div('INNER 03'):
+                with html.div('EVEN INNERER 03'):
+                    with html.div('THE INNERERMOSTEST 03'):
+                        with html.div('THE MOST INNERERMOSTEST 03'):
+                            html.div('THE MOSTESTESTEST INNERERMOSTEST OF ALL04')
         yield com_3
 
         # circle_small = svg.svg(width = '100', height = '100')
