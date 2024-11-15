@@ -88,30 +88,30 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 # =============================================================================
 class ComData(pydantic.BaseModel):
     """
-    Data class for UI components.
+    UI component data.
 
     Contains markup and metadata for the component.
 
     """
 
-    id_com:     str
-    id_page:    str
-    is_onpage:  bool = False  # Onpage components are pre-rendered on the page.
-    is_dyn_sse: bool = False  # Is dynamic using SSE.
-    markup:     str  = ''
+    id_com:         str
+    list_id_parent: list[str] = []
+    is_valid:       bool      = True   # set to False to delete the component.
+    is_dyn_sse:     bool      = False  # Is dynamic using SSE.
+    media_type:     str       = 'text/html'
 
 
 # =============================================================================
-class ComCtx(ComData):
+class Com(ComData):
     """
-    HTML div UI component context manager.
+    UI component.
 
     """
 
     # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
         """
-        Construct a DivCtx instance.
+        Construct a Com instance.
 
         """
 
@@ -125,7 +125,7 @@ class ComCtx(ComData):
         for key in kwargs_super.keys():
             del kwargs[key]
         if 'id' in kwargs:
-            raise RuntimeError('invalid kwarg "id" in DivCtx ctor.')
+            raise RuntimeError('invalid kwarg "id" in Com ctor.')
 
         if self.is_dyn_sse:
             kwargs['data_sse_swap'] = f'{self.id_com}'
@@ -151,8 +151,6 @@ class ComCtx(ComData):
         """
 
         self._tag.__exit__(exc_type, exc_value, traceback)
-        self.markup = self._tag.render()
-        del self._tag
 
     # -------------------------------------------------------------------------
     def __lt__(self, other):
@@ -162,6 +160,24 @@ class ComCtx(ComData):
         """
 
         return self.id_com < other.id_com
+
+    # -------------------------------------------------------------------------
+    def add_to_ctx(self):
+        """
+        Add the component to an open Dominate context.
+
+        """
+
+        return self._tag._add_to_ctx()
+
+    # -------------------------------------------------------------------------
+    def render(self):
+        """
+        Render the component.
+
+        """
+
+        return self._tag.render()
 
     # -------------------------------------------------------------------------
     def model_dump(self):
@@ -174,37 +190,49 @@ class ComCtx(ComData):
 
 
 # -----------------------------------------------------------------------------
-def _gencom() -> typing.Generator[ComCtx, None, None]:
+def _gencom() -> typing.Generator[Com, None, None]:
     """
     Yield components.
 
+    data_hx_get     - Issues a GET request to the given URL
+    data_hx_post    - Issues a POST request to the given URL
+    data_hx_put     - Issues a PUT request to the given URL
+    data_hx_patch   - Issues a PATCH request to the given URL
+    data_hx_delete  - Issues a DELETE request to the given URL
+    data_hx_trigger - Can be
+
     """
 
-    with ComCtx(id_com     = 'com_1',
-                id_page    = 'app',
-                is_onpage  = True,
-                is_dyn_sse = True) as com_1:
+    with Com(id_com         = 'com_1',
+             list_id_parent = ['app'],
+             is_dyn_sse     = True) as com_1:
 
-        html.div('[COMPONENT 01 ABC1212]', 
+        html.div('[COMPONENT 01] - AA1', 
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_1',
                  data_hx_get     = '/com_2',
                  data_hx_swap    = 'outerHTML')
         yield com_1
 
-    with ComCtx(id_com     = 'com_2',
-                id_page    = 'app',
-                is_onpage  = False,
-                is_dyn_sse = True) as com_2:
+    with Com(id_com         = 'com_2',
+             list_id_parent = [],
+             is_valid       = True,
+             is_dyn_sse     = True) as com_2:
 
-        html.div('[COMPONENT 02 DEFasas]',
+        html.div('[COMPONENT 02] - A',
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_2',
                  data_hx_get     = '/com_1',
                  data_hx_swap    = 'outerHTML')
         yield com_2
 
+    with Com(id_com         = 'com_3',
+             list_id_parent = ['com_1','com_2'],
+             is_valid       = True,
+             is_dyn_sse     = True) as com_3:
 
+        html.div('[COMPONENT 03] - BB2')
+        yield com_3
 
         # circle_small = svg.svg(width = '100', height = '100')
         # with circle_small:
