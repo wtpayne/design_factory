@@ -93,16 +93,22 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         (set_id_page,
          set_id_orphan,
          map_list_child) = _determine_site_structure(map_com_cache)
+        set_id_root      = set_id_page.union(set_id_orphan)
+
+        try:
+            _detect_loop(set_id_root, map_list_child)
+        except ValueError as exc:
+            print('LOOP DETECTED.')
+            continue
 
         # Generate markup for all of our
         # components.
         #
-        map_res     = fl.ui.web.util.ResMap()
-        set_id_root = set_id_page.union(set_id_orphan)
-        map_res     = _render_resources(set_id_root,
-                                        map_com_cache,
-                                        map_list_child,
-                                        map_res)
+        map_res = fl.ui.web.util.ResMap()
+        map_res = _render_resources(set_id_root,
+                                    map_com_cache,
+                                    map_list_child,
+                                    map_res)
 
         for id_page in sorted(set_id_page):
 
@@ -122,6 +128,32 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
         outputs['res']['ena']  = True
         outputs['res']['list'] = [dict(map_res)]
+
+
+# -----------------------------------------------------------------------------
+def _detect_loop(set_id_root, map_list_child):
+    """
+    Check for loops in the component tree.
+
+    """
+    set_id_visited = set()
+    for id_root in set_id_root:
+        _detect_loop_recursive(map_list_child, id_root, set_id_visited)
+
+
+# -----------------------------------------------------------------------------
+def _detect_loop_recursive(map_list_child, id_parent, set_id_visited):
+    """
+    Recursively render all the components in the specifiedtree.
+
+    """
+
+    for com in map_list_child[id_parent]:
+        id_com = com.id_com
+        if id_com in set_id_visited:
+            raise ValueError(f'Loop detected: {id_parent} -> {id_com}')
+        set_id_visited.add(id_com)
+        _detect_loop_recursive(map_list_child, id_com, set_id_visited)
 
 
 # -----------------------------------------------------------------------------
@@ -168,24 +200,24 @@ def _render_resources(set_id_root, map_com_cache, map_list_child, map_res):
         #
         if id_root not in map_com_cache:  
             id_page = id_root
-            map_res = _render_recursively(map_list_child, id_page, map_res)
+            map_res = _render_recursive(map_list_child, id_page, map_res)
 
         # id_root is an orphan component.
         #
         else:
-            id_com = id_root
-            com    = map_com_cache[id_com]
+            id_com  = id_root
+            com     = map_com_cache[id_com]
+            map_res = _render_recursive(map_list_child, id_com, map_res)
             with com:
-                map_res = _render_recursively(map_list_child, id_com, map_res)
-
-            content = com.render()
-            map_res.add(media_type = com.media_type, **{id_com: content})
+                for com_child in map_list_child[id_com]:
+                    com.add_raw_string(com_child.render())
+            map_res.add(media_type = com.media_type, **{id_com: com.render()})
 
     return map_res
 
 
 # -----------------------------------------------------------------------------
-def _render_recursively(map_list_child, id_parent, map_res):
+def _render_recursive(map_list_child, id_parent, map_res):
     """
     Recursively render all the components in the specifiedtree.
 
@@ -194,13 +226,11 @@ def _render_recursively(map_list_child, id_parent, map_res):
     try:
         for com in map_list_child[id_parent]:
             id_com  = com.id_com
-            map_res = _render_recursively(map_list_child, id_com, map_res)
+            map_res = _render_recursive(map_list_child, id_com, map_res)
             with com:
                 for com_child in map_list_child[id_com]:
-                    com_child.add_to_ctx()
-
-            content = com.render()
-            map_res.add(media_type = com.media_type, **{id_com: content})
+                    com.add_raw_string(com_child.render())
+            map_res.add(media_type = com.media_type, **{id_com: com.render()})
     except KeyError:
         pass
     return map_res
@@ -213,13 +243,13 @@ def _add_sse_topic(map_list_child, id_page, map_res, id_topic):
 
     """
 
-    list_id_com = sorted(_get_all_descendents(map_list_child, id_page))
+    list_id_com = sorted(_get_descendent_recursive(map_list_child, id_page))
     map_res.sse(**{id_topic: list_id_com})
     return map_res
 
 
 # -----------------------------------------------------------------------------
-def _get_all_descendents(map_list_child, id_parent, set_id_com = None):
+def _get_descendent_recursive(map_list_child, id_parent, set_id_com = None):
     """
     Recursively get the set of all descendents of the specified component.
 
@@ -231,7 +261,8 @@ def _get_all_descendents(map_list_child, id_parent, set_id_com = None):
     for com in map_list_child[id_parent]:
         id_com = com.id_com
         set_id_com.add(id_com)
-        set_id_com = _get_all_descendents(map_list_child, id_com, set_id_com)
+        set_id_com = _get_descendent_recursive(
+                                        map_list_child, id_com, set_id_com)
     return set_id_com
 
 
@@ -252,9 +283,9 @@ def _render_page(id_page, id_topic, map_list_child):
 
     with page.body:
         with html.div(data_hx_ext      = 'sse',
-                      data_sse_connect = f'/{id_topic}'):
+                      data_sse_connect = f'/{id_topic}') as div:
             for com_child in map_list_child[id_page]:
-                com_child.add_to_ctx()
+                div.add_raw_string(com_child.render())
 
     return page.render()
 

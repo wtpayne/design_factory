@@ -131,7 +131,11 @@ class Com(ComData):
             kwargs['data_sse_swap'] = f'{self.id_com}'
             kwargs['data_hx_swap']  = 'outerHTML'
 
-        self._tag = html.div(*args, **kwargs, id = self.id_com)
+        match self.media_type:
+            case 'text/html':
+                self._tag = html.div(*args, **kwargs, id = self.id_com)
+            case _:
+                raise ValueError(f'invalid media_type: {self.media_type}')
 
     # -------------------------------------------------------------------------
     def __enter__(self):
@@ -162,22 +166,22 @@ class Com(ComData):
         return self.id_com < other.id_com
 
     # -------------------------------------------------------------------------
-    def add_to_ctx(self):
-        """
-        Add the component to an open Dominate context.
-
-        """
-
-        return self._tag._add_to_ctx()
-
-    # -------------------------------------------------------------------------
-    def render(self):
+    def render(self) -> str:
         """
         Render the component.
 
         """
 
         return self._tag.render()
+    
+    # -------------------------------------------------------------------------
+    def add_raw_string(self, str_content: str) -> None:
+        """
+        Add a raw string to the component.
+
+        """
+
+        return self._tag.add_raw_string(str_content)
 
     # -------------------------------------------------------------------------
     def model_dump(self):
@@ -207,7 +211,7 @@ def _gencom() -> typing.Generator[Com, None, None]:
              list_id_parent = ['app'],
              is_dyn_sse     = True) as com_1:
 
-        html.div('[COMPONENT 01] - AA1', 
+        html.div('[COMPONENT 01] - A', 
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_1',
                  data_hx_get     = '/com_2',
@@ -216,10 +220,9 @@ def _gencom() -> typing.Generator[Com, None, None]:
 
     with Com(id_com         = 'com_2',
              list_id_parent = [],
-             is_valid       = True,
              is_dyn_sse     = True) as com_2:
 
-        html.div('[COMPONENT 02] - A',
+        html.div('[COMPONENT 02] - B',
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_2',
                  data_hx_get     = '/com_1',
@@ -227,11 +230,10 @@ def _gencom() -> typing.Generator[Com, None, None]:
         yield com_2
 
     with Com(id_com         = 'com_3',
-             list_id_parent = ['com_1','com_2'],
-             is_valid       = True,
+             list_id_parent = ['com_2'],
              is_dyn_sse     = True) as com_3:
 
-        html.div('[COMPONENT 03] - BB2')
+        html.div('[COMPONENT 03] - C')
         yield com_3
 
         # circle_small = svg.svg(width = '100', height = '100')
