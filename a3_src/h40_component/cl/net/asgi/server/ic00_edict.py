@@ -77,7 +77,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     id_node           = map_id.get('id_node',         None)
 
     if isinstance(log_level, str):
-        log_level = logging.getLevelName(log_level.upper())
+        log_level = getattr(logging, log_level.upper())
 
     if sessionsecret is None:
         sessionsecret = key.load(id_value     = key_sessionsecret,

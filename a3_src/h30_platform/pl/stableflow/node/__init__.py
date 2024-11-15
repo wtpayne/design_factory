@@ -6,8 +6,6 @@ Package of functions that support the operation of individual compute nodes.
 
 
 import functools
-import importlib
-import sys
 
 import pl.stableflow.log
 import pl.stableflow.signal
@@ -244,15 +242,20 @@ def _coro_reset(coro, runtime, config, inputs, state, outputs):
 
 
 # -----------------------------------------------------------------------------
-def _coro_step(inputs, state, outputs):
+def _coro_step(inputs: dict, state: dict, outputs: dict):
     """
     Single step the coroutine, running it to the next yield point.
 
     """
 
     try:
+        # This writes into the outputs dictionary
+        # without changing its identity.
+        #
         (outputs, signal) = state['__stableflow_coro__'].send(inputs)
         return signal
+    except GeneratorExit:
+        return (pl.stableflow.signal.exit_ok_controlled,)
     except StopIteration:
         return (pl.stableflow.signal.exit_ok_controlled,)
 
@@ -280,7 +283,9 @@ def _call_reset(id_node, fcn_reset, runtime, config, inputs, state, outputs):
 
     except Exception as error:
         pl.stableflow.log.logger.exception(
-                'Reset function failed for id_node = "{id}"', id = id_node)
+                        'Reset function failed for id_node = "{id}": {error}', 
+                        id    = id_node,
+                        error = str(error))
         return (pl.stableflow.signal.exit_ex_immediate,)
 
 
@@ -325,7 +330,9 @@ def _call_step(id_node, fcn_step, inputs, state, outputs):
 
     except Exception as error:
         pl.stableflow.log.logger.exception(
-                    'Step function failed for id_node = "{id}"', id = id_node)
+                        'Step function failed for id_node = "{id}": {error}',
+                        id    = id_node,
+                        error = str(error))
         return (pl.stableflow.signal.exit_ex_immediate,)
 
 
@@ -341,6 +348,8 @@ def _call_finalize(
 
     """
 
+    _cleanup_coroutine(state, id_node)
+
     if fcn_finalize is None:
         return (pl.stableflow.signal.continue_ok,)
 
@@ -353,8 +362,34 @@ def _call_finalize(
 
     except Exception as error:
         pl.stableflow.log.logger.exception(
-                'Finalize function failed for id_node = "{id}"', id = id_node)
+                    'Finalize function failed for id_node = "{id}": {error}',
+                    id    = id_node,
+                    error = str(error))
         return (pl.stableflow.signal.exit_ex_immediate,)
+
+
+# -----------------------------------------------------------------------------
+def _cleanup_coroutine(state, id_node):
+    """
+    Clean up any existing coroutine.
+
+    """
+
+    try:
+        coro = state['__stableflow_coro__']
+    except KeyError:
+        return
+
+    try:
+        if hasattr(coro, 'close'):
+            coro.close()
+        del state['__stableflow_coro__']
+    except Exception as error:
+        pl.stableflow.log.logger.warning(
+                'Error closing coroutine for id_node = "{id}": {error}',
+                id    = id_node,
+                error = str(error))
+        raise
 
 
 # -----------------------------------------------------------------------------

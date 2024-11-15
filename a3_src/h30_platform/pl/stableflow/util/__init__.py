@@ -7,8 +7,6 @@ Module of utility functions and classes used across the stableflow system.
 
 import collections
 import collections.abc
-import functools
-import itertools
 import string
 
 import dill

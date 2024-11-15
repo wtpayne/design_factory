@@ -457,7 +457,6 @@ def _prepare_cfg_pack(dirpath_root, id_env, envspec):
                         f'Unknown envspec item type ({id_type}) in {id_env}.')
         map_map_list_item[id_phase][id_method].append(item)
 
-
     # Ensure that we have an empty cfgpack
     # directory to hold all of the
     # scripts and requirements.txt files
@@ -706,6 +705,8 @@ def _apply_cfgpack(dirpath_root, id_env, map_map_filepath):
             if result.returncode != 0:
                 pass
                 # raise ValueError(f'Configuration phase {id_phase} failed.')
+
+    _touch(_dirpath_venv_pkg(dirpath_env))
 
 
 # -----------------------------------------------------------------------------

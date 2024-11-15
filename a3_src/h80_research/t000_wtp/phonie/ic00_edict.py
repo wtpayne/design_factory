@@ -47,7 +47,7 @@ license:
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     """
-    .
+    Coroutine to manage WebRTC connections.
 
     """
 

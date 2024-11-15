@@ -83,6 +83,14 @@
     "",
     "",
     "# -----------------------------------------------------------------------",
+    "# Packages required for web development.",
+    "#",
+
+    { "phase": 1, "type":   "pep517-pip", "spec": "dominate==2.9.1"           },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
     "# Packages required for mobile development.",
     "#",
 
@@ -118,7 +126,7 @@
     { "phase": 1, "type":   "pep517-pip", "spec": "CairoSVG==2.7.1"           },
     { "phase": 1, "type":   "pep517-pip", "spec": "dearpygui==2.0.0"          },
     { "phase": 1, "type":   "pep517-pip", "spec": "Pillow==10.4.0"            },
-    { "phase": 1, "type":   "pep517-pip", "spec": "rich==13.9.2"              },
+    { "phase": 1, "type":   "pep517-pip", "spec": "rich==13.9.4"              },
 
     "",
     "",

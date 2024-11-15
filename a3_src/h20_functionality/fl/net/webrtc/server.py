@@ -3,7 +3,7 @@
 ---
 
 title:
-    "ASGI server integration support module."
+    "WebRTC server module."
 
 description:
     "This Python module is designed to support
@@ -13,20 +13,10 @@ description:
     is based on starlette and uvicorn, and runs
     in a separate process, communicating with
     the main coroutine using multiprocessing
-    queues.
-    
-    SSE (Server-Sent Events)
-    ========================
-
-    The ASGI server implements a Server-Sent
-    Events (SSE) system that allows real-time
-    updates from server to client through a
-    pub/sub (publish/subscribe) model. This
-    enables clients to receive immediate updates
-    when resources they're interested in change."
+    queues."
 
 id:
-    "ea1c0472-71e3-465f-9478-7f0b683afe4d"
+    "542ca9bc-c651-444f-8b8b-30c5e43c8f62"
 
 type:
     dt003_python_module
@@ -63,6 +53,8 @@ license:
 
 import asyncio
 import collections
+import copy
+import datetime
 import hashlib
 import logging
 import multiprocessing
@@ -71,6 +63,7 @@ import time
 import uuid
 
 import dill
+import loguru
 import setproctitle
 import sse_starlette.sse
 import starlette.applications
@@ -108,8 +101,6 @@ _ID_COOKIE_USER    = 'xw_uid'
 @fl.util.coroutine
 def coro(cfg):
     """
-    Coroutine to manage the ASGI server process.
-
     """
 
     # Create the queues that we will be
@@ -129,7 +120,8 @@ def coro(cfg):
     queue_requests   = multiprocessing.Queue()  # From server to system
     map_queues       = dict(queue_resources = queue_resources,
                             queue_requests  = queue_requests)
-    str_name_process = 'stableflow-asgi-server'
+    iter_queue       = tuple(map_queues.values())
+    str_name_process = 'discord-bot'
     process_server   = multiprocessing.Process(target = _asgi_server_process,
                                                args   = (cfg, map_queues),
                                                name   = str_name_process,
@@ -138,39 +130,69 @@ def coro(cfg):
     map_hashes    = dict()
     list_from_api = list()
 
-    try:
+    while True:
 
+        list_from_api.clear()
         while True:
+            try:
+                list_from_api.append(queue_requests.get(block = False))
+            except queue.Empty:
+                break
 
-            list_from_api.clear()
-            while True:
-                try:
-                    list_from_api.append(queue_requests.get(block = False))
-                except queue.Empty:
-                    break
+        (list_to_api, unix_time) = yield (list_from_api)
 
-            (list_to_api, unix_time) = yield (list_from_api)
+        accumulator = dict()
+        for map_res in list_from_api:
+            _remove_duplicates(map_res, map_hashes)
+            accumulator.update(map_res)
 
-            accumulator = dict()
-            for map_res in list_to_api:
-                _remove_duplicates(map_res, map_hashes)
-                accumulator.update(map_res)
+            try:
+                queue_resources.put(accumulator, block = False)
+            except queue.Full:
+                pass # TODO: LOG SOME SORT OF ERROR?
 
-                try:
-                    queue_resources.put(accumulator, block = False)
-                except queue.Full:
-                    pass # TODO: LOG SOME SORT OF ERROR?
-    
-    finally:  # Cleanup when coroutine exits
+    # TODO:- Call uvicorn.stop on terminate
 
-        process_server.terminate()
-        process_server.join(timeout=5)
-        
-        # Clear and close queues
-        for queue_ipc in (queue_resources, queue_requests):
-            _clear(queue_ipc)
-            queue_ipc.close()
-            queue_ipc.cancel_join_thread()
+# -----------------------------------------------------------------------------
+# def finalize(runtime, config, inputs, state, outputs):
+#     """
+#     Clean up resources.
+
+#     """
+#     if not state:
+#         return
+
+#     # Halt the ASGI server process
+#     # before doing anything to the
+#     # queues. Once this server process
+#     # is stopped, nothing will be
+#     # reading or writing from
+#     # the queues and we can safely
+#     # terminate them as well.
+#     #
+#     state['process_server'].terminate()
+
+#     # For some reason joining
+#     # the process server causes
+#     # a broken pipe error. I'm
+#     # not quite sure why.
+#     #
+#     # state['process_server'].join()
+
+#     # Each multiprocessing queue has
+#     # an associated feeder thread that
+#     # needs to be closed and joined.
+#     #
+#     # The call to join_thread will block
+#     # unless the queue is empty or unless
+#     # the cancel_join_thread() function
+#     # has been called.
+#     #
+#     for queue_ipc in state['iter_queue']:
+#         queue_ipc.cancel_join_thread()
+#         queue_ipc.close()
+#         _clear(queue_ipc)
+#         queue_ipc.join_thread()
 
 
 # -----------------------------------------------------------------------------
