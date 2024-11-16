@@ -147,6 +147,7 @@
     { "phase": 1, "type":   "pep517-pip", "spec": "sse_starlette==2.1.3"      },
     { "phase": 1, "type":   "pep517-pip", "spec": "starlette==0.40.0"         },
     { "phase": 1, "type":   "pep517-pip", "spec": "uvicorn==0.32.0"           },
+    { "phase": 1, "type":   "pep517-pip", "spec": "python-multipart==0.0.17"  },
 
     "",
     "",

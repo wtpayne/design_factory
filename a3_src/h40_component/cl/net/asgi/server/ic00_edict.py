@@ -98,19 +98,18 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     # route messages of that type to the
     # corresponding output.
     #
-    set_type_out = set((
-                'log_event',  # Error messages and log messages.
-                'log_metric', # Quantitative metrics for KPIs etc...
-                'log_data',   # Raw data for resimulation.
-                'request'))   # Requests from frontend clients.
+    set_type_out = set(('log_event',  # Error messages and log messages.
+                        'log_metric', # Quantitative metrics for KPIs etc...
+                        'log_data',   # Raw data for resimulation.
+                        'request'))   # Requests from frontend clients.
 
     tup_key_in       = tuple(inputs.keys())
     tup_key_out      = tuple(outputs.keys())
     tup_key_msg_in   = tuple((k for k in tup_key_in  if k not in ('ctrl',)))
     tup_key_msg_out  = tuple((k for k in tup_key_out if k not in set_type_out))
     tup_key_type_out = tuple((k for k in tup_key_out if k in set_type_out))
-    list_to_api      = list()
-    list_from_api    = list()
+    list_to_asgi     = list()
+    list_from_asgi   = list()
     timestamp        = dict()
     signal           = fl.util.edict.init(outputs)
 
@@ -129,22 +128,22 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # Pass resources to the ASGI server.
         #
         for str_key in tup_key_msg_in:
-            list_to_api.extend(inputs[str_key]['list'])
+            list_to_asgi.extend(inputs[str_key]['list'])
 
         # Recieve responses and
         # log messages from the
         # ASGI server.
         #
-        list_from_api.clear()
-        list_from_api[:] = server.send((list_to_api, unix_time))
-        list_to_api.clear()
-        if not list_from_api:
+        list_from_asgi.clear()
+        list_from_asgi[:] = server.send((list_to_asgi, unix_time))
+        list_to_asgi.clear()
+        if not list_from_asgi:
             continue
 
         # Route messages to type-specific
         # outputs.
         #
-        list_msg     = list_from_api
+        list_msg     = list_from_asgi
         list_include = list()
         list_exclude = list()
         for key_type in tup_key_type_out:

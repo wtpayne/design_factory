@@ -75,6 +75,7 @@ import setproctitle
 import sse_starlette.sse
 import starlette.applications
 import starlette.background
+import starlette.datastructures
 import starlette.exceptions
 import starlette.middleware
 import starlette.middleware.sessions
@@ -135,24 +136,24 @@ def coro(cfg):
                                                name   = str_name_process,
                                                daemon = True)
     process_server.start()
-    map_hashes    = dict()
-    list_from_api = list()
+    map_hashes     = dict()
+    list_from_asgi = list()
 
     try:
 
         while True:
 
-            list_from_api.clear()
+            list_from_asgi.clear()
             while True:
                 try:
-                    list_from_api.append(queue_requests.get(block = False))
+                    list_from_asgi.append(queue_requests.get(block = False))
                 except queue.Empty:
                     break
 
-            (list_to_api, unix_time) = yield (list_from_api)
+            (list_to_asgi, unix_time) = yield (list_from_asgi)
 
             accumulator = dict()
-            for map_res in list_to_api:
+            for map_res in list_to_asgi:
                 _remove_duplicates(map_res, map_hashes)
                 accumulator.update(map_res)
 
@@ -239,11 +240,23 @@ def _asgi_server_process(cfg, map_queues):
         else:
             url_path    = request.url.path.strip('/')
             id_resource = request.path_params.get('id_resource', url_path)
+
+            # Extract form data if present.
+            #
+            ImmutableMultiDict = starlette.datastructures.ImmutableMultiDict
+            form_data = ImmutableMultiDict()
+            if 'form' in request.headers.get('content-type', ''):
+                try:
+                    form_data = await request.form()
+                except Exception as err:
+                    form_data = ImmutableMultiDict(error = str(err))
+            
             tasks.add_task(_enqueue_requests,
                            request     = request,
                            id_resource = id_resource,
                            id_session  = id_session,
-                           id_user     = id_user)
+                           id_user     = id_user,
+                           form_data   = form_data)
 
         (media_type, content) = _lookup_resource(id_resource)
 
@@ -423,7 +436,11 @@ def _asgi_server_process(cfg, map_queues):
             _update_and_notify()
 
     #--------------------------------------------------------------------------
-    async def _enqueue_requests(request, id_resource, id_session, id_user):
+    async def _enqueue_requests(request,
+                                id_resource,
+                                id_session,
+                                id_user,
+                                form_data):
         """
         Enqueue requests from the client for the rest of the bowyer system.
 
@@ -439,7 +456,8 @@ def _asgi_server_process(cfg, map_queues):
         except KeyError:
             pass
         else:
-            request_data = dict(id_resource     = str(id_resource),
+            request_data = dict(type            = 'request',
+                                id_resource     = str(id_resource),
                                 id_session      = str(id_session),
                                 id_user         = str(id_user),
                                 client_ip       = request['client'][0],
@@ -452,6 +470,12 @@ def _asgi_server_process(cfg, map_queues):
             query_params = request.query_params
             for key in query_params.keys():
                 request_data[key] = query_params.getlist(key)
+
+            # Extract form data if present.
+            #
+            request_data['form'] = dict()
+            for key in form_data.keys():
+                request_data['form'][key] = form_data.getlist(key)
 
             try:
                 app.state.queue_requests.put(request_data, block = False)
@@ -593,7 +617,7 @@ def _asgi_server_process(cfg, map_queues):
     #
     WSock = starlette.routing.WebSocketRoute
     Route = starlette.routing.Route
-    verbs = ['GET', 'POST']
+    verbs = ['GET', 'POST', 'PUT']
     list_routes = [WSock('/ws/{id_resource}', handle_route),
                    Route('/{id_resource}',    handle_route, methods = verbs),
                    Route('/',                 handle_route, methods = verbs)]

@@ -72,6 +72,12 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
     while True:
 
         inputs = yield (outputs, signal)
+
+        if inputs['request']['ena']:
+            print('#' * 100)
+            import pprint; pprint.pprint(inputs['request'])
+            print('#' * 100)
+
         if not inputs['ctrl']['ena']:
             continue
 
@@ -234,13 +240,36 @@ def _gencom() -> typing.Generator[Com, None, None]:
     with Com(id_com         = 'com_3',
              list_id_parent = ['com_1'],
              is_dyn_sse     = True) as com_3:
+        
+        with html.form(id                = 'form_send',
+                       data_hx_put       = '/send-message',
+                       data_hx_swap      = 'none',
+                       data_hx_indicator = '#loading'):
 
-        with html.div('[COMPONENT 03] - D'):
-            with html.div('INNER 03'):
-                with html.div('EVEN INNERER 03'):
-                    with html.div('THE INNERERMOSTEST 03'):
-                        with html.div('THE MOST INNERERMOSTEST 03'):
-                            html.div('THE MOSTESTESTEST INNERERMOSTEST OF ALL04')
+            html.input_(_class      = 'chat-input',
+                        type        = 'text',
+                        placeholder = 'Type a message...',
+                        name        = 'message')
+
+            with html.button(
+                        id                            = 'btn_send',
+                        type                          = 'submit',
+                        data_hx_disable_while_request = 'true',
+                        _class                        = 'chat-submit-button'):
+
+                html.div('Send',
+                         _class = 'button-text')
+            
+            html.div('Sending...',
+                     id     = 'loading',
+                     _class = 'htmx-indicator')
+
+
+
+        # html.label('First Name')
+        # html.input_(type = 'text',
+        #             name = 'firstName',
+        #             value = 'Joe')
         yield com_3
 
         # circle_small = svg.svg(width = '100', height = '100')
