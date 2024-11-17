@@ -218,7 +218,7 @@ def _gencom() -> typing.Generator[Com, None, None]:
              list_id_parent = ['app'],
              is_dyn_sse     = True) as com_1:
 
-        html.div('[COMPONENT 01] - AB', 
+        html.div('[COMPONENT 01] - *** CONINUITY ***', 
                  data_hx_trigger = 'click',
                  data_hx_target  = '#com_1',
                  data_hx_get     = '/com_2',

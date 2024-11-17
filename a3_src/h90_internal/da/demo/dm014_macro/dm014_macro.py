@@ -58,12 +58,16 @@ def start():
     """
 
     import da.env.run
+    import key
 
     tup_overrides = (
-        _key_cfg_static(0), _path_static('htmx/v2.0.3/htmx.js'),
-        _key_cfg_static(1), _path_static('htmx/v2.0.3/htmx.min.js'),
-        _key_cfg_static(2), _path_static('htmx-ext-sse/v2.2.2/sse.js'),
-        _key_cfg_static(3), _path_static('htmx-ext-sse/v2.2.2/sse.min.js'))
+        'node.static.config.list.0.filepath', _static('htmx/v2.0.3/htmx.js'),
+        'node.static.config.list.1.filepath', _static('htmx/v2.0.3/htmx.min.js'),
+        'node.static.config.list.2.filepath', _static('htmx-ext-sse/v2.2.2/sse.js'),
+        'node.static.config.list.3.filepath', _static('htmx-ext-sse/v2.2.2/sse.min.js'),
+        'node.synth.config.apikey_groq',      key.load('GROQ_API_KEY'),
+        'node.continuity.config.apikey_groq', key.load('GROQ_API_KEY'))
+
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
                                          tup_overrides = tup_overrides))
 
@@ -80,17 +84,7 @@ def stop():
 
 
 # -----------------------------------------------------------------------------
-def _key_cfg_static(idx):
-    """
-    Return the key for the static file configuration at the given index.
-
-    """
-
-    return 'node.static.config.list.{idx}.filepath'.format(idx = idx)
-
-
-# -----------------------------------------------------------------------------
-def _path_static(relpath_file):
+def _static(relpath_file):
     """
     Return the filepath to a static HTMX resource.
 

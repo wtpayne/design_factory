@@ -73,7 +73,13 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if not inputs['ctrl']['ena']:
             continue
 
-        if not inputs['com']['ena']:
+        # Pick up any new components to render.
+        #
+        list_com = []
+        for (key, value) in inputs.items():
+            if key not in ('ctrl',) and value['ena']:
+                list_com.extend(value['list'])
+        if not list_com:
             continue
 
         # The cache enables us to generate
@@ -83,7 +89,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         # recompute the site structure
         # when components change.
         #
-        for com in inputs['com']['list']:
+        for com in list_com:
             map_com_cache[com.id_com] = com
 
         # The site structure is defined by

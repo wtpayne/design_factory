@@ -18,7 +18,7 @@
     "#",
 
     { "phase": 3, "type":   "pep517-pip", "spec": "Cython==3.0.11"            },
-    { "phase": 3, "type":   "pep517-pip", "spec": "dill==0.3.9"               },
+    { "phase": 3, "type":   "pep517-pip", "spec": "dill==0.3.8"               },
     { "phase": 3, "type":   "pep517-pip", "spec": "jsonschema==4.23.0"        },
     { "phase": 3, "type":   "pep517-pip", "spec": "numpy==2.1.2"              },
     { "phase": 3, "type":   "pep517-pip", "spec": "psutil==6.1.0"             },
@@ -98,14 +98,10 @@
     { "phase": 1, "type":   "pep517-pip", "spec": "plyer==2.1.0"              },
     { "phase": 1, "type":   "pep517-pip", "spec": "pyjnius==1.6.1"            },
 
-    "",
-    "",
-    "# -----------------------------------------------------------------------",
-    "# Packages intended for speech recognition.",
-    "#",
-
-    { "phase": 1, "type":   "pep517-pip", "spec": "vosk==0.3.45"              },
-    { "phase": 1, "type":   "pep517-pip", "spec": "SpeechRecognition==3.11.0" },
+    "# - We need to install java to get this to worl:.  ",
+    "# /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" ",
+    "# brew install openjdk ",
+    "# sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk ",
 
     "",
     "",
@@ -148,6 +144,15 @@
     { "phase": 1, "type":   "pep517-pip", "spec": "starlette==0.40.0"         },
     { "phase": 1, "type":   "pep517-pip", "spec": "uvicorn==0.32.0"           },
     { "phase": 1, "type":   "pep517-pip", "spec": "python-multipart==0.0.17"  },
+
+    "",
+    "",
+    "# -----------------------------------------------------------------------",
+    "# Packages required for LLM functionality.",
+    "#",
+
+    { "phase": 1, "type":   "pep517-pip", "spec": "dspy==2.5.29"              },
+    { "phase": 1, "type":   "pep517-pip", "spec": "groq==0.12.0"              },
 
     "",
     "",

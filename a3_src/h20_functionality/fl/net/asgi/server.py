@@ -6,24 +6,63 @@ title:
     "ASGI server integration support module."
 
 description:
-    "This Python module is designed to support
-    the integration of one or more embedded ASGI
-    servers to serve web resources and provide
-    simple HTTP APIs. The embedded ASGI server
-    is based on starlette and uvicorn, and runs
-    in a separate process, communicating with
-    the main coroutine using multiprocessing
-    queues.
-    
-    SSE (Server-Sent Events)
-    ========================
+    "This Python module provides functionality
+    to support adding ASGI web resource servers
+    to Stableflow systems.
 
-    The ASGI server implements a Server-Sent
-    Events (SSE) system that allows real-time
-    updates from server to client through a
-    pub/sub (publish/subscribe) model. This
-    enables clients to receive immediate updates
-    when resources they're interested in change."
+    Conceptually, this module provides a
+    bridge between the dataflow-synchronous
+    message passing paradigm of Stableflow
+    and the asynchronous client-server
+    request-response paradigm of web
+    development.
+ 
+    Technically, this module manages an
+    instance of the Uvicorn ASGI server,
+    running asynchrnonously in a separate
+    process. This Uvicorn server runs a
+    generic 'static' web resource server,
+    responding to incoming requests from
+    clients with web resource data that
+    is maintained in an embedded cache
+    (key-value store).
+    
+    Messages that are recieved by this node
+    from stableflow are treated as incoming
+    web resources to be placed in the cache
+    and served when requested by a client.
+    
+    All incoming HTTP requests are treated
+    uniformly and are responded to with the
+    specified resource (if available) and
+    then forwarded to the application logic
+    running in the rest of the Stableflow
+    graph.
+    
+    Communication between the asynchronous
+    world of the Starlette/Uvicorn 'static'
+    web resource server and the dataflow-
+    synronous world of the Stableflow compute
+    graph is achieved with two queues, one
+    for resources going from Stableflow
+    to the ASGI server process, and one for
+    'request' data going in the opposite
+    direction.
+
+    In this way we largely forgo the ability
+    to respond to client requests "on demand"
+    but instead provide the ability to notify
+    clients when resources change using SSE
+    or websockets, enabling a more server-push
+    oriented flow of information through the
+    web interface.
+
+    Despite the fact that this is fundamentally
+    a "static" resource server, the fact that
+    clients can be easily notified when resource
+    content changes makes it especially useful
+    for highly dynamic content such as real-time
+    dashboards.
 
 id:
     "ea1c0472-71e3-465f-9478-7f0b683afe4d"

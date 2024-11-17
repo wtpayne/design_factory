@@ -35,6 +35,7 @@ node:
     state_type:     py_dict
     config:
       frequency_hz: 5
+      idx_max:      1
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
@@ -45,6 +46,32 @@ node:
     functionality:
       py_module:    cl.ctrl.proc.ic00_edict
     state_type:     py_dict
+
+  # ---------------------------------------------------------------------------
+  # Synthetic Data Generation.
+  #
+  synth:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.util.dynamic.from_file.ic00_edict
+    state_type:     py_dict
+    config:
+      py_module:    t000_wtp.macro.synth.ic00_edict
+      apikey_groq:  PLACEHOLDER_GROQ_API_KEY
+
+  # ---------------------------------------------------------------------------
+  # Continuity.
+  #
+  continuity:
+    process:        proc_main
+    req_host_cfg:   default_configuration
+    functionality:
+      py_module:    cl.util.dynamic.from_file.ic00_edict
+    state_type:     py_dict
+    config:
+      py_module:    t000_wtp.macro.continuity.ic00_edict
+      apikey_groq:  PLACEHOLDER_GROQ_API_KEY
 
   # ---------------------------------------------------------------------------
   # UI.
@@ -114,7 +141,7 @@ node:
     state_type:     py_dict
     config:
       host:                 0.0.0.0
-      port:                 8080
+      port:                 8800
       filepath_env:         Null
       key_sessionsecret:    HTTP_SESSION_SECRET
       sessionsecret:        Null
@@ -141,6 +168,16 @@ edge:
 
 - owner: main_process_controller
   data:  py_dict
+  src:   main_process_controller.outputs.ctrl_synth
+  dst:   synth.inputs.ctrl
+
+- owner: main_process_controller
+  data:  py_dict
+  src:   main_process_controller.outputs.ctrl_continuity
+  dst:   continuity.inputs.ctrl
+
+- owner: main_process_controller
+  data:  py_dict
   src:   main_process_controller.outputs.ctrl_gencom
   dst:   gencom.inputs.ctrl
 
@@ -159,10 +196,20 @@ edge:
   src:   main_process_controller.outputs.ctrl_asgi
   dst:   asgi.inputs.ctrl
 
+- owner: synth
+  data:  py_dict
+  src:   synth.outputs.doc
+  dst:   continuity.inputs.doc
+
+- owner: continuity
+  data:  py_dict
+  src:   continuity.outputs.com
+  dst:   render.inputs.com_continuity
+
 - owner: gencom
   data:  py_dict
   src:   gencom.outputs.com
-  dst:   render.inputs.com
+  dst:   render.inputs.com_gencom
 
 - owner: render
   data:  py_dict
