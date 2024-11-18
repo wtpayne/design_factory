@@ -68,13 +68,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                                 api_key     = cfg['apikey_model'],
                                 cache       = False,
                                 temperature = cfg['temperature']))
-    generation_spec = textwrap.dedent("""
-        Generate a random requirements specification for a light urban
-        transit system, then introduce issues into the spec which might
-        cause excessive energy consumption. Write out ONLY the spec with
-        no introduction or commentary.""")
-    module = SyntheticDataGeneration(generation_spec = generation_spec)
-
+    module = SyntheticDataGeneration(generation_spec = cfg['spec'])
     signal = None
 
     for key in outputs:
@@ -118,11 +112,11 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                     cache[key_cache] = prediction.toDict()
                 list_prediction.append(prediction)
 
-            # Outputs.
-            # 
-            for key in outputs:
-                outputs[key]['ena'] = True
-                outputs[key]['list'].extend(list_prediction)
+        # Outputs.
+        # 
+        for key in outputs:
+            outputs[key]['ena'] = True
+            outputs[key]['list'].extend(list_prediction)
 
 
 # -----------------------------------------------------------------------------

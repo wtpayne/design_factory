@@ -63,6 +63,47 @@ node:
       apikey_model:     PLACEHOLDER_MODEL_API_KEY
       temperature:      0.5
       count_sample:     2
+      spec:             Generate a random requirements specification for 
+                        a light urban transit system, then introduce issues
+                        into the spec which might cause excessive energy
+                        consumption. Write out ONLY the spec with no
+                        introduction or commentary.
+
+  # ---------------------------------------------------------------------------
+  # Synthetic data to gspread conversion.
+  #
+  synth_to_gspread:
+    process:            proc_main
+    req_host_cfg:       default_configuration
+    functionality:
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
+    config:
+      py_module:        t000_wtp.macro.synth_to_gspread.ic00_edict
+
+
+  # ---------------------------------------------------------------------------
+  # Gspread.
+  #
+  gspread:
+    process:            proc_main
+    req_host_cfg:       default_configuration
+    functionality:
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
+    config:
+      py_module:        t000_wtp.macro.gspread.ic00_edict
+      apikey_google:    PLACEHOLDER_APIKEY_GOOGLE
+      g_project_id:     PLACEHOLDER_GOOGLE_PROJECT_ID
+      g_priv_key_id:    PLACEHOLDER_GOOGLE_PRIVATE_KEY_ID
+      g_priv_key:       PLACEHOLDER_GOOGLE_PRIVATE_KEY
+      g_cli_email:      PLACEHOLDER_GOOGLE_CLIENT_EMAIL
+      g_cli_id:         PLACEHOLDER_GOOGLE_CLIENT_ID
+      g_auth_uri:       PLACEHOLDER_GOOGLE_AUTH_URI
+      g_token_uri:      PLACEHOLDER_GOOGLE_TOKEN_URI
+      g_prov_x509_url:  PLACEHOLDER_GOOGLE_AUTH_PROVIDER_X509_CERT_URL
+      g_cli_x509_url:   PLACEHOLDER_GOOGLE_CLIENT_X509_CERT_URL
+      g_univ_domain:    PLACEHOLDER_GOOGLE_UNIVERSE_DOMAIN
 
   # ---------------------------------------------------------------------------
   # Continuity.
@@ -177,6 +218,16 @@ edge:
 
 - owner:    main_process_controller
   data:     py_dict
+  src:      main_process_controller.outputs.ctrl_synth_to_gspread
+  dst:      synth_to_gspread.inputs.ctrl
+
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_gspread
+  dst:      gspread.inputs.ctrl
+
+- owner:    main_process_controller
+  data:     py_dict
   src:      main_process_controller.outputs.ctrl_continuity
   dst:      continuity.inputs.ctrl
 
@@ -200,10 +251,28 @@ edge:
   src:      main_process_controller.outputs.ctrl_asgi
   dst:      asgi.inputs.ctrl
 
+# -----------------------------------------------------------------------------
+# Synthetic data generationpipeline.
+# 
+
 - owner:    synth
   data:     py_dict
-  src:      synth.outputs.doc
-  dst:      continuity.inputs.doc
+  src:      synth.outputs.doc_continuity
+  dst:      continuity.inputs.synth
+
+- owner:    synth
+  data:     py_dict
+  src:      synth.outputs.synth_gspread
+  dst:      synth_to_gspread.inputs.synth
+
+- owner:    synth_to_gspread
+  data:     py_dict
+  src:      synth_to_gspread.outputs.synth_gspread
+  dst:      gspread.inputs.synth
+
+# -----------------------------------------------------------------------------
+# Web rendering pipeline.
+# 
 
 - owner:    continuity
   data:     py_dict

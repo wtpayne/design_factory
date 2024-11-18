@@ -61,30 +61,24 @@ def start():
     import key
 
     tup_overrides = (
-        'node.static.config.list.0.filepath',       
-        _static('htmx/v2.0.3/htmx.js'),
-
-        'node.static.config.list.1.filepath',       
-        _static('htmx/v2.0.3/htmx.min.js'),
-
-        'node.static.config.list.2.filepath',       
-        _static('htmx-ext-sse/v2.2.2/sse.js'),
-
-        'node.static.config.list.3.filepath',       
-        _static('htmx-ext-sse/v2.2.2/sse.min.js'),
-
-        'node.synth.config.filepath_cache',         
-        _filepath_cache('synth'),
-
-        'node.synth.config.apikey_model',            
-        key.load('APIKEY_GROQ'),
-
-        'node.continuity.config.filepath_cache',    
-        _filepath_cache('continuity'),
-
-        'node.continuity.config.apikey_model',       
-        key.load('APIKEY_GROQ'))
-
+        'node.synth.config.filepath_cache',      _filepath_cache('synth'),
+        'node.synth.config.apikey_model',        key.load('APIKEY_GROQ_DEV'),
+        'node.gspread.config.g_project_id',      key.load('GOOGLE_PROJECT_ID'),
+        'node.gspread.config.g_priv_key_id',     key.load('GOOGLE_PRIVATE_KEY_ID'),
+        'node.gspread.config.g_priv_key',        key.load('GOOGLE_PRIVATE_KEY'),
+        'node.gspread.config.g_cli_email',       key.load('GOOGLE_CLIENT_EMAIL'),
+        'node.gspread.config.g_cli_id',          key.load('GOOGLE_CLIENT_ID'),
+        'node.gspread.config.g_auth_uri',        key.load('GOOGLE_AUTH_URI'),
+        'node.gspread.config.g_token_uri',       key.load('GOOGLE_TOKEN_URI'),
+        'node.gspread.config.g_prov_x509_url',   key.load('GOOGLE_AUTH_PROVIDER_X509_CERT_URL'),
+        'node.gspread.config.g_cli_x509_url',    key.load('GOOGLE_CLIENT_X509_CERT_URL'),
+        'node.gspread.config.g_univ_domain',     key.load('GOOGLE_UNIVERSE_DOMAIN'),
+        'node.continuity.config.filepath_cache', _filepath_cache('continuity'),
+        'node.continuity.config.apikey_model',   key.load('APIKEY_GROQ_DEV'),
+        'node.static.config.list.0.filepath',    _static('htmx/v2.0.3/htmx.js'),
+        'node.static.config.list.1.filepath',    _static('htmx/v2.0.3/htmx.min.js'),
+        'node.static.config.list.2.filepath',    _static('htmx-ext-sse/v2.2.2/sse.js'),
+        'node.static.config.list.3.filepath',    _static('htmx-ext-sse/v2.2.2/sse.min.js'))
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
                                          tup_overrides = tup_overrides))
 

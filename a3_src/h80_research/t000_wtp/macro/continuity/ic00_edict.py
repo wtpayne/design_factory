@@ -75,8 +75,6 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         if not inputs['ctrl']['ena']:
             continue
 
-        import pprint; pprint.pprint(inputs)
-
         for key in inputs.keys():
             if key in ('ctrl',):
                 continue
@@ -86,7 +84,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             # output_text = proc_ace(input_text)
             # print(output_text)
 
-            import pprint; pprint.pprint(inputs[key])
+            # import pprint; pprint.pprint(inputs[key])
 
         for key in outputs:
             outputs[key]['ena']  = False
