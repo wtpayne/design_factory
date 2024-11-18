@@ -45,7 +45,10 @@ license:
 """
 
 
+import typing
+
 import gspread
+import gspread_formatting
 import pydantic
 
 
@@ -93,16 +96,32 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 continue
             if not inputs[key]['ena']:
                 continue
-            for item in sorted(inputs[key]['list'], key = _sortkey_update):
 
-                if item['id_spreadsheet'] != id_spreadsheet:
-                    id_spreadsheet = item['id_spreadsheet']
-                    spreadsheet    = client.open_by_key(id_spreadsheet)
-                if item['idx_worksheet'] != idx_worksheet:
-                    idx_worksheet = item['idx_worksheet']
-                    worksheet     = spreadsheet.get_worksheet(0)
-                fcn_operation = getattr(worksheet, item['id_operation'])
-                fcn_operation(*item['args'], **item['kwargs'])
+            for rpcdata in sorted(inputs[key]['list'], key = _sortkey_rpcdata):
+
+                try:
+                    if rpcdata['id_spreadsheet'] != id_spreadsheet:
+                        id_spreadsheet = rpcdata['id_spreadsheet']
+                        spreadsheet = client.open_by_key(id_spreadsheet)
+                except KeyError:
+                    pass
+
+                try:
+                    if rpcdata['idx_worksheet'] != idx_worksheet:
+                        idx_worksheet = rpcdata['idx_worksheet']
+                        worksheet = spreadsheet.get_worksheet(idx_worksheet)
+                except KeyError:
+                    pass
+
+                match rpcdata['id_api']:
+
+                    case 'worksheet':
+                        callable = getattr(worksheet, rpcdata['id_method'])
+                        callable(*rpcdata['args'], **rpcdata['kwargs'])
+
+                    case 'format-column-width':
+                        gspread_formatting.set_column_width(
+                            worksheet, *rpcdata['args'], **rpcdata['kwargs'])
 
         # TODO:- Listen for changes in the spreadsheet.
         #        This will require the insertion of an Apps Script
@@ -116,7 +135,7 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
 
 # -----------------------------------------------------------------------------
-def _sortkey_update(item):
+def _sortkey_rpcdata(item):
     """
     Sort key for a batch update specification.
 
@@ -127,24 +146,14 @@ def _sortkey_update(item):
 
 
 # =========================================================================
-class RangeUpdateSpec(pydantic.BaseModel):
+class WorksheetOperationSpec(pydantic.BaseModel):
     """
-    Specification for an update to a single contiguous range of cells.
-
-    """
-
-    range:  str
-    values: list[list[str]]
-
-
-# =========================================================================
-class BatchUpdateSpec(pydantic.BaseModel):
-    """
-    Specification for an update to multiple ranges of cells.
+    Specification for a worksheet operation.
 
     """
 
-    id_operation:   str
     id_spreadsheet: str
     idx_worksheet:  int
-    list_spec:      list[RangeUpdateSpec]
+    id_method:      str
+    args:           list[typing.Any]
+    kwargs:         dict[str, typing.Any]

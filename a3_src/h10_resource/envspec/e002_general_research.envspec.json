@@ -163,6 +163,7 @@
     "#",
 
     { "phase": 2, "type":   "pep517-pip", "spec": "gspread==6.1.4"            },
+    { "phase": 2, "type":   "pep517-pip", "spec": "gspread-formatting==1.2.0" },
 
     "",
     "",

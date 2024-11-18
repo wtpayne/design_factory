@@ -45,8 +45,12 @@ license:
 
 
 import uuid
+
 import gspread.utils
 
+
+# https://github.com/robin900/gspread-formatting
+# https://docs.gspread.org/en/v6.1.3/
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
@@ -105,21 +109,43 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         a1_range    = f"{a1_cell_lo}:{a1_cell_hi}"
         ord_row_lo  = ord_row_hi + 1
 
-        list_row          = [_build_row(item) for item in list_input]
-        list_spec         = [dict(range  = a1_range, values = list_row )]
-        list_worksheet_op = [
-            dict(id_spreadsheet = id_spreadsheet,
+        list_row     = [_build_row(item) for item in list_input]
+        list_spec    = [dict(range  = a1_range, values = list_row )]
+        list_rpcdata = [
+            dict(id_api         = 'worksheet',
+                 id_spreadsheet = id_spreadsheet,
                  idx_worksheet  = idx_worksheet,
-                 id_operation   = 'batch_update',
+                 id_method      = 'batch_update',
                  args           = [list_spec],
                  kwargs         = {})]
 
+        list_rpcdata.append(
+            dict(id_api         = 'format-column-width',
+                 id_spreadsheet = id_spreadsheet,
+                 idx_worksheet  = idx_worksheet,
+                 args           = ['A', 200],
+                 kwargs         = {}))
+
+        list_rpcdata.append(
+            dict(id_api         = 'format-column-width',
+                 id_spreadsheet = id_spreadsheet,
+                 idx_worksheet  = idx_worksheet,
+                 args           = ['B', 400],
+                 kwargs         = {}))
+
+        list_rpcdata.append(
+            dict(id_api         = 'format-column-width',
+                 id_spreadsheet = id_spreadsheet,
+                 idx_worksheet  = idx_worksheet,
+                 args           = ['C', 200],
+                 kwargs         = {}))
+
         # Outputs.
         # 
-        if list_spec:
+        if list_rpcdata:
             for key in outputs:
                 outputs[key]['ena'] = True
-                outputs[key]['list'].extend(list_worksheet_op)
+                outputs[key]['list'].extend(list_rpcdata)
 
 
 # -----------------------------------------------------------------------------
