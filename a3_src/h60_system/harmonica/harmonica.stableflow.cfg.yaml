@@ -191,8 +191,8 @@ node:
       host:                 0.0.0.0
       port:                 8080
       filepath_env:         Null
-      key_sessionsecret:    HTTP_SESSION_SECRET
-      sessionsecret:        Null
+      key_sess_secret:      HTTP_SESSION_SECRET
+      sess_secret:          Null
       debug:                True
       log_level:            'INFO'
       ssl_keyfile:          Null

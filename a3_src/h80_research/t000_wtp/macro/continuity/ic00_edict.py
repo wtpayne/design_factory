@@ -58,10 +58,10 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                   api_key = cfg['apikey_groq'])
     dspy.configure(lm = llm)
 
-    module = ContinuousProcessImprovement(
-                spec = """
-                Translate the requirement to the SOPHIST method.
-                """,)
+    # module = ContinuousProcessImprovement(
+    #             spec = """
+    #             Translate the requirement to the SOPHIST method.
+    #             """,)
 
     signal = None
 

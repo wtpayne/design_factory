@@ -626,7 +626,7 @@ def _asgi_server_process(cfg, map_queues):
 
     list_middleware = [starlette.middleware.Middleware(
                               starlette.middleware.sessions.SessionMiddleware,
-                              secret_key = cfg['sessionsecret'])]
+                              secret_key = cfg['sess_secret'])]
 
     app = starlette.applications.Starlette(debug              = True,
                                            routes             = list_routes,

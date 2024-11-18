@@ -63,35 +63,35 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
 
     fl.util.edict.validate(inputs = inputs,  must_contain = ('ctrl',))
 
-    filepath_env      = cfg.get('filepath_env',       None)
-    key_sessionsecret = cfg.get('key_sessionsecret',  'HTTP_SESSION_SECRET')
-    sessionsecret     = cfg.get('sessionsecret',      None)
-    host              = cfg.get('host',               '0.0.0.0')
-    port              = cfg.get('port',               8080)
-    debug             = cfg.get('debug',              False)
-    log_level         = cfg.get('log_level',          'WARNING')
-    ssl_keyfile       = cfg.get('ssl_keyfile',        None)
-    ssl_certfile      = cfg.get('ssl_certfile',       None)
-    map_id            = runtime.get('id',             dict())
-    id_system         = map_id.get('id_system',       None)
-    id_node           = map_id.get('id_node',         None)
+    filepath_env    = cfg.get('filepath_env',       None)
+    key_sess_secret = cfg.get('key_sess_secret',   'HTTP_SESSION_SECRET')
+    sess_secret     = cfg.get('sess_secret',        None)
+    host            = cfg.get('host',               '0.0.0.0')
+    port            = cfg.get('port',               8080)
+    debug           = cfg.get('debug',              False)
+    log_level       = cfg.get('log_level',          'WARNING')
+    ssl_keyfile     = cfg.get('ssl_keyfile',        None)
+    ssl_certfile    = cfg.get('ssl_certfile',       None)
+    map_id          = runtime.get('id',             dict())
+    id_system       = map_id.get('id_system',       None)
+    id_node         = map_id.get('id_node',         None)
 
     if isinstance(log_level, str):
         log_level = getattr(logging, log_level.upper())
 
-    if sessionsecret is None:
-        sessionsecret = key.load(id_value     = key_sessionsecret,
-                                 filepath_env = filepath_env)
+    if sess_secret is None:
+        sess_secret = key.load(id_value     = key_sess_secret,
+                               filepath_env = filepath_env)
 
-    server = fl.net.asgi.server.coro(cfg = dict(host          = host,
-                                                port          = port,
-                                                debug         = debug,
-                                                sessionsecret = sessionsecret,
-                                                log_level     = log_level,
-                                                ssl_keyfile   = ssl_keyfile,
-                                                ssl_certfile  = ssl_certfile,
-                                                id_system     = id_system,
-                                                id_node       = id_node))
+    server = fl.net.asgi.server.coro(cfg = dict(host         = host,
+                                                port         = port,
+                                                debug        = debug,
+                                                sess_secret  = sess_secret,
+                                                log_level    = log_level,
+                                                ssl_keyfile  = ssl_keyfile,
+                                                ssl_certfile = ssl_certfile,
+                                                id_system    = id_system,
+                                                id_node      = id_node))
 
     # If there are one or more outputs which are
     # named after a message type, then we will

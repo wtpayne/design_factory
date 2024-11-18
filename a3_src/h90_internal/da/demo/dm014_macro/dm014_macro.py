@@ -61,12 +61,29 @@ def start():
     import key
 
     tup_overrides = (
-        'node.static.config.list.0.filepath', _static('htmx/v2.0.3/htmx.js'),
-        'node.static.config.list.1.filepath', _static('htmx/v2.0.3/htmx.min.js'),
-        'node.static.config.list.2.filepath', _static('htmx-ext-sse/v2.2.2/sse.js'),
-        'node.static.config.list.3.filepath', _static('htmx-ext-sse/v2.2.2/sse.min.js'),
-        'node.synth.config.apikey_groq',      key.load('GROQ_API_KEY'),
-        'node.continuity.config.apikey_groq', key.load('GROQ_API_KEY'))
+        'node.static.config.list.0.filepath',       
+        _static('htmx/v2.0.3/htmx.js'),
+
+        'node.static.config.list.1.filepath',       
+        _static('htmx/v2.0.3/htmx.min.js'),
+
+        'node.static.config.list.2.filepath',       
+        _static('htmx-ext-sse/v2.2.2/sse.js'),
+
+        'node.static.config.list.3.filepath',       
+        _static('htmx-ext-sse/v2.2.2/sse.min.js'),
+
+        'node.synth.config.filepath_cache',         
+        _filepath_cache('synth'),
+
+        'node.synth.config.apikey_model',            
+        key.load('APIKEY_GROQ'),
+
+        'node.continuity.config.filepath_cache',    
+        _filepath_cache('continuity'),
+
+        'node.continuity.config.apikey_model',       
+        key.load('APIKEY_GROQ'))
 
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
                                          tup_overrides = tup_overrides))
@@ -90,20 +107,7 @@ def _static(relpath_file):
 
     """
 
-    return os.path.join(_dirpath_static(), relpath_file)
-
-
-# -----------------------------------------------------------------------------
-def _dirpath_static():
-    """
-    Return the directory path to the static web resources directory.
-
-    """
-
-    import da.env
-    return da.env.path(process_area = 'a3_src',
-                       control_tier = 'h80_research',
-                       relpath      = 't000_wtp/macro/static')
+    return _macropath('static', relpath_file)
 
 
 # -----------------------------------------------------------------------------
@@ -113,10 +117,37 @@ def _filepath_cfg():
 
     """
 
+    return _macropath('macro.stableflow.cfg.yaml')
+
+
+
+# -----------------------------------------------------------------------------
+def _filepath_cache(id_node):
+    """
+    Return the filepath to the cache database.
+
+    """
+
+    return _macropath(f'{id_node}.cache.sqlite', is_tmp = True)
+
+
+# -----------------------------------------------------------------------------
+def _macropath(*args, is_tmp = False):
+    """
+    Return a path in the macro workspace.
+
+    """
+
     import da.env
 
-    return da.env.path(
-                process_area = 'a3_src',
-                control_tier = 'h80_research',
-                relpath      = 't000_wtp/macro/macro.stableflow.cfg.yaml')
+    if is_tmp:
+        process_area = 'a4_tmp'
+    else:
+        process_area = 'a3_src'
+
+    dirpath_macro = da.env.path(process_area = process_area,
+                                control_tier = 'h80_research',
+                                relpath      = 't000_wtp/macro')
+
+    return os.path.join(dirpath_macro, *args)
 

@@ -5,20 +5,20 @@ system:
 ###############################################################################
 host:
   localhost:
-    hostname:        'localhost'
-    acct_run:        ''
-    acct_provision:  ''
-    port_range:      '8090-9000'
-    dirpath_log:     ''
-    launch_cmd:      ''
-    environment:     'e002_general_research'
-    log_level:       'TRACE'
+    hostname:           'localhost'
+    acct_run:           ''
+    acct_provision:     ''
+    port_range:         '8090-9000'
+    dirpath_log:        ''
+    launch_cmd:         ''
+    environment:        'e002_general_research'
+    log_level:          'TRACE'
 
 
 ###############################################################################
 process:
   proc_main:
-    host: localhost
+    host:               localhost
 
 
 ###############################################################################
@@ -28,74 +28,78 @@ node:
   # System clock and state management for the entire system.
   #
   system_controller:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.ctrl.sys.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.ctrl.sys.ic00_edict
+    state_type:         py_dict
     config:
-      frequency_hz: 5
-      idx_max:      1
+      frequency_hz:     5
+      idx_max:          1
 
   # ---------------------------------------------------------------------------
   # State management for the main process.
   #
   main_process_controller:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.ctrl.proc.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.ctrl.proc.ic00_edict
+    state_type:         py_dict
 
   # ---------------------------------------------------------------------------
   # Synthetic Data Generation.
   #
   synth:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.util.dynamic.from_file.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
     config:
-      py_module:    t000_wtp.macro.synth.ic00_edict
-      apikey_groq:  PLACEHOLDER_GROQ_API_KEY
+      py_module:        t000_wtp.macro.synth.ic00_edict
+      filepath_cache:   PLACEHOLDER_FILEPATH_DB
+      id_model:         groq/llama3-8b-8192
+      apikey_model:     PLACEHOLDER_MODEL_API_KEY
+      temperature:      0.5
+      count_sample:     2
 
   # ---------------------------------------------------------------------------
   # Continuity.
   #
   continuity:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.util.dynamic.from_file.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
     config:
-      py_module:    t000_wtp.macro.continuity.ic00_edict
-      apikey_groq:  PLACEHOLDER_GROQ_API_KEY
+      py_module:        t000_wtp.macro.continuity.ic00_edict
+      apikey_groq:      PLACEHOLDER_GROQ_API_KEY
 
   # ---------------------------------------------------------------------------
   # UI.
   #
   gencom:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.util.dynamic.from_file.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
     config:
-      py_module:    t000_wtp.macro.gencom.ic00_edict
+      py_module:        t000_wtp.macro.gencom.ic00_edict
 
   # ---------------------------------------------------------------------------
   # UI rendering.
   #
   render:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.util.dynamic.from_file.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.util.dynamic.from_file.ic00_edict
+    state_type:         py_dict
     config:
-      py_module:    t000_wtp.macro.render.ic00_edict
+      py_module:        t000_wtp.macro.render.ic00_edict
 
   # ---------------------------------------------------------------------------
   # Static file resources.
@@ -106,49 +110,49 @@ node:
   #   curl -o htmx.js     https://unpkg.com/htmx.org@2.0.3/dist/htmx.js
   #
   static:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.net.asgi.file.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.net.asgi.file.ic00_edict
+    state_type:         py_dict
     config:
       list:
-      - id_resource:  htmx.js
-        media_type:   text/javascript
-        is_binary:    false
-        filepath:     PLACEHOLDER_HTMX_JS
-      - id_resource:  htmx.min.js
-        media_type:   text/javascript
-        is_binary:    false
-        filepath:     PLACEHOLDER_HTMX_MIN_JS
-      - id_resource:  sse.js
-        media_type:   text/javascript
-        is_binary:    false
-        filepath:     PLACEHOLDER_SSE_JS
-      - id_resource:  sse.min.js
-        media_type:   text/javascript
-        is_binary:    false
-        filepath:     PLACEHOLDER_SSE_MIN_JS
+      - id_resource:    htmx.js
+        media_type:     text/javascript
+        is_binary:      false
+        filepath:       PLACEHOLDER_HTMX_JS
+      - id_resource:    htmx.min.js
+        media_type:     text/javascript
+        is_binary:      false
+        filepath:       PLACEHOLDER_HTMX_MIN_JS
+      - id_resource:    sse.js
+        media_type:     text/javascript
+        is_binary:      false
+        filepath:       PLACEHOLDER_SSE_JS
+      - id_resource:    sse.min.js
+        media_type:     text/javascript
+        is_binary:      false
+        filepath:       PLACEHOLDER_SSE_MIN_JS
         
   # ---------------------------------------------------------------------------
   # ASGI server.
   #
   asgi:
-    process:        proc_main
-    req_host_cfg:   default_configuration
+    process:            proc_main
+    req_host_cfg:       default_configuration
     functionality:
-      py_module:    cl.net.asgi.server.ic00_edict
-    state_type:     py_dict
+      py_module:        cl.net.asgi.server.ic00_edict
+    state_type:         py_dict
     config:
-      host:                 0.0.0.0
-      port:                 8800
-      filepath_env:         Null
-      key_sessionsecret:    HTTP_SESSION_SECRET
-      sessionsecret:        Null
-      debug:                True
-      log_level:            'INFO'
-      ssl_keyfile:          Null
-      ssl_certfile:         Null
+      host:             0.0.0.0
+      port:             8800
+      filepath_env:     Null
+      key_sess_secret:  HTTP_SESSION_SECRET
+      ses_secret:       Null
+      debug:            True
+      log_level:        'INFO'
+      ssl_keyfile:      Null
+      ssl_certfile:     Null
 
 
 ###############################################################################
@@ -161,70 +165,70 @@ edge:
 # components.
 #
 
-- owner: system_controller
-  data:  py_dict
-  src:   system_controller.outputs.ctrl_main
-  dst:   main_process_controller.inputs.ctrl
+- owner:    system_controller
+  data:     py_dict
+  src:      system_controller.outputs.ctrl_main
+  dst:      main_process_controller.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_synth
-  dst:   synth.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_synth
+  dst:      synth.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_continuity
-  dst:   continuity.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_continuity
+  dst:      continuity.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_gencom
-  dst:   gencom.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_gencom
+  dst:      gencom.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_render
-  dst:   render.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_render
+  dst:      render.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_static
-  dst:   static.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_static
+  dst:      static.inputs.ctrl
 
-- owner: main_process_controller
-  data:  py_dict
-  src:   main_process_controller.outputs.ctrl_asgi
-  dst:   asgi.inputs.ctrl
+- owner:    main_process_controller
+  data:     py_dict
+  src:      main_process_controller.outputs.ctrl_asgi
+  dst:      asgi.inputs.ctrl
 
-- owner: synth
-  data:  py_dict
-  src:   synth.outputs.doc
-  dst:   continuity.inputs.doc
+- owner:    synth
+  data:     py_dict
+  src:      synth.outputs.doc
+  dst:      continuity.inputs.doc
 
-- owner: continuity
-  data:  py_dict
-  src:   continuity.outputs.com
-  dst:   render.inputs.com_continuity
+- owner:    continuity
+  data:     py_dict
+  src:      continuity.outputs.com
+  dst:      render.inputs.com_continuity
 
-- owner: gencom
-  data:  py_dict
-  src:   gencom.outputs.com
-  dst:   render.inputs.com_gencom
+- owner:    gencom
+  data:     py_dict
+  src:      gencom.outputs.com
+  dst:      render.inputs.com_gencom
 
-- owner: render
-  data:  py_dict
-  src:   render.outputs.res
-  dst:   asgi.inputs.res_ui_components
+- owner:    render
+  data:     py_dict
+  src:      render.outputs.res
+  dst:      asgi.inputs.res_ui_components
 
-- owner: static
-  data:  py_dict
-  src:   static.outputs.res
-  dst:   asgi.inputs.res_static
+- owner:    static
+  data:     py_dict
+  src:      static.outputs.res
+  dst:      asgi.inputs.res_static
 
-- owner: asgi
-  data:  py_dict
-  src:   asgi.outputs.request
-  dst:   gencom.inputs.request
+- owner:    asgi
+  data:     py_dict
+  src:      asgi.outputs.request
+  dst:      gencom.inputs.request
 
 
 
@@ -246,11 +250,11 @@ req_host_cfg:
 role:
   default_role:
     tasks:
-      - name: Update apt-get repo and cache
-        become:        yes
-        become_user:   root
-        become_method: sudo
+      - name:                       Update apt-get repo and cache
+        become:                     yes
+        become_user:                root
+        become_method:              sudo
         apt:
-          update_cache:     yes
-          force_apt_get:    yes
-          cache_valid_time: 3600
+          update_cache:             yes
+          force_apt_get:            yes
+          cache_valid_time:         3600
