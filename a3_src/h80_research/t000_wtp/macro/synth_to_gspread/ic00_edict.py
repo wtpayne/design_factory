@@ -44,13 +44,24 @@ license:
 """
 
 
+# https://docs.google.com/spreadsheets/d/1bfUefa-0cMIzGkxsMXhlJGKZo1ZxWKo1KTl_y5AoMBk/edit?gid=0#gid=0
+# https://github.com/robin900/gspread-formatting
+# https://docs.gspread.org/en/v6.1.3/
+
+
+import os
+import json
 import uuid
 
 import gspread.utils
+import google.auth
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
 
 
-# https://github.com/robin900/gspread-formatting
-# https://docs.gspread.org/en/v6.1.3/
+google_auth_oauthlib.flow.InstalledAppFlow
+googleapiclient.discovery.build
+
 
 # -----------------------------------------------------------------------------
 def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
@@ -65,20 +76,18 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
         outputs[key]['ena']  = False
         outputs[key]['list'] = list()
 
-    ord_col_lo = 1
     ord_row_lo = 1
+    ord_col_lo = 1
 
     id_spreadsheet = '1bfUefa-0cMIzGkxsMXhlJGKZo1ZxWKo1KTl_y5AoMBk'
     idx_worksheet  = 0
 
-    map_key = dict(output = 'synth')
-
-    count_cols = 2
+    map_cache = dict()
 
     while True:
 
         # Check if the node is enabled on this step.
-        # 
+        #
         inputs = yield (outputs, signal)
         for key in outputs:
             outputs[key]['ena'] = False
@@ -87,75 +96,89 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
             continue
 
         # Collect all input data together into one list.
-        # 
-        list_input = list()
+        #
+        list_synth = list()
         for key in inputs:
             if key in ('ctrl',):
                 continue
             if not inputs[key]['ena']:
                 continue
-            list_input.extend(inputs[key]['list'])
+            list_synth.extend(inputs[key]['list'])
 
-        # TODO: Add a uuid for each row and store in a database.
-        # 
+        # Update the cache.
+        #
+        map_synth = {
+            uuid.uuid4().hex: [synth['output']] for synth in list_synth}
+        map_cache.update(map_synth)
 
-        # Format synthetic data for gspread.
-        # 
-        count_items = len(list_input)
-        ord_row_hi  = ord_row_lo + (count_items - 1)
-        ord_col_hi  = ord_col_lo + (count_cols - 1)
-        a1_cell_lo  = gspread.utils.rowcol_to_a1(ord_row_lo, ord_col_lo)
-        a1_cell_hi  = gspread.utils.rowcol_to_a1(ord_row_hi, ord_col_hi)
-        a1_range    = f"{a1_cell_lo}:{a1_cell_hi}"
-        ord_row_lo  = ord_row_hi + 1
-
-        list_row     = [_build_row(item) for item in list_input]
-        list_spec    = [dict(range  = a1_range, values = list_row )]
-        list_rpcdata = [
-            dict(id_api         = 'worksheet',
-                 id_spreadsheet = id_spreadsheet,
-                 idx_worksheet  = idx_worksheet,
-                 id_method      = 'batch_update',
-                 args           = [list_spec],
-                 kwargs         = {})]
-
-        list_rpcdata.append(
-            dict(id_api         = 'format-column-width',
-                 id_spreadsheet = id_spreadsheet,
-                 idx_worksheet  = idx_worksheet,
-                 args           = ['A', 200],
-                 kwargs         = {}))
-
-        list_rpcdata.append(
-            dict(id_api         = 'format-column-width',
-                 id_spreadsheet = id_spreadsheet,
-                 idx_worksheet  = idx_worksheet,
-                 args           = ['B', 400],
-                 kwargs         = {}))
-
-        list_rpcdata.append(
-            dict(id_api         = 'format-column-width',
-                 id_spreadsheet = id_spreadsheet,
-                 idx_worksheet  = idx_worksheet,
-                 args           = ['C', 200],
-                 kwargs         = {}))
+        # Get RPC data for the gspread and gspread-formatting APIs.
+        #
+        list_rpcdata = _list_rpcdata(id_spreadsheet,
+                                     idx_worksheet,
+                                     map_synth,
+                                     ord_row_lo,
+                                     ord_col_lo)
+        if not list_rpcdata:
+            continue
 
         # Outputs.
-        # 
-        if list_rpcdata:
-            for key in outputs:
-                outputs[key]['ena'] = True
-                outputs[key]['list'].extend(list_rpcdata)
+        #
+        for key in outputs:
+            outputs[key]['ena'] = True
+            outputs[key]['list'].extend(list_rpcdata)
 
 
 # -----------------------------------------------------------------------------
-def _build_row(item_input):
+def _list_rpcdata(id_spreadsheet,
+                  idx_worksheet,
+                  map_synth,
+                  ord_row_lo,
+                  ord_col_lo):
     """
-    Build a row of cells from a synthetic data item.
+    Return a list of RPC data for the gspread and gspread-formatting APIs.
 
     """
 
-    key_row    = uuid.uuid4().hex
-    spec_synth = item_input['output']
+    count_cols  = len(next(iter(map_synth.values()))) + 1
+    count_synth = len(map_synth)
+    ord_row_hi  = ord_row_lo + (count_synth - 1)
+    ord_col_hi  = ord_col_lo + (count_cols - 1)
+    a1_cell_lo  = gspread.utils.rowcol_to_a1(ord_row_lo, ord_col_lo)
+    a1_cell_hi  = gspread.utils.rowcol_to_a1(ord_row_hi, ord_col_hi)
+    a1_range    = f"{a1_cell_lo}:{a1_cell_hi}"
+    ord_row_lo  = ord_row_hi + 1
 
-    return [key_row, spec_synth]
+    list_row = list()
+    for (key_synth, list_items) in map_synth.items():
+        row = [key_synth] + list_items
+        list_row.append(row)
+
+    list_spec    = [dict(range = a1_range, values = list_row )]
+    list_args    = [list_spec]
+
+    list_rpcdata = [
+        dict(id_api         = 'worksheet',
+             id_spreadsheet = id_spreadsheet,
+             idx_worksheet  = idx_worksheet,
+             id_method      = 'batch_update',
+             args           = list_args,
+             kwargs         = {})]
+
+    list_rpcdata.extend([
+        dict(id_api         = 'format-column-width',
+             id_spreadsheet = id_spreadsheet,
+             idx_worksheet  = idx_worksheet,
+             args           = ['A', 200],
+             kwargs         = {}),
+        dict(id_api         = 'format-column-width',
+             id_spreadsheet = id_spreadsheet,
+             idx_worksheet  = idx_worksheet,
+             args           = ['B', 400],
+             kwargs         = {}),
+        dict(id_api         = 'format-column-width',
+             id_spreadsheet = id_spreadsheet,
+             idx_worksheet  = idx_worksheet,
+             args           = ['C', 200],
+             kwargs         = {})])
+
+    return list_rpcdata

@@ -162,8 +162,12 @@
     "# Packages required by Googler sheets apps.",
     "#",
 
-    { "phase": 2, "type":   "pep517-pip", "spec": "gspread==6.1.4"            },
-    { "phase": 2, "type":   "pep517-pip", "spec": "gspread-formatting==1.2.0" },
+    { "phase": 2, "type":   "pep517-pip", "spec": "gspread==6.1.4"                    },
+    { "phase": 2, "type":   "pep517-pip", "spec": "gspread-formatting==1.2.0"         },
+    { "phase": 2, "type":   "pep517-pip", "spec": "google-api-python-client==2.153.0" },
+    { "phase": 2, "type":   "pep517-pip", "spec": "google-auth==2.36.0"               },
+    { "phase": 2, "type":   "pep517-pip", "spec": "google-auth-oauthlib==1.2.1"       },
+    { "phase": 2, "type":   "pep517-pip", "spec": "google-auth-httplib2==0.2.0"       },
 
     "",
     "",

@@ -45,6 +45,7 @@ license:
 """
 
 
+import copy
 import typing
 
 import gspread
@@ -98,6 +99,8 @@ def coro(runtime, cfg, inputs, state, outputs):  # pylint: disable=W0613
                 continue
 
             for rpcdata in sorted(inputs[key]['list'], key = _sortkey_rpcdata):
+
+                rpcdata = copy.deepcopy(rpcdata)
 
                 try:
                     if rpcdata['id_spreadsheet'] != id_spreadsheet:
