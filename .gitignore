@@ -67,6 +67,10 @@
 !*.stableview.cfg.xml
 !*.stableview.cfg.yaml
 
+# Python project configuration files.
+#
+!pyproject.toml
+
 # Python/Cython/Codon design documents.
 #
 !*.py
