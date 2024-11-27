@@ -55,8 +55,8 @@ license:
 """
 
 
-import importlib.metadata
 import os
+import subprocess
 import sys
 
 import click
@@ -68,12 +68,36 @@ import pl.stableflow.cli.command
 
 
 # -----------------------------------------------------------------------------
+def _idcfg_da():
+    """
+    Return the design automation system configuration id.
+
+    We use the configuration id (git commit hash)
+    instead of a version number because we don't
+    make releases of our internal tooling, instead
+    preferring to rely on continuous integration
+    testing to ensure that the system remains
+    stable.
+
+    """
+
+    try:
+        list_cmd  = ['git', 'rev-parse', 'HEAD']
+        DEVNULL   = subprocess.DEVNULL
+        bytes_rev = subprocess.check_output(list_cmd, stderr=DEVNULL)
+        str_rev   = bytes_rev.decode('utf-8').strip().lower()
+        return str_rev
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return 'unspecified'
+
+
+# -----------------------------------------------------------------------------
 @click.group(
         name             = 'main',
         cls              = da.cli.group.Ordered,
         context_settings = { 'max_content_width': 50 })
 @click.version_option(
-        version          = importlib.metadata.version("h90_internal"))
+        version          = _idcfg_da())
 def grp_main():
     """
     Design automation command line interface.
@@ -211,44 +235,13 @@ def grp_demo():
     pass
 
 
-# # -----------------------------------------------------------------------------
-# @grp_demo.command()
-# @click.argument(
-#     'name',
-#     required = True,
-#     type     = click.STRING)
-# def start(name):
-#     """
-#     Start the named demonstration.
-
-#     """
-#     import da.cli.demo
-#     sys.exit(da.cli.demo.start(dirpath_src = _dirpath_src(),
-#                                name_demo   = name))
-
-
-# # -----------------------------------------------------------------------------
-# @grp_demo.command()
-# @click.argument(
-#     'name',
-#     required = True,
-#     type     = click.STRING)
-# def stop(name):
-#     """
-#     Stop the named demonstration.
-
-#     """
-#     import da.cli.demo
-#     sys.exit(da.cli.demo.stop(dirpath_src = _dirpath_src(),
-#                               name_demo   = name))
-
-
 # -----------------------------------------------------------------------------
 pl.stableflow.cli.command.grp_main.help = 'Stableflow system control.'
 grp_main.add_command(pl.stableflow.cli.command.grp_main, name = 'stableflow')
 
 da.cli.env.add_env_tools(grp_parent = grp_env)
 da.cli.demo.add_demos(grp_parent = grp_demo)
+
 
 # -----------------------------------------------------------------------------
 def _dirpath_src():
