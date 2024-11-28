@@ -5,9 +5,9 @@ Stableflow is a framework designed for engineering
 distributed data-flow oriented systems.
 
 It is intended to enable and encourage:
-- **Model driven engineering.**
-- **Product line engineering.**
-- **Engineering workflow automation.**
+- Model driven engineering.
+- Product line engineering.
+- Engineering workflow automation.
 
 To achieve this, it is designed to support:
 - Deterministic simulation and re-simulation.
@@ -221,8 +221,8 @@ Nodes can be implemented as step functions or coroutines.
 ### Step Function Node
 
 .. code-block:: python
-    import pl.stableflow.signal
 
+    import pl.stableflow.signal
     def step(inputs, state, outputs):
         if 'count' not in state:
             state['count'] = 0
@@ -230,12 +230,13 @@ Nodes can be implemented as step functions or coroutines.
             state['count'] += 1
         outputs['output']['count'] = state['count']
         if state['count'] >= 10:
-            return (exit_ok_controlled,)
+            return (pl.stableflow.signal.exit_ok_controlled,)
 
 ### Coroutine Node
 
 .. code-block:: python
 
+    import pl.stableflow.signal
     def coro(runtime, cfg, inputs, state, outputs):
         count = -1
         signal = (None,)
@@ -244,7 +245,7 @@ Nodes can be implemented as step functions or coroutines.
             count += 1
             outputs['output']['count'] = count
             if count >= 10:
-                signal = (exit_ok_controlled,)
+                signal = (pl.stableflow.signal.exit_ok_controlled,)
 
 Command-Line Interface
 ----------------------
