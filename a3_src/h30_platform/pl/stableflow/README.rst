@@ -2,14 +2,14 @@
 Stableflow Architectural Overview
 =================================
 
-Stableflow is a framework designed for engineering 
-distributed data-flow oriented systems.
+Stableflow is a tool for designing and operating 
+distributed systems. 
 
 It is intended to enable and encourage:
 
-* Model driven engineering.
+* Model driven design.
+* Design workflow automation.
 * Product line engineering.
-* Engineering workflow automation.
 
 To achieve this, it is designed to support:
 
@@ -17,10 +17,52 @@ To achieve this, it is designed to support:
 * Automatic transformation of system architecture specifications.
 * Automatic optimisation of system design parameters.
 
-Stableflow is also intended to integrate well into
-the modern ecosystem of ML/AI tools, allowing for
-e.g. the integration of LLMs into various engineering
-workflows.
+It is conceptually similar to tools like Simulink, 
+Labview or Ptolemy, but with a greater focus on
+interoperability with today's ecosystem of ML/AI
+models and tools, which is dominated by languages
+like Python.
+
+----------------------------
+The argument for Stableflow
+----------------------------
+
+Software development is on the cusp of a transformation.
+As AI reshapes how we build software, we need better ways
+to express, manipulate, and reason about system architecture
+at scale. Traditional approaches that focus on individual
+features and products are no longer enough.
+
+Two powerful techniques from industries like aerospace,
+defense, and automotive offer a path forward:
+
+Product line engineering transforms how we think about
+product strategy - instead of building individual products,
+we design entire families of related products. This enables:
+* Systematic reuse across product variants
+* Strategic planning of feature combinations
+* Rapid response to market opportunities
+* Clear mapping between market segments and technical capabilities
+
+Model-driven development changes how we build systems by
+making the architecture itself programmable. This enables:
+* Automatic generation of system variants
+* Rapid adaptation to different deployment scenarios
+* Architecture-level transformations and optimizations
+* Strong foundations for AI-assisted system design
+
+While many developers work effectively within client-server
+architectures and user-story driven development ("As a user,
+I want to..."), these approaches alone don't unlock the full
+potential of automated system design and strategic product
+planning.
+
+Stableflow brings these powerful techniques into the modern
+software development ecosystem, combining them with the
+agility and tooling that developers expect. As AI and LLMs
+transform software development, having explicit, transformable
+models of system architecture becomes increasingly valuable.
+
 
 -------------
 Core Concepts
