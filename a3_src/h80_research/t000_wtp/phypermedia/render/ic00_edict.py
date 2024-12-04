@@ -3,11 +3,11 @@
 ---
 
 title:
-    "Hyperview web resource rendering."
+    "Phypermedia web resource rendering."
 
 description:
     "Web resource rendering functionality for
-    the hyperview UI framework."
+    the phypermedia UI framework."
 
 id:
     "915fc204-39e8-4d00-a9b6-032769b3d169"

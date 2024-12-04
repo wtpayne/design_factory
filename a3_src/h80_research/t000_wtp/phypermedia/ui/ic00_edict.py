@@ -3,10 +3,10 @@
 ---
 
 title:
-    "Hyperview UI compoenent generation."
+    "Phypermedia UI compoenent generation."
 
 description:
-    "Hyperview UI compoenent generation functionality."
+    "Phypermedia UI compoenent generation functionality."
 
 id:
     "cee65c85-728b-4576-bd63-c347136db697"
@@ -153,7 +153,7 @@ class UiContext():
                 list_weakref_subscriber.remove(weakref_subscriber)
 
     # -------------------------------------------------------------------------
-    def com(self, str_filt, *args, **kwargs) -> Com:
+    def com(self, str_filt, *args, **kwargs) -> 'Com':
         """
         Create a new component.
 
@@ -193,8 +193,20 @@ class UiContext():
 
         """
 
-        # for reo_filt in self.map_subscriber.keys():
-        #     if msg.key
+        list_msg_out = list()
+        for (reo_filt, list_weakref_subscriber) in self.list_subs:
+
+            list_msg_filt = list()
+            for msg_in in list_msg_in:
+                id_msg = msg_in['id_msg']
+                if reo_filt.match(id_msg):
+                    list_msg_filt.append(msg_in)
+
+            for weakref_subscriber in list_weakref_subscriber:
+                subscriber = weakref_subscriber()
+                if subscriber is None:
+                    continue
+                list_msg_out.extend(subscriber.step(list_msg_filt))
 
         return list_msg_out
 
@@ -240,7 +252,7 @@ class Com(ComData):
 
     """
 
-    broker: Broker | None = None
+    broker: UiContext | None = None
     reo_filt: re.Pattern | None = None
 
     # -------------------------------------------------------------------------

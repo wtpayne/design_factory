@@ -3,11 +3,11 @@
 ---
 
 title:
-    "dm016_demo demo commands."
+    "dm016_demo commands."
 
 description:
     "This module defines commands for the
-    dm015_hyperview demonstration."
+    dm016_demo demonstration."
 
 id:
     "8b0a4ecb-8d7b-413b-98de-61fe5ef4c742"

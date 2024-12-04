@@ -3,11 +3,11 @@
 ---
 
 title:
-    "dm015_hyperview demo commands."
+    "dm015_phypermedia demo commands."
 
 description:
     "This module defines commands for the
-    dm015_hyperview demonstration."
+    dm015_phypermedia demonstration."
 
 id:
     "2d2b8c9b-ee61-402e-ab31-6c6c2fb27435"
@@ -49,13 +49,13 @@ import os.path
 import sys
 
 
-NAME_DEMO = 'hyperview'
+NAME_DEMO = 'phypermedia'
 
 
 # -----------------------------------------------------------------------------
 def start():
     """
-    Start the dm014 macro system.
+    Start the dm015 phypermedia system.
 
     """
 
@@ -63,10 +63,19 @@ def start():
     import key
 
     tup_overrides = (
-        'node.static.config.list.0.filepath',    _static('htmx/v2.0.3/htmx.js'),
-        'node.static.config.list.1.filepath',    _static('htmx/v2.0.3/htmx.min.js'),
-        'node.static.config.list.2.filepath',    _static('htmx-ext-sse/v2.2.2/sse.js'),
-        'node.static.config.list.3.filepath',    _static('htmx-ext-sse/v2.2.2/sse.min.js'))
+
+        'node.static.config.list.0.filepath',
+        _filepath_static('htmx/v2.0.3/htmx.js'),
+
+        'node.static.config.list.1.filepath',
+        _filepath_static('htmx/v2.0.3/htmx.min.js'),
+
+        'node.static.config.list.2.filepath',
+        _filepath_static('htmx-ext-sse/v2.2.2/sse.js'),
+
+        'node.static.config.list.3.filepath',
+        _filepath_static('htmx-ext-sse/v2.2.2/sse.min.js'))
+
     sys.exit(da.env.run.stableflow_start(path_cfg      = _filepath_cfg(),
                                          tup_overrides = tup_overrides))
 
@@ -74,7 +83,7 @@ def start():
 # -----------------------------------------------------------------------------
 def stop():
     """
-    Stop the dm014 macro system.
+    Stop the dm015 phypermedia system.
 
     """
 
@@ -83,13 +92,13 @@ def stop():
 
 
 # -----------------------------------------------------------------------------
-def _static(relpath_file):
+def _filepath_static(relpath_file):
     """
     Return the filepath to a static HTMX resource.
 
     """
 
-    return _macropath('static', relpath_file)
+    return _wspath('static', relpath_file)
 
 
 # -----------------------------------------------------------------------------
@@ -99,7 +108,7 @@ def _filepath_cfg():
 
     """
 
-    return _macropath(f'{NAME_DEMO}.stableflow.cfg.yaml')
+    return _wspath(f'{NAME_DEMO}.stableflow.cfg.yaml')
 
 
 
@@ -110,13 +119,13 @@ def _filepath_cache(id_node):
 
     """
 
-    return _macropath(f'{id_node}.cache.sqlite', is_tmp = True)
+    return _wspath(f'{id_node}.cache.sqlite', is_tmp = True)
 
 
 # -----------------------------------------------------------------------------
-def _macropath(*args, is_tmp = False):
+def _wspath(*args, is_tmp = False):
     """
-    Return a path in the macro workspace.
+    Return a path in the demo R&D workspace.
 
     """
 

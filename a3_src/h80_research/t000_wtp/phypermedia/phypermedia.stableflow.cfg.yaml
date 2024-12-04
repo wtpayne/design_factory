@@ -1,5 +1,5 @@
 system:
-  id_system: dm015_hyperview
+  id_system: dm015_phypermedia
 
 
 ###############################################################################
@@ -57,7 +57,7 @@ node:
       py_module:        cl.util.dynamic.from_file.ic00_edict
     state_type:         py_dict
     config:
-      py_module:        t000_wtp.hyperview.ui.ic00_edict
+      py_module:        t000_wtp.phypermedia.ui.ic00_edict
 
   # ---------------------------------------------------------------------------
   # UI rendering.
@@ -69,7 +69,7 @@ node:
       py_module:        cl.util.dynamic.from_file.ic00_edict
     state_type:         py_dict
     config:
-      py_module:        t000_wtp.hyperview.render.ic00_edict
+      py_module:        t000_wtp.phypermedia.render.ic00_edict
 
   # ---------------------------------------------------------------------------
   # Static file resources.
