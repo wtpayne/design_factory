@@ -211,7 +211,7 @@ class UiContext():
         return list_msg_out
 
     # -------------------------------------------------------------------------
-    def subscribe(self, filt: str | re.Pattern, com: Com):
+    def subscribe(self, filt: str | re.Pattern, com: "Com"):
         """
         Subscribe to a message from the pub-sub broker.
 
@@ -236,6 +236,8 @@ class ComData(pydantic.BaseModel):
     Contains markup and metadata for the component.
 
     """
+
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed = True)
 
     id_com:         str
     list_id_parent: list[str] = []    # Defines the containment hierarchy.
