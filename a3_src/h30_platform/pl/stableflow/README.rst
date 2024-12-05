@@ -69,16 +69,15 @@ Core Concepts
 -------------
 
 Stableflow's architecture is built around several 
-core concepts:
+foundational concepts:
 
 * **System**:  The highest level entity representing the system of interest as a whole.
-* **Host**:    A physical or virtual processor, capable of hosting one or more contexts of execution. This normally corresponds to a single machine or device.
-* **Process**: A single context of execution, capable of executing one or more nodes sequentially. This normally corresponds to a single thread or operating system process.
-* **Node**:    The fundamental unit of computation that meets a specific functional specification.
+* **Host**:    A physical or virtual processor that can run one or more execution contexts. This typically corresponds to a single machine or device.
+* **Process**: A single execution context that can run one or more nodes sequentially. This typically corresponds to a single thread or operating system process.
+* **Node**:    The basic building block that implements a specific system behavior.
 
-These concepts interact to form a distributed 
-system capable of instantiating and running complex
-workflows across a distributed collection of devices.
+These concepts work together to form distributed systems
+capable of running sophisticated workflows across multiple devices.
 
 ------------------------------------
 Core concepts and Their Interactions
@@ -137,12 +136,24 @@ Process functions:
 Node
 ^^^^
 
-A **Node** is the basic unit of functionality in Stableflow.
-Each node meets a specific functional specification and can
-be composed either manually or automatically with other
-nodes to implement more complex compound functions.
+A **Node** is the basic building block in Stableflow. Each
+node represents a specific system behavior and can be
+connected to other nodes to create more complex behaviors.
 
-Node characteristics:
+We make a distinction between a node's **configuration**
+and the **implementation** which defines it's behavior.
+
+Node Implementation:
+* Each implementation must provide two programming functions:
+  * A reset() function that initializes or reinitializes the node's state
+  * A step() function that performs the node's behavior for one time step
+* Alternatively, a node can be implemented as a coroutine
+  (see Programming Models section for details)
+
+Node Properties:
+* **State**: Nodes maintain internal state between time steps
+* **Behavior**: The node's system function is defined by how it
+  transforms inputs to outputs over time
 
 * **Functionality**: Defined by a reset function and a step function, or as a coroutine. Nodes encapsulate the design implementation needed to perform their function.
 * **State**: Nodes maintain state across executions, which can be reset as needed.
@@ -154,6 +165,8 @@ Node Lifecycle:
 2. **Reset**: Prepare the node for execution, resetting state if necessary.
 3. **Step**: Execute the node's main functionality, processing inputs and producing outputs.
 4. **Finalize**: Clean up resources when the node is no longer needed.
+
+NOTE FROM PS: Reset can be used to return a node to it's starting conditions at any time.
 
 Data Flow and Communication
 ---------------------------
@@ -170,6 +183,11 @@ Edges
   * **Intra-Process**: Communication between nodes within the same process.
   * **Inter-Process**: Communication between nodes in different processes on the same host.
   * **Inter-Host**: Communication between nodes on different hosts.
+
+NOTE FROM PS: Just to be clear; these words encapsulated with ** ** - are these actually script keywords, or just general concepts, or both in some cases? I'm not certain if we are describing how the system works conceptually, or whether these are script keywords?
+NOTE FROM WP: These are concepts, not keywords. We should rewrite this to make it clear.
+NOTE FROM PS: Suggestion: If these are keywords, 'Intra-Process' and 'Inter-Process' are incredibly similar - this could be a place where the user could introduce bugs into their design with a very trivial typo that would be difficult to spot... suggest 'Process' and 'Intra-Process' instead... 
+NOTE FROM WP: Not keywords, but language could be improved for clarity.
 
 Queues
 ^^^^^^
@@ -199,6 +217,8 @@ Signal Types
 Signal Handling
 ^^^^^^^^^^^^^^^
 
+NOTE FROM PS: Suggest moving the below paragraph above the list here
+
 * Processes and nodes can emit and handle signals to control the flow of execution.
 * The system and hosts listen for signals to manage the overall execution state.
 
@@ -213,11 +233,20 @@ Execution Flow
 5. **Control Signals**: Signals can alter the execution flow, triggering pauses, resets, or shutdowns.
 6. **System Shutdown**: The system coordinates a graceful shutdown of all components when execution is complete or upon receiving an exit signal.
 
+NOTE FROM PS: Should the "process initialization" item be broken into two phases?  Node Reset and Node Execution?  Also, Node's don't execute their reset functions, right? I thought the Process executes them in an iteration loop...this language may suggest the nodes are responsible for resetting themselves.)
+NOTE FROM PS: Why are Data Processing and Control Signals separate steps here?  Aren't these integral parts of the system execution?
+NOTE FROM PS: If this section is designed to describe distinct phases of execution, then am I understanding this wrong?
+NOTE FROM PS: I'm not clear on how control signals fit in.  How are they passed between things?  How are they handled?  By a function? or as parameters to other functions?
+NOTE FROM WP: Signals came in as a means for the application layer nodes to communicate with the runtime. I'm very much open to re-engineering how they work.
+
 -------------
 Configuration
 -------------
 
 Stableflow applications are configured using structured data (e.g., dictionaries). Configuration specifies:
+
+NOTE FROM PS: Should we be explicit that this is a JSON text file? - or is that optional?
+NOTE FROM WP: It can be a text file or it can be an API call. The API call is central to the automation of model transformation.
 
 * **Processes and Nodes**: Definitions of processes and the nodes they contain.
 * **Edges**: Connections between nodes, including the type of communication channel.
@@ -225,6 +254,9 @@ Stableflow applications are configured using structured data (e.g., dictionaries
 * **Runtime Options**: Settings for execution behavior (e.g., local vs. distributed execution).
 
 Example (incomplete) configuration snippet:
+
+NOTE FROM PS: Is the below snippet intended to be JSON?
+NOTE FROM WP: This example shows Python dictionaries, to intoduce it using a fully programmatic example. But I need to make that intent clear.
 
 .. code-block:: python
 
@@ -271,14 +303,30 @@ Example (incomplete) configuration snippet:
         }
     }
 
+NOTE FROM PS: Most of this is self-explanatory, but not clear on the 'data' thing - what is it defining?
+NOTE FROM PS: What is py_dill?
+NOTE FROM WP: I should probably try to make the data section optional and remove it from the example, or explain that it is to define the data types used above.
+NOTE FROM WP: py_dill is a pickle of a function - I need to explain that.
+
+
 ---------------------------
 Example Node Implementation
 ---------------------------
+
+NOTE FROM PS: Talk about the various languages that are supported.  The following example is python
+NOTE FROM PS: Not sure how 'coroutines' work - I guess this is a python specific concept? How
+NOTE FROM WP: Yes, we need to do a better job of explaining that.
 
 Nodes can be implemented as step functions or coroutines.
 
 Step Function Node
 ^^^^^^^^^^^^^^^^^^
+
+NOTE FROM PS: Is this readme also intended to be a API Spec? We may need to 
+provide an explanation of these function parameters - particularly 'state'
+and its lifecycle.
+NOTE FROM PS: Also, should there not be a 'reset' function here, just to be complete?
+NOTE FROM WP: Yes, it should be more complete, and yes, it is an introduction to the API spec.
 
 .. code-block:: python
 
@@ -323,6 +371,20 @@ Main Commands
   * **pause**: Pause the system.
   * **step**: Step through execution.
 * **host**: Control individual hosts.
+
+NOTE FROM PS: So when you 'start' the system, it will always run in the background? - as a daemon? - and immediately return control to the shell? - in which case I assume there is a command to see it's current running time-step? or status?
+NOTE FROM WP: No, it could be running on the local machine, or it could be running on a remote machine. Whichever machine it DOES run on though, it will be a daemon, or something similar.
+NOTE FROM WP: I **Do** need to give some thought about what happens when the remote machine restarts ... does the daemon also restart and attempt to reconnect?
+
+NOTE FROM PS: Just a thought - I could imagine breaking "system start" into "system init" and "system run" and a separate "system reset" because if the initialization phase is long and complex, you might want to do that ahead of time before running the simulation... also I could imagine a "system run <timesteps>" function that would run a certain number of steps before stopping. - you can then keep calling "system run <timesteps>" to advance the simulation by specific chunks of time... "system run 1" would be equivalent to "system step" I guess...
+NOTE FROM WP: The phased system start is a good idea. Definitely things to give some careful thought to.
+
+NOTE FROM PS: I could also imagine a "system status <node/nodes/all>" .. or something... to get data associated with the current state.
+NOTE FROM WP: Yes, that is something we could add.
+
+NOTE FROM PS: I assume there's a lot more CLI commands?
+NOTE FROM WP: Yes, there are, for host and process as well. We should add them to the README.
+NOTE FROM WP: I can imagine that the CLI will evolve and grow as well.
 
 Example usage:
 
