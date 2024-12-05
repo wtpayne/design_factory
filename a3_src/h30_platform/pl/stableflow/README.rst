@@ -1,5 +1,5 @@
 =================================
-Stableflow Architectural Overview
+Stableflow architectural overview
 =================================
 
 Stableflow is a tool for designing and operating 
@@ -21,10 +21,11 @@ It is conceptually similar to tools like Simulink,
 Labview or Ptolemy, but with a greater focus on
 interoperability with today's ecosystem of ML/AI
 models and tools, which is dominated by languages
-like Python.
+like Python, R, Julia and C/C++.
+
 
 ----------------------------
-The argument for Stableflow
+The argument for stableflow
 ----------------------------
 
 Software development is on the cusp of a transformation.
@@ -65,55 +66,66 @@ models of system architecture becomes increasingly valuable.
 
 
 -------------
-Core Concepts
+Core concepts
 -------------
 
 Stableflow's architecture is built around several 
 foundational concepts:
 
-* **System**:  The highest level entity representing the system of interest as a whole.
-* **Host**:    A physical or virtual processor that can run one or more execution contexts. This typically corresponds to a single machine or device.
-* **Process**: A single execution context that can run one or more nodes sequentially. This typically corresponds to a single thread or operating system process.
-* **Node**:    The basic building block that implements a specific system behavior.
+* **System**: The highest level entity representing the system of interest as a whole.
+* **Host**: A physical or virtual processor that can run one or more execution contexts. This typically corresponds to a single machine, device, processor core or virtual machine.
+* **Process**: A single sequential execution context running on a host. This typically corresponds to a single thread or operating system process.
+* **Node**: The basic building block of system behavior, recieving and sending messages. Runs within the execution context of a process.
+* **Node implementation**: The software that gives a node behaviour. Must implement one of a handful of interface standards.
+* **Edge**: Represents a flow of messages between nodes, usually implemented using either a queue of a piece of shared memory.
+* **Functional chain**: Represents a contiguously connected subset of the nodes and edges in the system, and is normally associated with a high level system function.
+* **Computational model**: An abstract model of concurrent computation, specifying when and how nodes are run, and the guarantees that arise as a result.
 
 These concepts work together to form distributed systems
-capable of running sophisticated workflows across multiple devices.
+capable of running sophisticated workflows across multiple 
+devices.
+
 
 ------------------------------------
-Core concepts and Their Interactions
+Core concepts and their interactions
 ------------------------------------
+
 
 System
 ^^^^^^
 
 The **System** orchestrates the entire Stableflow SOI 
-(System Of Interest). It manages the lifecycle of hosts 
-and processes, ensuring that all components work together
-cohesively. The system is responsible for starting, 
-stopping, pausing, and stepping through the execution
-of the SOI, both in simulation and also in live operation.
+(System Of Interest). It manages the lifecycle of hosts and
+processes, ensuring that all components work together 
+cohesively. The system is responsible for starting, stopping,
+resetting, pausing, and stepping through the execution of 
+the SOI, both in simulation (i.e. during development) and
+also in live operation.
 
 Key functions:
 
 * **Start**: Initiates the system, starting all hosts and processes.
 * **Stop**: Stops the system gracefully.
-* **Pause/Step**: Allows for controlled execution by pausing and stepping through the processes.
+* **Reset**: Resets the system to some initial state.
+* **Pause/Step**: Allows for controlled execution by pausing and single-stepping the system.
+
 
 Host
 ^^^^
 
 A **Host** represents a physical or virtual processor, 
-capable of hosting one or more contexts of execution.
-Each host normally corresponds a single machine or device
-that participates in the system of interest. Each host is
-responsible for managing the resources needed by the
-processes they run.
+capable of hosting one or more contexts of execution. Each
+host normally corresponds to a single machine, device (or
+processor core on a SoC) that participates in the system of
+interest. Each host is responsible for managing the resources
+needed by the processes they run.
 
 Host responsibilities:
 
 * Starting and stopping local processes.
 * Managing inter-process communication for processes on the same host.
-* Handling control signals from the system (e.g., pause, resume).
+* Handling control signals from the system (e.g., start, stop, pause, step).
+
 
 Process
 ^^^^^^^
@@ -133,40 +145,136 @@ Process functions:
 * **Execution**: Managing the execution loop that steps through nodes.
 * **Signal Handling**: Processes handle control signals to manage execution flow (e.g., pause, reset).
 
+
 Node
 ^^^^
 
-A **Node** is the basic building block in Stableflow. Each
-node represents a specific system behavior and can be
-connected to other nodes to create more complex behaviors.
+A **Node** is the basic building block of system behaviour
+in Stableflow. The system as a whole can be seen as a data
+flow graph which is composed of nodes and edges, potentially
+spanning across multiple hosts and processes. Each edge in
+this graph represents messages being passed from node to node, 
+and each node represents some computation. The design of that
+computation is determined by the **implementation** that is
+associated with each node.
 
-We make a distinction between a node's **configuration**
-and the **implementation** which defines it's behavior.
+Stableflow is intended to be used for model driven engineering,
+so it is designed to make it possible to swap out different
+node implementations with minimal changes to the system
+configuration as a whole. The node itself ends up being a
+small wrapper which simply "glues" the implementation into
+the larger system.
+
 
 Node Implementation:
-* Each implementation must provide two programming functions:
-  * A reset() function that initializes or reinitializes the node's state
-  * A step() function that performs the node's behavior for one time step
-* Alternatively, a node can be implemented as a coroutine
-  (see Programming Models section for details)
+^^^^^^^^^^^^^^^^^^^^
 
-Node Properties:
-* **State**: Nodes maintain internal state between time steps
-* **Behavior**: The node's system function is defined by how it
-  transforms inputs to outputs over time
+It is intended that node implementations can be provided by
+a wide variety of different programming languages, although
+currently only Python is supported.
 
-* **Functionality**: Defined by a reset function and a step function, or as a coroutine. Nodes encapsulate the design implementation needed to perform their function.
-* **State**: Nodes maintain state across executions, which can be reset as needed.
-* **Inputs and Outputs**: Nodes receive inputs and produce outputs, enabling data flow between nodes.
+For Python modules, Stableflow also allows a couple of
+different interface conventions to be used, each offering
+different advantages and disadvantages.
+
+* **Functional** uses pure functions for node lifecycle stages.
+* **Coroutine** uses a synchronous coroutine (generator function).
+
+The functional approach is conceptually very simple, allows
+logic to be translated very easily to different programming
+languages, but imposes some complexity as state information
+needs to be explicitly passed between consecutive model steps.
+
+.. code-block:: python
+
+    def reset(runtime, cfg, inputs, state, outputs):
+        """
+        The reset function initializes or reinitializes
+        inputs, state and outputs to initial values. It is 
+        always called on system start, and can be called
+        again to reset the node back to a known good
+        condition. The reset implementation must take care
+        of disposing of any allocated resources as needed
+        before (re-)allocating them.
+
+        """
+        iter_signal = ...
+        return iter_signal
+
+    def step(inputs, state, outputs):
+        """
+        The step function carries out a single computational
+        step, reading from inputs and state, and writing to
+        state and outputs.
+
+        """
+        iter_signal = ...
+        return iter_signal
+
+    def finalize(runtime, cfg, inputs, state, outputs):
+        """
+        The finalize function is called when the node is no
+        longer needed. It can be used to clean up any resources
+        allocated by the node.
+
+        """
+        iter_signal = ...
+        return iter_signal
+
+The coroutine approach is conceptually a little bit more
+complex, as it requires engineers to understand how to use
+synchronous coroutines (generator functions), but it has
+the advantage of dramatically simplifying the logic for
+handling state.
+
+.. code-block:: python
+    def coro(runtime, cfg, inputs, state, outputs):
+        """
+        The coro function enables us to store state as local
+        variables, simplifying state management, and
+        enabling conditional logic to be implemented in a
+        far simpler manner than would be possible in a
+        step function.
+
+        """
+        while True:
+            iter_signal = ...
+            inputs = yield (outputs, iter_signal)
+
+    def finalize(runtime, cfg, inputs, state, outputs):
+        """
+        The finalize function is called when the node is no
+        longer needed. It can be used to clean up any resources
+        allocated by the node.
+
+        """
+        pass
+
 
 Node Lifecycle:
+^^^^^^^^^^^^^^^
 
-1. **Initialization**: Configure the node with necessary parameters and initialize state.
-2. **Reset**: Prepare the node for execution, resetting state if necessary.
-3. **Step**: Execute the node's main functionality, processing inputs and producing outputs.
-4. **Finalize**: Clean up resources when the node is no longer needed.
+1. **Configuration**: Configuration data is processed, nodes instantiated, queues created and static schedules computed.
+2. **reset**: All nodes are reset, allocating resources as required. If a reset function fails, the system is finalized and exits early.
+3. **pause/step**: If the system is paused, single-stepping is handled.
+3. **run**: If the system is not paused, nodes are stepped continuously.
+4. **Finalize**: If the system shuts down, finalize is called to clear resources.
 
-NOTE FROM PS: Reset can be used to return a node to it's starting conditions at any time.
+TODO: Draw a state machine diagram to illustrate the operation
+      of pl/stableflow/proc/mainloop.py
+
+
+Computational Model:
+^^^^^^^^^^^^^^^^^^^^
+
+The following computational models are possible for functional chains in
+the system:-
+
+* **Concurrent sequential processes** - Blocking reads and blocking writes. Nodes trigger when at least one message is ready. Determinism is guaraneed.
+* **Kahn process network** - Blocking reads and nonblocking writes. Nodes trigger when all inputs are ready. Determinism is guaranteed.
+* **Actor model** - Nonblocking reads and writes. Nodes trigger when at least one message is ready. Nondeterministic, but provides higher utilization.
+
+NOTE: Currently only Kahn process models are implemented.
 
 Data Flow and Communication
 ---------------------------
