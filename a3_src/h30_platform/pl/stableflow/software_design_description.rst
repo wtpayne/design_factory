@@ -114,25 +114,29 @@ foundational concepts:
 Stableflow employs several key design patterns and principles:
 
 * **Minimal Engine**: Core platform provides only essential capabilities:
-  - Deterministic message passing (KPN)
-  - Basic lifecycle management
-  - Resource coordination
+
+  * Deterministic message passing (KPN)
+  * Basic lifecycle management
+  * Resource coordination
 
 * **Model Transformation**: System functionality implemented through:
-  - Configuration generation/modification
-  - Node composition and connection
-  - Edge implementation selection
+
+  * Configuration generation/modification
+  * Node composition and connection
+  * Edge implementation selection
 
 * **Application Layer Features**: Complex capabilities built as transformations:
-  - Testing and monitoring
-  - Deployment variants
-  - Performance optimization
-  - Debug support
+
+  * Testing and monitoring
+  * Deployment variants
+  * Performance optimization
+  * Debug support
 
 * **Separation of Concerns**:
-  - Engine: Message passing and lifecycle
-  - Model: System structure and behavior
-  - Transformations: Feature implementation
+
+  * Engine: Message passing and lifecycle
+  * Model: System structure and behavior
+  * Transformations: Feature implementation
 
 
 2.3 System Context
@@ -141,19 +145,22 @@ Stableflow employs several key design patterns and principles:
 Stableflow operates within the context of:
 
 * Development Environment:
-  - Source code in various languages (primarily Python)
-  - Build and deployment tools
-  - Testing and simulation infrastructure
+
+  * Source code in various languages (primarily Python)
+  * Build and deployment tools
+  * Testing and simulation infrastructure
 
 * Runtime Environment:
-  - Operating system processes and threads
-  - Network communication infrastructure
-  - Hardware resources (CPU, memory, etc.)
+
+  * Operating system processes and threads
+  * Network communication infrastructure
+  * Hardware resources (CPU, memory, etc.)
 
 * User Environment:
-  - Command line interface
-  - Configuration files
-  - Monitoring and debugging tools
+
+  * Command line interface
+  * Configuration files
+  * Monitoring and debugging tools
 
 
 3. Detailed Design
@@ -172,6 +179,7 @@ Interest). It manages the lifecycle of hosts and processes,
 ensuring all components work together cohesively.
 
 Key responsibilities:
+
 * Starting and stopping the system
 * Managing system-wide state
 * Coordinating between hosts
@@ -186,6 +194,7 @@ running one or more execution contexts. Each host typically
 corresponds to a single machine, device, or processor core.
 
 Key responsibilities:
+
 * Starting and stopping local processes
 * Managing inter-process communication
 * Managing local resources
@@ -201,6 +210,7 @@ system process or thread (currently only OS processes are
 supported).
 
 Key responsibilities:
+
 * Managing node execution order
 * Handling inter-node communication
 * Processing control signals
@@ -211,6 +221,7 @@ Node Component
 """"""""""""""
 
 A Node provides minimal functionality:
+
 * Message buffer management
 * Implementation invocation
 * Basic lifecycle support
@@ -225,8 +236,9 @@ Node Implementation
 
 Node implementations provide the actual behavior for nodes.
 Currently supported in Python with two interface styles:
-* Functional: Pure functions for lifecycle stages
-* Coroutine: Generator functions for simpler state management
+
+* **Functional**: Pure functions for lifecycle stages
+* **Coroutine**: Generator functions for simpler state management
 
 
 Edge Component
@@ -234,6 +246,7 @@ Edge Component
 
 Edges represent message flows between nodes. Implementation
 varies based on:
+
 * Whether nodes are in same/different processes
 * Whether nodes are on same/different hosts
 * The computational model being used
@@ -286,6 +299,7 @@ The system progresses through several stages::
     └──────────────────────┘
 
 Lifecycle Stages:
+
 1. **Configure**: Process configuration data, instantiate components
 2. **Reset**: Initialize all nodes and allocate resources
 3. **Run**: Execute nodes according to computational model
@@ -300,8 +314,10 @@ The system uses several types of control signals:
 
 * **Continue**: Normal execution should proceed
 * **Exit**: 
-  - Immediate: Non-recoverable error, terminate immediately
-  - Controlled: Graceful shutdown requested
+
+  * Immediate: Non-recoverable error, terminate immediately
+  * Controlled: Graceful shutdown requested
+
 * **Reset**: Return to initial state
 * **Pause/Step**: Debug execution control
 
@@ -327,17 +343,20 @@ Flow Control
 Message flow is governed by the computational model in use:
 
 * **Kahn Process Networks**:
-  - Nodes block on reading until data available
-  - Writing never blocks
-  - Deterministic behavior guaranteed
+
+  * Nodes block on reading until data available
+  * Writing never blocks
+  * Deterministic behavior guaranteed
 
 * **Actor Model** (planned):
-  - Non-blocking reads and writes
-  - Higher performance but non-deterministic
+
+  * Non-blocking reads and writes
+  * Higher performance but non-deterministic
 
 * **CSP** (under consideration):
-  - Synchronized communication
-  - Both reader and writer must be ready
+
+  * Synchronized communication
+  * Both reader and writer must be ready
 
 
 4. Data Design
@@ -357,15 +376,17 @@ Core Configuration Data
 Minimal configuration required by the engine:
 
 * System topology:
-  - Node definitions (inputs/outputs only)
-  - Edge connections
-  - Process assignments
-  - Host mappings
+
+  * Node definitions (inputs/outputs only)
+  * Edge connections
+  * Process assignments
+  * Host mappings
 
 * Implementation bindings:
-  - Node implementation references
-  - Edge implementation selection
-  - Data type specifications
+
+  * Node implementation references
+  * Edge implementation selection
+  * Data type specifications
 
 Extended configuration (e.g., for testing, monitoring, etc.) is
 implemented through model transformations that augment this
@@ -376,6 +397,7 @@ Node State Management
 """""""""""""""""""""
 
 Engine manages only essential node data:
+
 * Input message buffers
 * Output message buffers
 * Implementation state container
@@ -393,6 +415,7 @@ Engine Storage
 """"""""""""""
 
 Core engine only handles:
+
 * In-memory message queues
 * Basic node state
 * Active configuration
@@ -402,6 +425,7 @@ Extended Storage
 """"""""""""""""
 
 Additional storage capabilities provided through transformations:
+
 * Recording nodes for data capture
 * Replay nodes for data playback
 * Monitor nodes for state inspection
@@ -549,12 +573,14 @@ Implementation Approaches
 """""""""""""""""""""""""
 
 1. Functional Implementation:
+
    * Separate functions for reset, step, finalize
    * Explicit state management
    * Simple to understand and port
    * Suitable for simple nodes
 
 2. Coroutine Implementation:
+
    * Single generator function
    * Implicit state management
    * More natural control flow
@@ -585,16 +611,19 @@ Implementation Types
 """"""""""""""""""""
 
 1. Intra-Process Edges:
+
    * Direct memory transfer
    * Lightweight queue implementation
    * No serialization needed
 
 2. Inter-Process Edges:
+
    * Shared memory queues
    * System V IPC or similar
    * Basic serialization required
 
 3. Inter-Host Edges:
+
    * Network communication (ZeroMQ)
    * Full serialization required
    * Network error handling
@@ -632,40 +661,46 @@ Model-Driven Design Requirements
 """"""""""""""""""""""""""""""""
 
 * **MDD-1**: System architecture must be explicitly modeled
-  - Implemented via configuration data structures
-  - Supported by node/edge abstractions
+
+  * Implemented via configuration data structures
+  * Supported by node/edge abstractions
 
 * **MDD-2**: Architecture must be programmatically transformable
-  - Configuration can be generated/modified by code
-  - Node implementations can be swapped
+
+  * Configuration can be generated/modified by code
+  * Node implementations can be swapped
 
 
 Product Line Engineering Requirements
 """""""""""""""""""""""""""""""""""""
 
 * **PLE-1**: Support multiple system variants from single design
-  - Configuration-driven variant generation
-  - Reusable node implementations
-  - Flexible edge implementations
+
+  * Configuration-driven variant generation
+  * Reusable node implementations
+  * Flexible edge implementations
 
 * **PLE-2**: Enable systematic testing across variants
-  - Deterministic execution model
-  - Replay capability
-  - Common test infrastructure
+
+  * Deterministic execution model
+  * Replay capability
+  * Common test infrastructure
 
 
 Execution Requirements
 """"""""""""""""""""""
 
 * **EXEC-1**: Support distributed execution
-  - Multi-host deployment
-  - Network communication
-  - Resource management
+
+  * Multi-host deployment
+  * Network communication
+  * Resource management
 
 * **EXEC-2**: Enable deterministic simulation
-  - Kahn Process Network model
-  - Reproducible message passing
-  - State management
+
+  * Kahn Process Network model
+  * Reproducible message passing
+  * State management
 
 
 7.2 Non-Functional Requirements
@@ -676,42 +711,48 @@ Performance Requirements
 """"""""""""""""""""""""
 
 * **PERF-1**: Minimal overhead for local communication
-  - Direct memory transfer within processes
-  - Shared memory between processes
-  - Zero-copy where possible
+
+  * Direct memory transfer within processes
+  * Shared memory between processes
+  * Zero-copy where possible
 
 * **PERF-2**: Scalable distributed execution
-  - Efficient network protocols
-  - Parallel execution where possible
-  - Resource-aware scheduling
+
+  * Efficient network protocols
+  * Parallel execution where possible
+  * Resource-aware scheduling
 
 
 Reliability Requirements
 """"""""""""""""""""""""
 
 * **REL-1**: Graceful error handling
-  - Controlled shutdown capability
-  - Error isolation between nodes
-  - State recovery mechanisms
+
+  * Controlled shutdown capability
+  * Error isolation between nodes
+  * State recovery mechanisms
 
 * **REL-2**: Deterministic behavior
-  - Reproducible execution
-  - Predictable resource usage
-  - Consistent error handling
+
+  * Reproducible execution
+  * Predictable resource usage
+  * Consistent error handling
 
 
 Maintainability Requirements
 """"""""""""""""""""""""""""
 
 * **MAINT-1**: Modular architecture
-  - Clear component boundaries
-  - Well-defined interfaces
-  - Separation of concerns
+
+  * Clear component boundaries
+  * Well-defined interfaces
+  * Separation of concerns
 
 * **MAINT-2**: Extensible design
-  - Plugin architecture for node implementations
-  - Support for new computational models
-  - Configurable communication mechanisms
+
+  * Plugin architecture for node implementations
+  * Support for new computational models
+  * Configurable communication mechanisms
 
 
 8. Testing Considerations
@@ -766,6 +807,7 @@ Deterministic Execution
 
 The KPN computational model provides deterministic execution,
 allowing transformed system models to:
+
 * Record inputs and outputs of specific nodes
 * Replay previously recorded data
 * Verify system behavior across runs
@@ -778,30 +820,35 @@ Testing capabilities are implemented by transforming the
 original system model to include additional nodes:
 
 * **Recording Nodes**:
-  - Inserted between existing nodes
-  - Capture messages passing through edges
-  - Store data for later replay/verification
+
+  * Inserted between existing nodes
+  * Capture messages passing through edges
+  * Store data for later replay/verification
 
 * **Replay Nodes**:
-  - Replace original data sources
-  - Replay recorded data deterministically
-  - Enable reproducible testing
+
+  * Replace original data sources
+  * Replay recorded data deterministically
+  * Enable reproducible testing
 
 * **Verification Nodes**:
-  - Monitor specific edges or nodes
-  - Compare actual vs expected behavior
-  - Report test results
+
+  * Monitor specific edges or nodes
+  * Compare actual vs expected behavior
+  * Report test results
 
 * **Mock Nodes**:
-  - Replace complex subsystems
-  - Provide controlled test conditions
-  - Simulate error conditions
+
+  * Replace complex subsystems
+  * Provide controlled test conditions
+  * Simulate error conditions
 
 
 State Inspection
 """"""""""""""""
 
 System state inspection is achieved through:
+
 * Adding monitor nodes to edges of interest
 * Transforming nodes to expose internal state
 * Collecting data from monitoring nodes
@@ -811,6 +858,7 @@ Variant Testing
 """""""""""""""
 
 Testing across variants is supported by:
+
 * Automated transformation of base system model
 * Generation of variant-specific test configurations
 * Common monitoring/verification infrastructure
