@@ -50,15 +50,18 @@ vision systems:
 
 * Base Architecture: Image Capture → Pre-processing → Object Detection → Scene Understanding → Control Output
 * Variants:
-  - Development: Using recorded data, with visualization and debugging
-  - Simulation: Simulated sensors, simulated vehicle responses.
-  - Hardware-in-Loop: Real sensors, simulated vehicle responses
-  - Production: Optimized for specific vehicle configurations
+
+  * Development: Using recorded data, with visualization and debugging
+  * Simulation: Simulated sensors, simulated vehicle responses.
+  * Hardware-in-Loop: Real sensors, simulated vehicle responses
+  * Production: Optimized for specific vehicle configurations
+
     * High-end: Multiple high-res cameras, dedicated compute
     * Mid-range: Balanced sensor suite, shared compute
     * Economy: Essential sensors, resource-constrained
 
 Stableflow enables:
+
 * Single architecture supporting all development phases
 * Automated generation of variant-specific implementations
 * Deterministic replay of recorded data for testing
@@ -74,12 +77,16 @@ pipeline:
 
 * Base Architecture: Data Collection → Filtering → Analysis → Storage → Visualization
 * Variants:
-  - Development: Small datasets, debug outputs, hot reloading
-  - Testing: 
+
+  * Development: Small datasets, debug outputs, hot reloading
+  * Testing: 
+
     * Unit tests with mock data sources
     * Integration tests with recorded data
     * Performance tests with data generators
-  - Production:
+
+  * Production:
+
     * Local: Single machine, minimal latency
     * Distributed: Multiple machines, high throughput
     * Embedded: Resource-constrained environment
@@ -116,17 +123,20 @@ Computational Models
 Stableflow supports multiple computational models that 
 determine how nodes communicate and process data:
 
-1. **Kahn Process Networks (Primary Model)**
+#. **Kahn Process Networks (Primary Model)**
+
    * Nodes run when all inputs are available
    * Deterministic behavior
    * Best for simulation and testing
 
-2. **Actor Model (Planned)**
+#. **Actor Model (Planned)**
+
    * Nodes run as soon as any input is ready
    * Higher runtime performance
    * Best for efficient use of computational resources
 
-3. **Concurrent Sequential Processes (Planned?)**
+#. **Concurrent Sequential Processes (Planned?)**
+
    * Direct synchronization between nodes
    * Best for tightly coordinated processes
 
@@ -184,47 +194,49 @@ Node Implementation
 Nodes can be implemented using two approaches:
 
 1. **Functional Interface**:
+
    * Pure functions for lifecycle stages
    * Simple to understand and port
    * Explicit state management
 
-.. code-block:: python
+   .. code-block:: python
 
-    def reset(runtime, cfg, inputs, state, outputs):
-        """
-        Initialize or reinitialize the node
-        
-        """
-        return iter_signal
+      def reset(runtime, cfg, inputs, state, outputs):
+          """
+          Initialize or reinitialize the node
+          
+          """
+          return iter_signal
 
-    def step(inputs, state, outputs):
-        """
-        Perform one computational step
-        
-        """
-        return iter_signal
+      def step(inputs, state, outputs):
+          """
+          Perform one computational step
+          
+          """
+          return iter_signal
 
-    def finalize(runtime, cfg, inputs, state, outputs):
-        """
-        Clean up resources
-        
-        """
-        return iter_signal
+      def finalize(runtime, cfg, inputs, state, outputs):
+          """
+          Clean up resources
+          
+          """
+          return iter_signal
 
 2. **Coroutine Interface**:
+
    * Uses generator functions
    * Simpler state management
    * More natural control flow
 
-.. code-block:: python
+   .. code-block:: python
 
-    def coro(runtime, cfg, inputs, state, outputs):
-        """
-        Main node logic as a coroutine
-        
-        """
-        while True:
-            inputs = yield (outputs, iter_signal)
+      def coro(runtime, cfg, inputs, state, outputs):
+          """
+          Main node logic as a coroutine
+          
+          """
+          while True:
+              inputs = yield (outputs, iter_signal)
 
 
 Configuration
