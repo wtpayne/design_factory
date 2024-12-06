@@ -92,6 +92,7 @@ pipeline:
     * Embedded: Resource-constrained environment
 
 Stableflow enables:
+
 * Same architecture across all development stages
 * Deterministic testing with recorded data
 * Easy switching between variants without code changes
@@ -199,28 +200,28 @@ Nodes can be implemented using two approaches:
    * Simple to understand and port
    * Explicit state management
 
-   .. code-block:: python
+.. code-block:: python
 
-      def reset(runtime, cfg, inputs, state, outputs):
-          """
-          Initialize or reinitialize the node
-          
-          """
-          return iter_signal
+    def reset(runtime, cfg, inputs, state, outputs):
+        """
+        Initialize or reinitialize the node
+        
+        """
+        return iter_signal
 
-      def step(inputs, state, outputs):
-          """
-          Perform one computational step
-          
-          """
-          return iter_signal
+    def step(inputs, state, outputs):
+        """
+        Perform one computational step
+        
+        """
+        return iter_signal
 
-      def finalize(runtime, cfg, inputs, state, outputs):
-          """
-          Clean up resources
-          
-          """
-          return iter_signal
+    def finalize(runtime, cfg, inputs, state, outputs):
+        """
+        Clean up resources
+        
+        """
+        return iter_signal
 
 2. **Coroutine Interface**:
 
@@ -228,15 +229,15 @@ Nodes can be implemented using two approaches:
    * Simpler state management
    * More natural control flow
 
-   .. code-block:: python
+.. code-block:: python
 
-      def coro(runtime, cfg, inputs, state, outputs):
-          """
-          Main node logic as a coroutine
-          
-          """
-          while True:
-              inputs = yield (outputs, iter_signal)
+    def coro(runtime, cfg, inputs, state, outputs):
+        """
+        Main node logic as a coroutine
+        
+        """
+        while True:
+            inputs = yield (outputs, iter_signal)
 
 
 Configuration
