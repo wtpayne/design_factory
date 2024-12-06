@@ -78,7 +78,7 @@ foundational concepts:
 * **Node**: The basic building block of system behavior, recieving and sending messages. Runs within the execution context of a process.
 * **Node implementation**: The software that gives a node behaviour. Must implement one of a handful of interface standards.
 * **Edge**: Represents a flow of messages between nodes, usually implemented using either a queue of a piece of shared memory.
-* **Functional chain**: Represents a contiguously connected subset of the nodes and edges in the system, and is normally associated with a high level system function.
+* **Functional chain**: Represents an interconnected sequence of nodes and edges that together implement a specific system function.
 * **Computational model**: An abstract model of concurrent computation, specifying when and how nodes are run, and the guarantees that arise as a result.
 
 These concepts work together to form distributed systems
@@ -108,6 +108,58 @@ Key functions:
 * **Stop**: Stops the system gracefully.
 * **Reset**: Resets the system to some initial state.
 * **Pause/Step**: Allows for controlled execution by pausing and single-stepping the system.
+
+
+System lifecycle
+^^^^^^^^^^^^^^^^
+
+The following diagram shows the system lifecycle::
+
+    ┌──────────────────────┐
+    │                      │
+    │      Configure       │
+    │   (load settings)    │
+    │                      │
+    └───────────┬──────────┘
+                │
+                │ start (first part)
+                │
+                ▼
+    ┌──────────────────────┐
+    │                      │
+    │        Reset         │
+    │ (allocate resources) │
+    │                      │
+    └───────────┬──────────┘
+                │
+                │ start (second part)
+                │
+                ▼
+    ┌──────────────────────┐      pause     ┌───────────────┐
+    │                      │───────────────►│               │
+    │         Run          │                │     Pause     │
+    │     (main loop)      │◄───────────────│               │
+    │                      │     start      └──┬────────────┘
+    └───────────┬──────────┘                   │         ▲
+                │                              │         │
+                │ stop                         │  step   │
+                │                              └─────────┘
+                ▼
+    ┌──────────────────────┐
+    │                      │
+    │         Stop         │
+    │  (cleanup/dispose)   │
+    │                      │
+    └──────────────────────┘
+
+1. **Configure**: Configuration data is processed, processes and nodes instantiated, queues created and static schedules computed.
+2. **Reset**: All nodes are reset, allocating resources as required.
+3. **Run**: Nodes are stepped as per the computational model.
+4. **Pause**: If the system is paused, single-stepping is handled.
+5. **Stop**: If the system is stopped, nodes are finalized to clear resources.
+
+Note that the system can be reset or stopped at any time, but
+these transitions are omitted from the diagram for clarity.
 
 
 Host
@@ -251,57 +303,124 @@ handling state.
         pass
 
 
-Node Lifecycle:
-^^^^^^^^^^^^^^^
+Edge
+^^^^
 
-1. **Configuration**: Configuration data is processed, nodes instantiated, queues created and static schedules computed.
-2. **reset**: All nodes are reset, allocating resources as required. If a reset function fails, the system is finalized and exits early.
-3. **pause/step**: If the system is paused, single-stepping is handled.
-3. **run**: If the system is not paused, nodes are stepped continuously.
-4. **Finalize**: If the system shuts down, finalize is called to clear resources.
+**Edges** represent the connections between nodes, defining 
+the data flow. The implementation of an edge can vary depending 
+on the computational model and whether the edge goes from one 
+host to another, or from one process to another within the 
+same host, or from one node to another within the same process.
+When the system is being configured, the Stableflow platform
+determines the appropriate edge implementation based on the
+configuration.
 
-TODO: Draw a state machine diagram to illustrate the operation
-      of pl/stableflow/proc/mainloop.py
+In general, edges that span between different hosts will be
+implemented with some sort of networked queue, such as zeromq,
+whereas edges that span between processes on the same host will
+be implemented using some form of shared memory queue. Edges
+that span between nodes within the same process can use an
+even simpler shared memory mechanism, although this depends
+on the computational model for that node.
+
+
+Functional chain:
+^^^^^^^^^^^^^^^^^
+
+A **Functional chain** is a connected group of nodes that 
+work together to implement a specific feature or capability 
+in the system. Think of it like a pipeline or workflow that
+accomplishes one particular task that your users care about.
+
+For example, in a video streaming application, you might have
+a functional chain for "video playback" that includes nodes
+for:
+
+* Fetching video chunks from storage
+* Decoding the video
+* Applying filters or effects
+* Rendering to screen
+
+While individual nodes might contain programming functions, 
+a functional chain operates at a higher level - it often
+represents an entire user-facing feature described in your
+requirements (like "users can watch videos"). The chain
+encompasses all the components needed to deliver that
+feature end-to-end.
+
+In systems engineering terminology, these user-facing features
+are called "system functions" and are typically described as
+"functional requirements" in specification documents. For
+example, "The system shall allow users to watch videos" would
+be a functional requirement that maps to our video playback
+chain.
+
+This concept helps you:
+* Map user requirements directly to the parts of your system that implement them
+* Understand dependencies between features
+* Analyze performance and reliability of specific features
+* Make changes to features without accidentally affecting other parts of the system
+* Identify and talk about (potentially overlapping) subsets of the system data flow graph.
 
 
 Computational Model:
 ^^^^^^^^^^^^^^^^^^^^
 
-The following computational models are possible for functional chains in
-the system:-
+A computational model defines the rules for how and when nodes
+communicate and process data. Think of it as the "traffic rules"
+that govern how messages flow between nodes in your system.
+These rules determine important characteristics like whether
+your system will behave predictably (deterministic) or not.
 
-* **Concurrent sequential processes** - Blocking reads and blocking writes. Nodes trigger when at least one message is ready. Determinism is guaraneed.
-* **Kahn process network** - Blocking reads and nonblocking writes. Nodes trigger when all inputs are ready. Determinism is guaranteed.
-* **Actor model** - Nonblocking reads and writes. Nodes trigger when at least one message is ready. Nondeterministic, but provides higher utilization.
+Stableflow supports several computational models, each with
+different tradeoffs:
 
-NOTE: Currently only Kahn process models are implemented.
+1. **Kahn Process Networks (Primary Model)**
+   * How it works: Nodes only run when ALL their input data is ready
+   * Reading: Blocks (waits) until data is available
+   * Writing: Never blocks (always succeeds)
+   * Key benefit: Guaranteed predictable behavior - given the same inputs, you'll always get the same outputs
+   * Best for: Simulation, testing, and situations where predictability is crucial
 
-Data Flow and Communication
----------------------------
+2. **Actor Model (Planned)**
+   * How it works: Nodes can run as soon as ANY input data is ready
+   * Reading: Never blocks (returns immediately if no data)
+   * Writing: Never blocks
+   * Key benefit: Better performance and resource utilization
+   * Trade-off: Behavior can vary between runs
+   * Best for: High-performance systems where exact reproducibility isn't critical
 
-Stableflow uses a message-passing mechanism for communication
-between nodes, processes, and hosts.
+3. **Concurrent Sequential Processes (Under Consideration)**
+   * How it works: Nodes communicate through synchronized message passing
+   * Reading: Blocks until data is available
+   * Writing: Blocks until receiver is ready
+   * Key benefit: Predictable behavior with direct communication between nodes
+   * Trade-off: Can be more complex to reason about
+   * Best for: Systems requiring tight coordination between nodes
 
-Edges
-^^^^^
+For most applications, we recommend starting with the Kahn
+Process Network model as it provides the best balance of
+simplicity and predictability. You can switch to the Actor
+model if you need better performance and can tolerate
+non-deterministic behavior.
 
-* **Edges** represent the connections between nodes, defining the data flow.
-* Edges can be:
+Because the computational model is all about how nodes are
+triggered by messages, it is good to think about computational
+models as applying to connected subsets of the system graph,
+in other words, what can be thought of as functional chains.
 
-  * **Intra-Process**: Communication between nodes within the same process.
-  * **Inter-Process**: Communication between nodes in different processes on the same host.
-  * **Inter-Host**: Communication between nodes on different hosts.
+For example, in a video streaming application, you might have:
+* A deterministic functional chain for video processing (using Kahn Process Networks)
+* A high-performance functional chain for real-time user interface updates (using Actor Model)
+* A synchronized functional chain for managing user sessions (using CSP)
 
-NOTE FROM PS: Just to be clear; these words encapsulated with ** ** - are these actually script keywords, or just general concepts, or both in some cases? I'm not certain if we are describing how the system works conceptually, or whether these are script keywords?
-NOTE FROM WP: These are concepts, not keywords. We should rewrite this to make it clear.
-NOTE FROM PS: Suggestion: If these are keywords, 'Intra-Process' and 'Inter-Process' are incredibly similar - this could be a place where the user could introduce bugs into their design with a very trivial typo that would be difficult to spot... suggest 'Process' and 'Intra-Process' instead... 
-NOTE FROM WP: Not keywords, but language could be improved for clarity.
+This ability to mix computational models within well-defined boundaries (functional chains) allows you to:
+* Use the right model for each part of your system
+* Maintain clear guarantees about behavior where needed
+* Optimize performance where determinism isn't critical
+* Test and verify critical paths independently
+* Clearly communicate the behavior expectations for different system features
 
-Queues
-^^^^^^
-
-* **Queues** are used for inter-node communication, handling message passing along edges.
-* Depending on the edge type, different queue implementations are used (e.g., in-memory queues for intra-process communication, network-based queues for inter-host communication).
 
 ---------------
 Control Signals
@@ -325,8 +444,6 @@ Signal Types
 Signal Handling
 ^^^^^^^^^^^^^^^
 
-NOTE FROM PS: Suggest moving the below paragraph above the list here
-
 * Processes and nodes can emit and handle signals to control the flow of execution.
 * The system and hosts listen for signals to manage the overall execution state.
 
@@ -341,11 +458,6 @@ Execution Flow
 5. **Control Signals**: Signals can alter the execution flow, triggering pauses, resets, or shutdowns.
 6. **System Shutdown**: The system coordinates a graceful shutdown of all components when execution is complete or upon receiving an exit signal.
 
-NOTE FROM PS: Should the "process initialization" item be broken into two phases?  Node Reset and Node Execution?  Also, Node's don't execute their reset functions, right? I thought the Process executes them in an iteration loop...this language may suggest the nodes are responsible for resetting themselves.)
-NOTE FROM PS: Why are Data Processing and Control Signals separate steps here?  Aren't these integral parts of the system execution?
-NOTE FROM PS: If this section is designed to describe distinct phases of execution, then am I understanding this wrong?
-NOTE FROM PS: I'm not clear on how control signals fit in.  How are they passed between things?  How are they handled?  By a function? or as parameters to other functions?
-NOTE FROM WP: Signals came in as a means for the application layer nodes to communicate with the runtime. I'm very much open to re-engineering how they work.
 
 -------------
 Configuration
@@ -353,18 +465,12 @@ Configuration
 
 Stableflow applications are configured using structured data (e.g., dictionaries). Configuration specifies:
 
-NOTE FROM PS: Should we be explicit that this is a JSON text file? - or is that optional?
-NOTE FROM WP: It can be a text file or it can be an API call. The API call is central to the automation of model transformation.
-
 * **Processes and Nodes**: Definitions of processes and the nodes they contain.
 * **Edges**: Connections between nodes, including the type of communication channel.
 * **Data Types**: Definitions of data structures passed between nodes.
 * **Runtime Options**: Settings for execution behavior (e.g., local vs. distributed execution).
 
 Example (incomplete) configuration snippet:
-
-NOTE FROM PS: Is the below snippet intended to be JSON?
-NOTE FROM WP: This example shows Python dictionaries, to intoduce it using a fully programmatic example. But I need to make that intent clear.
 
 .. code-block:: python
 
@@ -411,30 +517,20 @@ NOTE FROM WP: This example shows Python dictionaries, to intoduce it using a ful
         }
     }
 
-NOTE FROM PS: Most of this is self-explanatory, but not clear on the 'data' thing - what is it defining?
-NOTE FROM PS: What is py_dill?
-NOTE FROM WP: I should probably try to make the data section optional and remove it from the example, or explain that it is to define the data types used above.
-NOTE FROM WP: py_dill is a pickle of a function - I need to explain that.
+Note that dill is a library for serializing (pickling)
+Python objects, and enables us to serialize the node
+implementation functions so that they can be passed
+into dynamically generated system configurations.
 
 
 ---------------------------
 Example Node Implementation
 ---------------------------
 
-NOTE FROM PS: Talk about the various languages that are supported.  The following example is python
-NOTE FROM PS: Not sure how 'coroutines' work - I guess this is a python specific concept? How
-NOTE FROM WP: Yes, we need to do a better job of explaining that.
-
 Nodes can be implemented as step functions or coroutines.
 
 Step Function Node
 ^^^^^^^^^^^^^^^^^^
-
-NOTE FROM PS: Is this readme also intended to be a API Spec? We may need to 
-provide an explanation of these function parameters - particularly 'state'
-and its lifecycle.
-NOTE FROM PS: Also, should there not be a 'reset' function here, just to be complete?
-NOTE FROM WP: Yes, it should be more complete, and yes, it is an introduction to the API spec.
 
 .. code-block:: python
 
@@ -479,20 +575,6 @@ Main Commands
   * **pause**: Pause the system.
   * **step**: Step through execution.
 * **host**: Control individual hosts.
-
-NOTE FROM PS: So when you 'start' the system, it will always run in the background? - as a daemon? - and immediately return control to the shell? - in which case I assume there is a command to see it's current running time-step? or status?
-NOTE FROM WP: No, it could be running on the local machine, or it could be running on a remote machine. Whichever machine it DOES run on though, it will be a daemon, or something similar.
-NOTE FROM WP: I **Do** need to give some thought about what happens when the remote machine restarts ... does the daemon also restart and attempt to reconnect?
-
-NOTE FROM PS: Just a thought - I could imagine breaking "system start" into "system init" and "system run" and a separate "system reset" because if the initialization phase is long and complex, you might want to do that ahead of time before running the simulation... also I could imagine a "system run <timesteps>" function that would run a certain number of steps before stopping. - you can then keep calling "system run <timesteps>" to advance the simulation by specific chunks of time... "system run 1" would be equivalent to "system step" I guess...
-NOTE FROM WP: The phased system start is a good idea. Definitely things to give some careful thought to.
-
-NOTE FROM PS: I could also imagine a "system status <node/nodes/all>" .. or something... to get data associated with the current state.
-NOTE FROM WP: Yes, that is something we could add.
-
-NOTE FROM PS: I assume there's a lot more CLI commands?
-NOTE FROM WP: Yes, there are, for host and process as well. We should add them to the README.
-NOTE FROM WP: I can imagine that the CLI will evolve and grow as well.
 
 Example usage:
 
