@@ -3,299 +3,263 @@ Stableflow
 ==========
 
 
-Executive Summary
+Introduction
+------------
+
+This document provides a brief introduction to the
+stableflow system covering it's intended purpose, 
+benefits and key concepts needed to understand how
+it operates and what benefits it provides.
+
+
+Executive summary
 -----------------
 
 Stableflow is a framework for designing and operating 
-distributed systems, focusing on model-driven design and
-product line engineering. It enables teams to build
-families of related systems that can be automatically
-transformed and optimized based on architectural models.
+distributed systems.
+
+It is most suited to continuously operating systems
+composed of data flows or data processing pipelines
+such as sensor data processing, continuous workflow
+processing, or "digital twin" simulation systems.
+
+It is designed to make it easy to adapt and tailor
+such systems for different testing, simulation and 
+deployment scenarios, making it especially useful for
+medium to large scale projects where effort needs 
+to be expended on quality assurance, e.g. evidenced
+safety cases.
+
+These benefits come at the expense of imposing a 
+data-flow oriented architecture, which means that it
+is much less suitable for building event-driven or
+reactive applications, such as user-interfaces or
+CRUD applications.
 
 
-When to Use Stableflow
+When to use Stableflow
 ----------------------
 
 Stableflow is ideal for:
 
-* Building families of related distributed systems where variants need to share core architecture
-* Systems requiring rigorous testing and simulation before deployment
+* Distributed "cyber-physical" systems
+* Systems of cooperating "agents"
+* Systems requiring rigorous testing and simulation before or during deployment
+* Building families of related systems with a shared architecture
 * Projects where architectural exploration and optimization are key concerns
 * Teams adopting model-driven development practices
 
 Stableflow may not be the best choice for:
 
-* Simple CRUD applications
-* Single-purpose applications with minimal architectural complexity
-* Projects requiring rapid prototyping
+* Small scale projects
+* Inherently event-driven applications such as user interfaces or web APIs
+* Projects with minimal need for simulation or testing
+* Projects with minimal need for different system variants or configurations
 
 
-Key Benefits
-------------
-
-* Model-Driven Design: Express system architecture explicitly and transform it automatically
-* Design Automation: Generate system variants and optimize parameters systematically
-* Simulation Support: Test and validate system behavior deterministically
-* Modern Integration: Works with contemporary ML/AI tools and languages
-
-
-Example Use Cases
+Example use cases
 -----------------
 
-Machine Vision System
-^^^^^^^^^^^^^^^^^^^^^
+The following examples illustrate the sort of use
+cases that Stableflow is intended to support.
 
-Consider an autonomous vehicle company developing machine
-vision systems:
 
-* Base Architecture: Image Capture → Pre-processing → Object Detection → Scene Understanding → Control Output
+Autonomous vehicle development
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Consider a tier 1 automotive supplier developing
+a machine vision system for autonomous vehicles:
+
+* Base architecture: 
+
+  #. Image capture
+  #. Object detection
+  #. Object tracking
+  #. Track fusion
+  #. Scene understanding
+  #. Control output
+
 * Variants:
 
-  * Development: Using recorded data, with visualization and debugging
-  * Simulation: Simulated sensors, simulated vehicle responses.
-  * Hardware-in-Loop: Real sensors, simulated vehicle responses
-  * Production: Optimized for specific vehicle configurations
+  * Development: Isolated functional chains running on developer workstations using recorded data with visualization and debugging
+  * Model-in-the-loop: Integrated systems running on engineering servers with simulated sensors, communications and vehicle responses
+  * Hardware-in-the-loop: Integrated systems running on hardware development boards with recorded or simulated sensor data
+  * Test drive: Integrated systems running on development hardware with data recording for resimulation
+  * Production: Integrated systems running on production hardware fusing data across one or more vehicles
 
-    * High-end: Multiple high-res cameras, dedicated compute
+    * Economy: Essential sensors only, cost-optimized compute
     * Mid-range: Balanced sensor suite, shared compute
-    * Economy: Essential sensors, resource-constrained
+    * High-end: Multiple high-res cameras, dedicated compute, vehicle-to-vehicle communication with sensor fusion
 
-Stableflow enables:
+It should be clear that the development process requires
+many different variants of the system to be able to run
+in different configurations and on different hardware.
+Stableflow supports this approach to systems development by
+providing:
 
-* Single architecture supporting all development phases
-* Automated generation of variant-specific implementations
+* Single framework supporting all development phases
+* Automated generation of variant-specific configurations
 * Deterministic replay of recorded data for testing
 * Clear traceability from requirements to deployment
 * Systematic validation across vehicle configurations
 
 
-Data Processing Pipeline
-^^^^^^^^^^^^^^^^^^^^^^^^
+Business process automation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Consider a team building a real-time data processing
-pipeline:
+Consider a software company building business
+process automation systems for various clients.
 
-* Base Architecture: Data Collection → Filtering → Analysis → Storage → Visualization
+* Base architecture:
+
+  #. Data integration (internal wiki, network shares, etc.)
+  #. Data transformation (tagging, classification, indexing, etc.)
+  #. Task ingestion (email, messenger etc.)
+  #. Plan creation / query generation
+  #. Agent assignment (human or LLM)
+  #. Task execution monitoring
+  #. Report generation
+  #. Quality monitoring and feedback elicitation 
+
 * Variants:
 
-  * Development: Small datasets, debug outputs, hot reloading
-  * Testing: 
+  * Invoice processing system for a small business client
+  * Bid processing system for a public sector client
+  * Superset system for internal integration and regression testing
 
-    * Unit tests with mock data sources
-    * Integration tests with recorded data
-    * Performance tests with data generators
+In this case, rather than different system variants
+being produced for different stages of the development
+process, we instead produce different system variants
+for different clients, reflecting how the base product
+has been tailored to their individual needs and 
+requirements. In particular, because the different
+variants are able to be generated automatically from
+the base system, rolling out improvements, bugfixes
+and security patches can be done in a much more
+controlled and systematic manner.
 
-  * Production:
-
-    * Local: Single machine, minimal latency
-    * Distributed: Multiple machines, high throughput
-    * Embedded: Resource-constrained environment
-
-Stableflow enables:
-
-* Same architecture across all development stages
-* Deterministic testing with recorded data
-* Easy switching between variants without code changes
-* Performance optimization for different deployments
+* Single framework supporting all clients
+* Automated generation of client-specific tailored configurations
+* Systematic synchronization and testing of changes across variants
 
 
 Core Concepts
 -------------
 
-System Overview
-^^^^^^^^^^^^^^^
+The following sections describe some core concepts
+that will help you understand how Stableflow works
+and what benefits it provides.
 
-A Stableflow system is composed of:
 
-* **Hosts**: Physical or virtual machines that run processes
+Data flow
+^^^^^^^^^
+
+A Stableflow system is a distributed data flow graph,
+composed of nodes and edges, where nodes can reside
+on different devices (called "hosts"), and edges
+represent data flows either across a network or within
+a host. Key concepts to understand are:
+
+* **Hosts**: Physical or virtual devices that run processes
 * **Processes**: Execution contexts that contain nodes
 * **Nodes**: Basic computational units that process data
 * **Edges**: Connections that carry data between nodes
 * **Functional Chains**: Connected groups of nodes implementing specific features
 
-These components work together to form distributed 
-systems capable of running sophisticated workflows
-across multiple devices.
+The functional behaviour of a system is defined by
+the data flow graph which is formed from nodes and
+edges. Different parts of the functional behaviour
+(functional chains) can be represented by different
+paths through the data flow graph. Nodes can be
+allocated to different processes, allowing computation
+to be run concurrently or in parallel, and those
+processes can be allocated to different hosts, allowing
+computation to be run in a distributed manner.
 
 
-Computational Models
+Computational models
 ^^^^^^^^^^^^^^^^^^^^
+
+A computational model is an intellectual tool that
+helps us talk about concurrency and parallelism.
+They mainly give us the ability to talk about how
+communication within a system impacts the behaviour
+and guarantees that the system as a whole can provide.
 
 Stableflow supports multiple computational models that 
 determine how nodes communicate and process data:
 
-#. **Kahn Process Networks (Primary Model)**
+#. **Kahn process network**
 
+   * Nodes use non-blocking writes and blocking reads for communication
    * Nodes run when all inputs are available
    * Deterministic behavior
-   * Best for simulation and testing
+   * Best when quality assurance requires accurate simulation and testing
+   * Computational resources may be uner-utilised
 
-#. **Actor Model (Planned)**
+#. **Actor model**
 
-   * Nodes run as soon as any input is ready
-   * Higher runtime performance
+   * Nodes use non-blocking writes and non-blocking reads for communication
+   * Nodes run as soon as any one input is ready
+   * Nondeterministic behavior
    * Best for efficient use of computational resources
+   * Simulation and testing are only approximate and functional behaviour is not guaranteed
 
-#. **Concurrent Sequential Processes (Planned?)**
-
-   * Direct synchronization between nodes
-   * Best for tightly coordinated processes
-
-
-Architecture Details
---------------------
-
-System Lifecycle
-^^^^^^^^^^^^^^^^
-
-Systems progress through the following stages::
+Both kahn process networks and actor models are
+data flow models, and both are based on the idea
+of data driven execution.
 
 
-    ┌──────────────────────┐
-    │                      │
-    │      Configure       │
-    │   (load settings)    │
-    │                      │
-    └───────────┬──────────┘
-                │
-                │ start (first part)
-                │
-                ▼
-    ┌──────────────────────┐
-    │                      │
-    │        Reset         │
-    │ (allocate resources) │
-    │                      │
-    └───────────┬──────────┘
-                │
-                │ start (second part)
-                │
-                ▼
-    ┌──────────────────────┐      pause     ┌───────────────┐
-    │                      │───────────────►│               │
-    │         Run          │                │     Pause     │
-    │     (main loop)      │◄───────────────│               │
-    │                      │     start      └──┬────────────┘
-    └───────────┬──────────┘                   │         ▲
-                │                              │         │
-                │ stop                         │  step   │
-                │                              └─────────┘
-                ▼
-    ┌──────────────────────┐
-    │                      │
-    │         Stop         │
-    │  (cleanup/dispose)   │
-    │                      │
-    └──────────────────────┘
+Model driven engineering
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Model driven engineering is an approach to software
+and systems development where functionality is 
+prototyped and validated as a model before being 
+deployed to production.
+
+For a lot of software intensive projects, there
+is no meaningful difference between the model and
+the production system, so in these contexts model
+driven engineering can be considered more as a
+philosophy and an approach to how test environments
+and test mocks are constructed.
+
+In Stableflow, as with many other model driven
+engineering approaches, the system architecture
+is made programmable so that it can be transformed
+automatically into different variants, including
+test variants where key inputs are replaced with
+test data, or key components are replaced with
+mocks.
+
+By making the architecture programmable, we enable:
+
+* Automatic generation of system variants
+* Rapid adaptation to different deployment scenarios
+* Search-based optimisation of system architecture
+* Support for AI-assisted system design
+
+When Kahn process network semantics are used, we
+can make strong guarantees about functional behaviour
+based on the results of simulation and modeling.
 
 
-Node Implementation
-^^^^^^^^^^^^^^^^^^^
+Product line engineering
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Nodes can be implemented using two approaches:
+The idea of product line engineering is most applicable
+to businesses that produce multiple closely related
+products, for example in business-to-business products
+where functionality is often tailored for each customer.
 
-1. **Functional Interface**:
+It is very common for such products to be built using
+some common core with some functionality to support
+configurability e.g. a plugin architecture around a
+common core system.
 
-   * Pure functions for lifecycle stages
-   * Simple to understand and port
-   * Explicit state management
-
-.. code-block:: python
-
-    def reset(runtime, cfg, inputs, state, outputs):
-        """
-        Initialize or reinitialize the node
-        
-        """
-        return iter_signal
-
-    def step(inputs, state, outputs):
-        """
-        Perform one computational step
-        
-        """
-        return iter_signal
-
-    def finalize(runtime, cfg, inputs, state, outputs):
-        """
-        Clean up resources
-        
-        """
-        return iter_signal
-
-2. **Coroutine Interface**:
-
-   * Uses generator functions
-   * Simpler state management
-   * More natural control flow
-
-.. code-block:: python
-
-    def coro(runtime, cfg, inputs, state, outputs):
-        """
-        Main node logic as a coroutine
-        
-        """
-        while True:
-            inputs = yield (outputs, iter_signal)
-
-
-Configuration
--------------
-
-Systems are configured using structured data that specifies:
-
-* Process and node definitions
-* Edge connections
-* Data types
-* Runtime options
-
-Example configuration:
-
-.. code-block:: python
-
-    cfg = {
-        'system': {
-            'id_system': 'example_system'
-        },
-        'host': {
-            'localhost': {
-                'hostname': '127.0.0.1',
-            }
-        },
-        'process': {
-            'process_main': {'host': 'localhost'}
-        },
-        'node': {
-            'node_a': {
-                'process': 'process_main',
-                'state_type': 'python_dict',
-                'functionality': {
-                    'py_dill': {
-                        'step': dill.dumps(step)
-                    }
-                }
-            }
-        },
-        'edge': [{
-            'owner': 'node_a',
-            'data': 'python_dict',
-            'src': 'node_a.outputs.output',
-            'dst': 'node_b.inputs.input'
-        }]
-    }
-
-Command Line Interface
-----------------------
-
-Stableflow provides a CLI for system control:
-
-.. code-block:: shell
-
-    # Start the system
-    stableflow system start --cfg-path /path/to/config
-
-    # Control execution
-    stableflow system pause
-    stableflow system step
-    stableflow system stop
+The programmable architecture that Stableflow provides
+enables us to take a systematic approach to product
+line engineering, using scripts to generate different
+product variants as well as supersets for integration
+testing.

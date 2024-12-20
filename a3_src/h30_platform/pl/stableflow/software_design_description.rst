@@ -36,37 +36,6 @@ interoperability with today's ecosystem of ML/AI
 models and tools.
 
 
-1.2 Design Motivation
-^^^^^^^^^^^^^^^^^^^^^
-
-Software development is on the cusp of a transformation.
-As AI reshapes how we build software, we need better 
-ways to express, manipulate, and reason about system
-architecture at scale. Traditional approaches that
-focus on individual features and products are no longer
-enough.
-
-Two powerful techniques from industries like aerospace,
-defense, and automotive offer a path forward:
-
-Product line engineering transforms how we think
-about product strategy - instead of building individual
-products, we design entire families of related 
-products. This enables:
-
-* Systematic reuse across product variants
-* Strategic planning of feature combinations
-* Rapid response to market opportunities
-* Clear mapping between market segments and technical capabilities
-
-Model-driven development changes how we build 
-systems by making the architecture itself programmable.
-This enables:
-
-* Automatic generation of system variants
-* Rapid adaptation to different deployment scenarios
-* Architecture-level transformations and optimizations
-* Strong foundations for AI-assisted system design
 
 
 1.3 Definitions and Acronyms
