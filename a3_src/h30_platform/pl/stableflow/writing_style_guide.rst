@@ -105,7 +105,7 @@ Diagrams
 * Add explanatory text before diagrams
 * Use consistent symbols for similar elements
 
-Example:
+Example::
 
     ┌──────────────────────┐
     │                      │
