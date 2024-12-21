@@ -6,6 +6,9 @@ Stableflow software design description
 1. Introduction
 ---------------
 
+This document provides a technical description of
+the Stableflow framework
+
 NOTE: This document is currently in DRAFT form. Many sections
 are placeholders and will be expanded updated and corrected
 as the document is reviewed and revised.

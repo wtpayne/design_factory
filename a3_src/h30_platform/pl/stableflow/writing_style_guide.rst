@@ -74,7 +74,10 @@ Lists and enumerations
 * Add blank line before and after lists
 * Add blank line before and after sub-lists
 * Capitalize first word of each list item
-* Avoid ending list items with periods
+* List items which span multiple lines should
+  end in a period.
+* List items which span only one line should
+  not end in a period.
 
 
 Formatted examples

@@ -7,7 +7,7 @@ Introduction
 ------------
 
 This document provides a brief introduction to the
-stableflow system covering it's intended purpose, 
+Stableflow framework covering it's intended purpose, 
 benefits and key concepts needed to understand how
 it operates and what benefits it provides.
 
@@ -72,12 +72,12 @@ a machine vision system for autonomous vehicles:
 
 * Base architecture: 
 
-  #. Image capture
-  #. Object detection
-  #. Object tracking
-  #. Track fusion
-  #. Scene understanding
-  #. Control output
+  * Image capture
+  * Object detection
+  * Object tracking
+  * Track fusion
+  * Scene understanding
+  * Control output
 
 * Variants:
 
