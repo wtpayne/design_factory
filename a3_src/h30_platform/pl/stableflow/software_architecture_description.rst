@@ -179,24 +179,28 @@ The software architecture is developed following
 a layered approach with clear separation of concerns:
 
 * Core Engine Layer: Provides essential capabilities
+
   * Message passing infrastructure
   * Node lifecycle management
   * Resource coordination
   * Basic state management
 
 * Model Layer: Defines system structure and behavior
+
   * System topology definition
   * Node and edge configuration
   * Process and host assignments
   * Implementation bindings
 
 * Transformation Layer: Implements advanced features
+
   * System variant generation
   * Testing and monitoring
   * Performance optimization
   * Debug support
 
 * Application Layer: Implements specific system functionality
+
   * User-defined nodes and edges
   * Custom transformations
   * Domain-specific features
