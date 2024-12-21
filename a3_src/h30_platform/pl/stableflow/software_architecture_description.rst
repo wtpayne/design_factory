@@ -10,21 +10,36 @@ Stableflow software architecture description
 1.1 Identification
 ^^^^^^^^^^^^^^^^^^
 
-This Software Architecture Description (SAD) applies
-to the Stableflow framework, a platform for designing
-and operating distributed systems. The framework is
-primarily implemented in Python and focuses on data
-flow-oriented architectures.
+This software architecture description document
+applies to the Stableflow framework, a platform
+for designing and operating distributed systems.
+
+The stableflow framework is a core part of the 
+"Design factory", an opinionated approach to the
+design and development of software intensive
+systems.
+
+Design factory
+  https://github.com/wtpayne/design_factory/
+
+Stableflow
+  https://github.com/wtpayne/design_factory/tree/main/a3_src/h30_platform/pl/stableflow
 
 
 1.2 System overview
 ^^^^^^^^^^^^^^^^^^^
 
-Stableflow is a framework for designing and
-operating distributed systems, particularly
-suited for continuously operating systems
-composed of data flows or data processing
-pipelines. The framework enables:
+Stableflow is a framework for designing and operating
+distributed systems. 
+
+It is most suited to continuously operating systems
+that can be easily described in terms of data flows
+or data processing pipelines. Such systems include
+sensor data processing, autonomous vehicle control,
+business process automation, "digital twin" simulation,
+and other similar data-intensive systems.
+
+The framework enables:
 
 * Model driven design
 * Design workflow automation
@@ -45,7 +60,69 @@ Key use cases include:
 * Building families of related systems with shared architecture
 * Projects where architectural exploration and optimization are key concerns
 
-The system is developed and maintained by the Stableflow team, with primary users being system designers and engineers working on distributed systems and data processing pipelines.
+The ideas behind stableflow have been developed 
+since the late 2000s and early 2010s and are based
+on experiences developing machine vision systems
+for aerospace, automative and maritime autonomy
+applications.
+
+Experiences with using MATLAB, Simulink and rational
+Rhapsody for model driven engineering highlighted 
+some critical issues with these tools, including:
+
+* Restrictions placed on system architecture and
+  engineering team structure in order to work around
+  the lack of support for usable textual diffing
+  and merging of system designs in Simulink.
+* Developers attempting to reverse engineer the
+  model design from the desired generated code
+  because of a lack of transparency and direct
+  developer control over the generated code in
+  both Rhapsody and Simulink.
+* Difficulty in integrating the latest technical
+  developments from the public domain due to
+  the awkwardness of Python/MATLAB inter-operability.
+* Administrative overhead associated with licensing
+  and compliance for MATLAB and Simulink.
+* RSI due to the heavy use of mouse-based interaction
+  in Simulink.
+
+On the other hand, attempting to do away with MDE
+tools like Simulink and Rhapsody, coding directly
+in C++ highlighted a different set of issues, including:
+
+* Difficulty in communicating the architectural
+  design to non-technical stakeholders without a
+  "native" graphical representation. 
+* Lack of support for simulation or resimulation
+  making testing exceedingly difficult.
+* Lack of a systematic approach to component composition
+  and the generation of system variants for testing
+  and simulation.
+
+These experiences and lessons learned have informed
+the development of Stableflow, which is mainly
+intended to provide some of the benefits of MDE
+without these drawbacks. Initially envisaged as
+a sort of "Simulink-but-for-Python", as it has
+developed, certain design decisions have pointed
+towards a slightly more refined approach to MDE.
+
+TODO: Discuss the influence of spinnaker, and the
+      idea of the model as the equivalent of an
+      HDL netlist, emphasiszing the importance of
+      model transformations to achieve engineering
+      goals.
+
+TODO: Discuss automated / search-based optimization
+      and the use of model transformations to help
+      achieve this.
+
+Stableflow has been developed as a public domain
+project by William Payne with the eventual goal
+of finding a commercial home for the project.
+
+TODO: Discuss future plans for the project.
 
 
 1.3 Document overview
@@ -58,7 +135,17 @@ provides diagrams and text documenting various
 architectural views and serves as the basis for
 detailed design.
 
-This document follows the Software Architecture Description template as specified in the Software Development Standard for Mission Critical Systems (SDSMCS).
+This document follows the Software Architecture 
+Description template as specified in the Software
+Development Standard for Mission Critical Systems
+(SDSMCS).
+
+This document is released into the public domain
+under the Apache license, version 2.0.
+
+License
+  http://www.apache.org/licenses/LICENSE-2.0
+
 
 1.4 Relationship to other documents
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -88,36 +175,38 @@ This SAD is related to the following documents:
 3.1 Software architecture plans
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The software architecture is developed following a layered approach with clear separation of concerns:
+The software architecture is developed following 
+a layered approach with clear separation of concerns:
 
 * Core Engine Layer: Provides essential capabilities
-  - Message passing infrastructure
-  - Node lifecycle management
-  - Resource coordination
-  - Basic state management
+  * Message passing infrastructure
+  * Node lifecycle management
+  * Resource coordination
+  * Basic state management
 
 * Model Layer: Defines system structure and behavior
-  - System topology definition
-  - Node and edge configuration
-  - Process and host assignments
-  - Implementation bindings
+  * System topology definition
+  * Node and edge configuration
+  * Process and host assignments
+  * Implementation bindings
 
 * Transformation Layer: Implements advanced features
-  - System variant generation
-  - Testing and monitoring
-  - Performance optimization
-  - Debug support
+  * System variant generation
+  * Testing and monitoring
+  * Performance optimization
+  * Debug support
 
 * Application Layer: Implements specific system functionality
-  - User-defined nodes and edges
-  - Custom transformations
-  - Domain-specific features
+  * User-defined nodes and edges
+  * Custom transformations
+  * Domain-specific features
 
 
 3.2 Software architecture processes and tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The architecture is developed using:
+
 * Python as the primary implementation language
 * YAML/JSON for configuration
 * UML and similar diagrams for architecture representation
@@ -125,6 +214,7 @@ The architecture is developed using:
 * Testing and simulation infrastructure
 
 The architecture evolves through:
+
 1. High-level component definition
 2. Interface specification
 3. Model transformation development
@@ -140,6 +230,7 @@ The architecture evolves through:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Critical requirements:
+
 * Support for distributed data flow systems
 * Deterministic execution capability
 * Model-driven development support
@@ -147,6 +238,7 @@ Critical requirements:
 * Rigorous testing and simulation support
 
 Driving requirements:
+
 * Message passing infrastructure
 * Node lifecycle management
 * Graph representation and manipulation
@@ -161,31 +253,36 @@ Driving requirements:
 The architecture follows these key principles:
 
 * Minimal Engine: Core platform provides only essential capabilities
-  - Deterministic message passing (KPN)
-  - Basic lifecycle management
-  - Resource coordination
+
+  * Deterministic message passing (KPN)
+  * Basic lifecycle management
+  * Resource coordination
 
 * Model Transformation: System functionality implemented through
-  - Configuration generation/modification
-  - Node composition and connection
-  - Edge implementation selection
+
+  * Configuration generation/modification
+  * Node composition and connection
+  * Edge implementation selection
 
 * Application Layer Features: Complex capabilities built as transformations
-  - Testing and monitoring
-  - Deployment variants
-  - Performance optimization
-  - Debug support
+
+  * Testing and monitoring
+  * Deployment variants
+  * Performance optimization
+  * Debug support
 
 * Separation of Concerns:
-  - Engine: Message passing and lifecycle
-  - Model: System structure and behavior
-  - Transformations: Feature implementation
+
+  * Engine: Message passing and lifecycle
+  * Model: System structure and behavior
+  * Transformations: Feature implementation
 
 
 4.3 Software architecture evaluations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Architecture evaluation focuses on:
+
 * Deterministic execution capabilities
 * System variant generation effectiveness
 * Testing and simulation support
@@ -193,6 +290,7 @@ Architecture evaluation focuses on:
 * Security and reliability
 
 Evaluation methods include:
+
 * Model checking for deterministic behavior
 * Performance testing of message passing
 * Scalability testing of transformations
@@ -203,6 +301,7 @@ Evaluation methods include:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Key risks include:
+
 * Memory management in Kahn Process Networks
 * Network reliability in distributed deployments
 * Scalability of model transformations
@@ -225,6 +324,7 @@ The Stableflow architecture is built around these core concepts:
 Component Views:
 
 1. Logical View:
+
    * System Component: Orchestrates overall execution
    * Host Component: Manages local resources and processes
    * Process Component: Provides execution context
@@ -232,16 +332,19 @@ Component Views:
    * Edge Component: Manages data flow
 
 2. Process View:
+
    * Main System Process: Coordinates overall execution
    * Node Processes: Execute node implementations
    * Monitor Process: System observation and control
 
 3. Physical View:
+
    * Same Process Communication: Direct memory transfer
    * Inter-Process Communication: Shared memory queues
    * Inter-Host Communication: Network protocols (e.g., ZeroMQ)
 
 4. Development View:
+
    * Core Engine Implementation
    * Model Transformation Tools
    * Configuration Management
@@ -289,6 +392,7 @@ System Lifecycle::
 The architecture supports multiple computational models:
 
 1. Kahn Process Networks (Primary):
+
    * Deterministic behavior
    * Non-blocking writes, blocking reads
    * Suitable for testing and simulation
@@ -298,6 +402,7 @@ The architecture supports multiple computational models:
    * Guarantees deterministic behavior
 
 2. Actor Model (Planned):
+
    * Non-deterministic behavior
    * Higher performance
    * Suitable for production systems
@@ -305,6 +410,7 @@ The architecture supports multiple computational models:
    * Non-blocking operations
 
 3. CSP Model (Under Consideration):
+
    * Synchronized communication
    * Suitable for tightly coupled processes
    * Blocking read/write operations
@@ -321,26 +427,30 @@ The architecture supports multiple computational models:
 The core engine provides:
 
 * Message Passing Infrastructure:
-  - Direct memory transfer (same process)
-  - Shared memory queues (different processes)
-  - Network communication (different hosts)
+
+  * Direct memory transfer (same process)
+  * Shared memory queues (different processes)
+  * Network communication (different hosts)
 
 * Node Lifecycle Management:
-  - Configuration
-  - Reset
-  - Run
-  - Pause
-  - Stop
+
+  * Configuration
+  * Reset
+  * Run
+  * Pause
+  * Stop
 
 * Resource Coordination:
-  - Process allocation
-  - Memory management
-  - Network resources
+
+  * Process allocation
+  * Memory management
+  * Network resources
 
 * Basic State Management:
-  - Input message buffers
-  - Output message buffers
-  - Implementation state container
+
+  * Input message buffers
+  * Output message buffers
+  * Implementation state container
 
 
 6.2 Model Layer
@@ -349,44 +459,50 @@ The core engine provides:
 The model layer handles:
 
 * System Topology Definition:
-  - Node definitions (inputs/outputs)
-  - Edge connections
-  - Process assignments
-  - Host mappings
+
+  * Node definitions (inputs/outputs)
+  * Edge connections
+  * Process assignments
+  * Host mappings
 
 * Configuration Management:
-  - Node implementation references
-  - Edge implementation selection
-  - Data type specifications
+
+  * Node implementation references
+  * Edge implementation selection
+  * Data type specifications
 
 * State Management:
-  - Recording nodes
-  - Replay nodes
-  - Monitor nodes
-  - Checkpoint nodes
+
+  * Recording nodes
+  * Replay nodes
+  * Monitor nodes
+  * Checkpoint nodes
 
 
 6.3 Transformation Layer
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The transformation layer enables:
 
 * System Variant Generation:
-  - Development variants
-  - Test variants
-  - Production variants
+
+  * Development variants
+  * Test variants
+  * Production variants
 
 * Testing and Monitoring:
-  - Data capture
-  - Playback
-  - State inspection
-  - Performance monitoring
+
+  * Data capture
+  * Playback
+  * State inspection
+  * Performance monitoring
 
 * Debug Support:
-  - Step execution
-  - State inspection
-  - Error handling
-  - Logging
+
+  * Step execution
+  * State inspection
+  * Error handling
+  * Logging
 
 
 7. Notes
@@ -407,13 +523,17 @@ The transformation layer enables:
 7.2 Glossary
 ^^^^^^^^^^^^
 
-See separate Stableflow Glossary document for detailed term definitions.
+See separate Stableflow Glossary document for detailed 
+term definitions.
 
 
 7.3 General information
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The architecture is designed to be extensible through model transformations while maintaining a minimal core engine. This approach enables both system flexibility and maintainability.
+The architecture is designed to be extensible through 
+model transformations while maintaining a minimal 
+core engine. This approach enables both system 
+flexibility and maintainability.
 
 
 A. Appendices
@@ -423,7 +543,8 @@ A. Appendices
 A.1 Example Configurations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-See example configuration files in the codebase for reference implementations.
+See example configuration files in the codebase
+for reference implementations.
 
 
 A.2 Implementation Examples
@@ -1308,162 +1429,3 @@ SOI Test Support
 
 
 
-
-
-Architecture details
---------------------
-
-System Lifecycle
-^^^^^^^^^^^^^^^^
-
-Systems progress through the following stages::
-
-
-    ┌──────────────────────┐
-    │                      │
-    │      Configure       │
-    │   (load settings)    │
-    │                      │
-    └───────────┬──────────┘
-                │
-                │ start (first part)
-                │
-                ▼
-    ┌──────────────────────┐
-    │                      │
-    │        Reset         │
-    │ (allocate resources) │
-    │                      │
-    └───────────┬──────────┘
-                │
-                │ start (second part)
-                │
-                ▼
-    ┌──────────────────────┐      pause     ┌───────────────┐
-    │                      │───────────────►│               │
-    │         Run          │                │     Pause     │
-    │     (main loop)      │◄───────────────│               │
-    │                      │     start      └──┬────────────┘
-    └───────────┬──────────┘                   │         ▲
-                │                              │         │
-                │ stop                         │  step   │
-                │                              └─────────┘
-                ▼
-    ┌──────────────────────┐
-    │                      │
-    │         Stop         │
-    │  (cleanup/dispose)   │
-    │                      │
-    └──────────────────────┘
-
-
-Node Implementation
-^^^^^^^^^^^^^^^^^^^
-
-Nodes can be implemented using two approaches:
-
-1. **Functional Interface**:
-
-   * Pure functions for lifecycle stages
-   * Simple to understand and port
-   * Explicit state management
-
-.. code-block:: python
-
-    def reset(runtime, cfg, inputs, state, outputs):
-        """
-        Initialize or reinitialize the node
-        
-        """
-        return iter_signal
-
-    def step(inputs, state, outputs):
-        """
-        Perform one computational step
-        
-        """
-        return iter_signal
-
-    def finalize(runtime, cfg, inputs, state, outputs):
-        """
-        Clean up resources
-        
-        """
-        return iter_signal
-
-2. **Coroutine Interface**:
-
-   * Uses generator functions
-   * Simpler state management
-   * More natural control flow
-
-.. code-block:: python
-
-    def coro(runtime, cfg, inputs, state, outputs):
-        """
-        Main node logic as a coroutine
-        
-        """
-        while True:
-            inputs = yield (outputs, iter_signal)
-
-
-Configuration
--------------
-
-Systems are configured using structured data that specifies:
-
-* Process and node definitions
-* Edge connections
-* Data types
-* Runtime options
-
-Example configuration:
-
-.. code-block:: python
-
-    cfg = {
-        'system': {
-            'id_system': 'example_system'
-        },
-        'host': {
-            'localhost': {
-                'hostname': '127.0.0.1',
-            }
-        },
-        'process': {
-            'process_main': {'host': 'localhost'}
-        },
-        'node': {
-            'node_a': {
-                'process': 'process_main',
-                'state_type': 'python_dict',
-                'functionality': {
-                    'py_dill': {
-                        'step': dill.dumps(step)
-                    }
-                }
-            }
-        },
-        'edge': [{
-            'owner': 'node_a',
-            'data': 'python_dict',
-            'src': 'node_a.outputs.output',
-            'dst': 'node_b.inputs.input'
-        }]
-    }
-
-Command Line Interface
-----------------------
-
-Stableflow provides a CLI for system control:
-
-.. code-block:: shell
-
-    # Start the system
-    stableflow system start --cfg-path /path/to/config
-
-    # Control execution
-    stableflow system pause
-    stableflow system step
-    stableflow system stop
