@@ -263,3 +263,29 @@ enables us to take a systematic approach to product
 line engineering, using scripts to generate different
 product variants as well as supersets for integration
 testing.
+
+
+Academic Foundations
+--------------------
+
+The framework builds on foundational academic work
+in parallel and distributed computing:
+
+* Bell Labs' BLODI (Block diagram compiler) from the early 1960s
+* Gilles Kahn and David Macqueen's work on Kahn process networks (1974)
+* Jack Dennis' work on Data Flow networks
+* Tony Hoare's work on Communicating Sequential Processes (1976)
+
+These concepts have influenced many modern systems
+including Unix pipes, coroutines, message-based
+middleware, and actor models. The framework particularly
+leverages Kahn's work for its deterministic guarantees,
+which are crucial for model-based engineering
+methodologies.
+
+While there are many similar commercial systems
+(e.g., Simulink, LabView, LUSTRE) and open-source
+frameworks (e.g., ROS), this framework's distinct 
+value lies in providing a uniform interface for
+automatic configuration and deployment, enabling
+a higher level of automation than typically available.

@@ -1,10 +1,10 @@
-================================================
-Software Architecture Description (SAD) Template
-================================================
+==========================================
+Software architecture description template
+==========================================
 
 This appendix is a MANDATORY part of the (SDSMCS).
 It provides the content requirements for the
-Software Architecture Description(SAD).
+Software architecture description.
 
 #. If the section numbering used below is not used, 
    the developer shall provide an appendix in the 
@@ -14,25 +14,28 @@ Software Architecture Description(SAD).
 #. If there is such a traceability mapping appendix,
    it shall be referenced in Section 1.3.
 
-Purpose: The Software Architecture Description
-(SAD)  documents the software architecture,
-including the approach, important design decisions,
-rationale, and tradeoffs. It provides diagrams and
-text to document the various architectural views
-from different perspectives and serves as the
-basis for the detailed design.
+
+Purpose
+-------
+
+The Software architecture description documents the
+software architecture, including the approach,
+important design decisions, rationale, and tradeoffs.
+It provides diagrams and text to document the various
+architectural views from different perspectives and
+serves as the basis for the detailed design.
 
 
 References
 ----------
 
-(SDSMCS) Adams, R. J., S. Eslinger, K. L. Owens, 
-J. M. Tagami, and M. A. Zambrana, Software 
-Development Standard for Mission Critical Systems
-(SDSMCS), Aerospace Report No. TR-RS-2015-00012, 
-March 17, 2014, The Aerospace Corporation. This 
-is the same as SMC Standard SMC-S-012, Software
-Development Standard.
+* (SDSMCS) Adams, R. J., S. Eslinger, K. L. Owens, 
+  J. M. Tagami, and M. A. Zambrana, Software 
+  Development Standard for Mission Critical Systems
+  (SDSMCS), Aerospace Report No. TR-RS-2015-00012, 
+  March 17, 2014, The Aerospace Corporation. This 
+  is the same as SMC Standard SMC-S-012, Software
+  Development Standard.
 
 
 Content Requirements
