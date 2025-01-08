@@ -2,63 +2,45 @@
 Software development plan template
 ==================================
 
-Template overview
------------------
+This appendix is a MANDATORY part of the (SDSMCS).
+It provides the content requirements for the
+software development plan.
 
-This template defines the required structure and 
-content for creating a Software Development Plan
-(SDP). It is designed to:
+#. Referenced information cited in paragraphs 4, 
+   5, 6, and 7 shall be provided as attachments to
+   the plan.
+#. If the section numbering used below is not
+   used, the developer shall provide an appendix
+   in the SDP with a traceability matrix mapping
+   from the section numbers and titles below to
+   the section numbers and titles used in the
+   developer’s SDP.
+#. If there is such a traceability mapping
+   appendix, it shall be referenced in section
+   1.3.
 
-1. Guide the systematic documentation of 
-   software development plans.
-2. Ensure comprehensive coverage of all critical
-   aspects.
-3. Maintain consistency across different
-   projects.
-4. Enable automated processing and validation.
-
-Key Template Usage Rules:
-
-1. All referenced information from sections 4, 
-   5, 6, and 7 must be included as attachments.
-2. If using different section numbers, provide a
-   mapping matrix in an appendix.
-3. Reference any mapping matrix in section 1.3.
-4. Follow the exact structure and numbering
-   unless explicitly mapping differences.
-
-Note:
-    The section numbering aligns with the
-    Software Development Standard for Mission
-    Critical Systems (SDSMCS).
+Note 1:
+  The numbering shown in paragraphs 4 and 5 below
+  is consistent with the Software Development
+  Standard for Mission Critical Systems (SDSMCS).
 
 
 Purpose
 ^^^^^^^
 
-The Software Development Plan (SDP) is a
-comprehensive document that:
-
-1. Details the complete software development
-   approach.
-2. Covers all development activities:
-
-   * New development
-   * Modifications
-   * Reuse of existing code
-   * System reengineering
-   * COTS integration
-   * Maintenance
-   * Any other software-related activities
-
-3. Provides stakeholders with:
-
-   * Clear development process documentation
-   * Defined methodologies
-   * Activity-specific approaches
-   * Project scheduling
-   * Resource allocation
-   * Organizational structure
+The Software Development Plan (SDP) describes a 
+developer’s plans for conducting a software
+development effort. The term “software
+development" is meant to include the new
+development, modification, reuse, reengineering,
+incorporation of commercial item (also known as
+COTS) packages, maintenance, and all other
+activities resulting in software products. The SDP
+provides the acquirer insight into, and a tool for
+monitoring, the processes to be followed for
+software development; the methods to be used; the 
+approach to be followed for each activity; and
+project schedules, organization, and resources.
 
 
 References
@@ -78,26 +60,24 @@ References
   Critical Systems, Aerospace Report No.
   TOR-2009(8506)-6, 5 May, 2011, The Aerospace
   Corporation.
-* (SDSMCS) Adams, R. J., S. Eslinger, K. L.
-  Owens, J. M. Tagami, and M. A. Zambrana,
-  Software Development Standard for Mission
-  Critical Systems (SDSMCS), Aerospace Report
-  No. TR-RS-2015-00012, March 17, 2014, The
-  Aerospace Corporation. This is the same as SMC
-  Standard SMC-S-012, Software Development
-  Standard.
+* (SDSMCS) Adams, R. J., S. Eslinger, K. L. Owens,
+  J. M. Tagami, and M. A. Zambrana, Software
+  Development Standard for Mission Critical
+  Systems (SDSMCS), Aerospace Report No.
+  TR-RS-2015-00012, March 17, 2014, The Aerospace
+  Corporation. This is the same as SMC Standard
+  SMC-S-012, Software Development Standard.
 
 
 Content requirements
 ^^^^^^^^^^^^^^^^^^^^
 
-Each section in this template:
-
-1. Contains specific required information
-2. Must be completed in full
-3. Should maintain consistent formatting
-4. Must use clear, unambiguous language
-5. Should enable automated validation
+This template contains the required content of the 
+Software Development Plan (SDP). See Section 3 of
+the Software Development Standard for Mission
+Critical Systems (SDSMCS), Aerospace Report No.
+TOR-2013-00083, for definitions of all italicized
+words or phrases.
 
 
 1. Scope
@@ -110,10 +90,10 @@ paragraphs.
 1.1 Identification
 ^^^^^^^^^^^^^^^^^^
 
-This paragraph shall contain a full 
-identification of the system and the software to
-which this document applies, including, as
-applicable, identification number(s), title(s),
+This paragraph shall contain a full identification
+of the system and the software to which this
+document applies, including, as applicable,
+identification number(s), title(s),
 abbreviation(s), version number(s), and release
 number(s).
 
@@ -121,18 +101,18 @@ number(s).
 1.2 System overview
 ^^^^^^^^^^^^^^^^^^^
 
-This paragraph shall briefly state the purpose
-of the system and the software to which this
-document applies. It shall: 
+This paragraph shall briefly state the purpose of 
+the system and the software to which this document
+applies. It shall: 
 
-1. Describe the general nature of the system and
+#. Describe the general nature of the system and
    software.
-2. Summarize the history of system development,
+#. Summarize the history of system development,
    operation, and maintenance.
-3. Identify the project sponsor, acquirer, user,
+#. Identify the project sponsor, acquirer, user,
    developer, and support organizations.
-4. Identify current and planned operating and
-   user sites.
+#. Identify current and planned operating and user
+   sites.
 
 
 1.3 Document overview
@@ -147,19 +127,18 @@ associated with its use.
 1.4 Relationship to other plans
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This paragraph shall describe the relationship,
-if any, of the SDP to other project management
-plans.
+This paragraph shall describe the relationship, if
+any, of the SDP to other project management plans.
 
 
 2. Referenced documents
 -----------------------
 
 This section shall list the number, title,
-revision,  and date of all documents referenced
-in this plan. This section shall also identify
-the source for all documents not available
-through normal Government stocking activities.
+revision,  and date of all documents referenced in
+this plan. This section shall also identify the
+source for all documents not available through
+normal Government stocking activities.
 
 
 3. Overview of required work
@@ -167,167 +146,107 @@ through normal Government stocking activities.
 
 This section shall be divided into paragraphs as 
 needed to establish the context for the planning
-described in later sections. It shall include,
-as applicable, an overview of:
+described in later sections. It shall include, as
+applicable, an overview of:
 
-1. Requirements and constraints on the system
-   and software to be developed.
-2. Requirements and constraints on project 
-   documentation.
-3. Position of the project in the system
-   lifecycle.
-4. The selected project and acquisition strategy
-5. Any requirements or constraints on the
-   selected project and acquisition strategy.
-6. Requirements and constraints on project
-   schedules and resources.
-7. Other requirements and constraints, such as
-   on project security, privacy, methods,
-   standards, interdependencies on hardware and
-   software development.
+#. Requirements and constraints on the system and 
+   software to be developed
+#. Requirements and constraints on project 
+   documentation
+#. Position of the project in the system lifecycle
+#. The selected project and acquisition strategy
+#. Any requirements or constraints on the selected
+   project and acquisition strategy
+#. Requirements and constraints on project
+   schedules and resources
+#. Other requirements and constraints, such as on
+   project security, privacy, methods, standards,
+   interdependencies on hardware and software
+   development
 
 
 4. General requirements
 -----------------------
 
-This section defines the core requirements and 
-processes for software development.
-
-Key Section Guidelines:
-
-1. Mark non-applicable activities with 
-   "Not applicable".
-2. Document build-specific differences
-   explicitly.
-2. Document software-item-specific differences
-   explicitly.
-3. Include risk analysis for each component
-4. Follow SDSMCS Section 4 requirements
-
-For each subsection below:
-
-1. Identify specific risks and mitigation plans
-2. Document assumptions and constraints
-3. Specify success criteria
-4. Define validation methods
+Provisions corresponding to nonrequired activities
+may be satisfied by the words “Not applicable.” If
+different builds or different software on the
+project require different planning, these
+differences shall be noted in the paragraphs. See
+Section 4 in the body of the Software Development
+Standard for Mission Critical Systems (SDSMCS) for
+the activities and topics to be addressed in this
+leading paragraph. This section shall be divided
+into the following paragraphs. In addition to the
+content specified below, each paragraph shall
+identify applicable risks and uncertainties and
+plans for dealing with them.
 
 
 4.1 Software development process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Define the complete software development
-approach including:
+This paragraph shall describe the software
+development process to be used. The planning
+shall cover: 
 
-1. Development lifecycle:
-
-   * Selected lifecycle model(s)
-   * Rationale for selection
-   * Key lifecycle phases
-   * Phase transitions
-
-2. Build strategy:
-
-   * Build identification
-   * Build objectives
-   * Build contents
-   * Build schedule
-
-3. Development activities:
-
-   * Activities per build
-   * Entry/exit criteria
-   * Quality gates
-   * Review points
+#. Identification of the software development 
+   lifecycle model(s) to be used
+#. Planned builds, if applicable 
+#. Their build objectives
+#. The software development activities to be
+   performed in each build. See Section 4.1 in the 
+   body of (SDSMCS) for the activities and topics
+   to be addressed in this paragraph.
 
 
 4.2 General requirements for software development
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section defines the core requirements and
-processes for software development, ensuring
-that: 
-
-* Systematic and documented methods have been
-  used for all software development activities.
-* Methods are specified and documented in the
-  SDP.
+See Section 4.2 and its subsections in the body of
+(SDSMCS) for the activities and topics to be
+addressed in this paragraph on software
+development. This paragraph shall be divided into
+the following subparagraphs.
 
 
 4.2.1 Software development methods
 """"""""""""""""""""""""""""""""""
 
-Specify the software development methods to be
-used:
-
-1. Overall approach and methodology:
-
-   * Quality strategies
-   * Design philosophies
-   * Development activity model(s)
-   * Development lifecycle model(s)
-   * Applicable standards documents
-   * Best practices guides
-
-2. Tool selection:
-
-   * Requirements analysis tools
-   * Documentation tools
-   * Design automation tools
-   * Static analysis, linting tools
-   * Test automation tools
-
-3. Specific methods, procedures and protocols:
-
-   * Methods documents
-   * Procedures documents
-   * Checklists
-   * Tool configuration and usage protocols
-
-It is acceptable to reference other paragraphs
-in this plan if the methods are better described
-in context with the activities to which they
-will be applied.
+This paragraph shall describe or reference the
+software development methods to be used. This
+paragraph shall include descriptions of the manual
+and automated tools and procedures to be used in
+support of these methods. Reference may be made to
+other paragraphs in this plan if the methods are
+better described in context with the activities to
+which they will be applied. See Section 4.2.1 and
+its subparagraphs in the body of (SDSMCS) for the
+activities and topics to be addressed in this
+paragraph on software development methods.
 
 
 4.2.2 Standards for products
 """"""""""""""""""""""""""""
 
-List references to standards for all development
-artifacts:
+This paragraph shall describe or reference the
+standards to be followed for representing
+requirements, architecture, design, code, test
+cases, test procedures, test results, test logs,
+and discrepancy and change reports. The standards
+shall cover all contractual requirements
+concerning standards for products. Reference may
+be made to other paragraphs in this plan if the
+standards are better described in context with the
+activities to which they will be applied. See
+Section 4.2.2 in the body of (SDSMCS) for the
+activities and topics to be addressed in this
+paragraph on standards for software products.
+The contents of Paragraph 4.2.2 shall be placed
+into separate appendices of the SDP, not in
+Paragraph 4.2.2. Paragraph 4.2.2 shall reference
+these appendices.
 
-1. Documentation standards:
-
-   * Requirements documentation standards
-   * Architecture documentation standards
-   * Design decision documentation standards
-   * Test documentation standards
-
-2. Design (coding) standards:
-
-   * Language style guides
-   * Inline documentation standards
-   * Peer review criteria
-   * Quality metrics
-
-3. Test standards:
-
-   * Test cases
-   * Test procedures
-   * Test results
-
-4. Change management:
-
-   * Change reports
-   * Discrepancy reports
-   * Status tracking
-   * Resolution process
-
-A copy of the standards documents shall be
-placed in appendices, and this paragraph shall
-contain a list of references to those
-appendices. The standards listed shall cover all
-contractual requirements concerning standards
-for products.
 
 4.2.2.1 Standards for code
 """"""""""""""""""""""""""
@@ -360,46 +279,6 @@ minimum:
    aggregates.
 
 
-For each programming language, specify:
-
-1. Formatting Requirements:
-   - Indentation rules
-   - Spacing conventions
-   - Capitalization rules
-   - Code organization
-
-2. Documentation Requirements:
-   - Header format
-   - Required fields
-   - Content expectations
-   - Update procedures
-
-3. Naming Conventions:
-   - Variables
-   - Functions
-   - Classes
-   - Files
-   - Packages
-
-4. Code Organization:
-   - File structure
-   - Module organization
-   - Import ordering
-   - Section ordering
-
-5. Language Usage:
-   - Approved features
-   - Restricted features
-   - Required patterns
-   - Forbidden patterns
-
-6. Complexity Limits:
-   - Function size
-   - Class size
-   - Nesting depth
-   - Cyclomatic complexity
-
-
 4.2.2.2 Standards for DCRs
 """"""""""""""""""""""""""
 
@@ -430,38 +309,6 @@ include, as a minimum:
    can be used.
 
 
-Define comprehensive DCR standards including:
-
-1. Terminology:
-   - Standard terms
-   - Definitions
-   - Usage guidelines
-   - Context rules
-
-2. Required Content:
-   - Title format
-   - Description format
-   - Cause analysis
-   - Resolution steps
-
-3. Supporting Information:
-   - Acronym list
-   - Activity names
-   - Process steps
-   - Status codes
-
-4. Process Requirements:
-   - Submission process
-   - Review process
-   - Approval process
-   - Implementation process
-
-5. Documentation:
-   - Required fields
-   - Optional fields
-   - Attachments
-   - References
-
 4.2.2.3 Standards for test logs
 """""""""""""""""""""""""""""""
 
@@ -473,32 +320,6 @@ test log standards shall include, as a minimum:
 #. Alternative and additional definitions, if any,
    for test log terms specified in Appendix F.2.1
    of (SDSMCS).
-
-Specify test log requirements including:
-
-1. Required Fields:
-   - Test identification
-   - Environment details
-   - Execution steps
-   - Results recording
-
-2. Content Standards:
-   - Field definitions
-   - Format requirements
-   - Value constraints
-   - Relationships
-
-3. Process Requirements:
-   - Creation timing
-   - Update procedures
-   - Review process
-   - Storage requirements
-
-4. Additional Elements:
-   - Custom fields
-   - Extended definitions
-   - Special cases
-   - Exceptions
 
 
 4.2.3 Traceability
@@ -732,37 +553,6 @@ section shall be divided into the following
 paragraphs.
 
 
-This section provides detailed plans for software development activities.
-Each activity description must follow this structure:
-
-Activity Documentation Framework:
-1. Purpose and Scope
-2. Entry Criteria
-3. Input Requirements
-4. Required Tasks
-5. Output Products
-6. Verification Methods
-7. Exit Criteria
-8. Risk Assessment
-
-For each activity:
-1. Document variations by:
-   - Build type
-   - Software category
-   - Development phase
-   - Maintenance needs
-
-2. Include for each task:
-   - Analysis methods
-   - Result recording
-   - Deliverable preparation
-
-3. Address:
-   - Technical procedures
-   - Documentation needs
-   - Quality assurance
-   - Risk management
-
 5.1 Project planning and oversight
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -775,167 +565,29 @@ shall be divided into the following subparagraphs
 to describe the approach to be followed for 
 project planning and oversight.
 
-Define comprehensive project management approach:
-
-1. Planning Activities:
-   - Initial planning
-   - Ongoing updates
-   - Risk management
-   - Resource allocation
-
-2. Oversight Methods:
-   - Progress tracking
-   - Performance metrics
-   - Quality indicators
-   - Risk monitoring
-
-3. Control Mechanisms:
-   - Change management
-   - Issue resolution
-   - Decision making
-   - Escalation paths
 
 5.1.1 Software development planning
 """""""""""""""""""""""""""""""""""
-
-Detail the development planning process:
-
-1. Plan Components:
-   - Schedule development
-   - Resource allocation
-   - Risk assessment
-   - Quality targets
-
-2. Planning Process:
-   - Input gathering
-   - Stakeholder review
-   - Approval workflow
-   - Update procedures
-
-3. Integration Points:
-   - Cross-team coordination
-   - Dependency management
-   - Interface planning
-   - Resource sharing
 
 
 5.1.2 Software integration and test planning
 """"""""""""""""""""""""""""""""""""""""""""
 
-Define integration and test strategy:
-
-1. Integration Approach:
-   - Component identification
-   - Integration sequence
-   - Interface verification
-   - System assembly
-
-2. Test Strategy:
-   - Test levels
-   - Test types
-   - Coverage requirements
-   - Success criteria
-
-3. Resource Planning:
-   - Environment needs
-   - Tool requirements
-   - Personnel allocation
-   - Schedule constraints
-
 
 5.1.2.1 Software integration planning
 """""""""""""""""""""""""""""""""""""
-
-Detail the integration planning process:
-
-1. Integration Levels:
-   - Unit integration
-   - Component integration
-   - System integration
-   - External interfaces
-
-2. Integration Methods:
-   - Bottom-up approach
-   - Top-down approach
-   - Hybrid strategies
-   - Risk mitigation
-
-3. Verification Points:
-   - Interface checks
-   - Functionality tests
-   - Performance validation
-   - Security verification
 
 
 5.1.2.2 Software item qualification test planning
 """""""""""""""""""""""""""""""""""""""""""""""""
 
-Define qualification test approach:
-
-1. Test Scope:
-   - Functionality coverage
-   - Performance requirements
-   - Interface validation
-   - Security assessment
-
-2. Test Methods:
-   - Test case development
-   - Test procedure creation
-   - Test data management
-   - Results analysis
-
-3. Quality Criteria:
-   - Pass/fail criteria
-   - Performance thresholds
-   - Acceptance standards
-   - Documentation requirements
-
 
 5.1.3 System qualification test planning
 """"""""""""""""""""""""""""""""""""""""
 
-Specify system-level test planning:
-
-1. Test Coverage:
-   - System requirements
-   - Performance goals
-   - Integration points
-   - User scenarios
-
-2. Test Environment:
-   - Hardware needs
-   - Software configuration
-   - Data requirements
-   - Tool support
-
-3. Test Execution:
-   - Sequence definition
-   - Resource allocation
-   - Schedule planning
-   - Risk management
 
 5.1.4 Planning for software transition to operations
 """"""""""""""""""""""""""""""""""""""""""""""""""""
-
-Define operational transition strategy:
-
-1. Transition Requirements:
-   - Operational readiness
-   - User preparation
-   - System cutover
-   - Support handover
-
-2. Documentation Needs:
-   - User manuals
-   - Operation guides
-   - Training materials
-   - Support procedures
-
-3. Validation Process:
-   - Acceptance criteria
-   - Performance validation
-   - Security verification
-   - Operational testing
 
 
 5.1.5 Planning for software transition to maintenance
@@ -963,244 +615,41 @@ subparagraphs to describe the approach to be
 followed for establishing, controlling, and
 maintaining a software development environment.
 
-Define the complete development environment including:
-
-1. Environment Components:
-   - Development tools
-   - Testing frameworks
-   - Build systems
-   - Version control
-   - Issue tracking
-   - Documentation tools
-   - Collaboration platforms
-
-2. Environment Management:
-   - Setup procedures
-   - Maintenance processes
-   - Access control
-   - Backup strategies
-   - Recovery procedures
-
-3. Environment Analysis:
-   - Capability assessment
-   - Performance monitoring
-   - Security evaluation
-   - Compliance verification
-
 
 5.2.1 Software engineering environment
 """"""""""""""""""""""""""""""""""""""
-
-Detail the engineering environment setup:
-
-1. Development Tools:
-   - IDEs and editors
-   - Compilers/interpreters
-   - Debugging tools
-   - Code analysis tools
-   - Documentation generators
-
-2. Support Systems:
-   - Version control
-   - Build automation
-   - Continuous integration
-   - Code review platforms
-
-3. Quality Tools:
-   - Static analyzers
-   - Test frameworks
-   - Coverage tools
-   - Performance profilers
 
 
 5.2.1.1 Software engineering environment description
 """"""""""""""""""""""""""""""""""""""""""""""""""""
 
-Provide detailed environment specifications:
-
-1. Hardware Requirements:
-   - Processor specifications
-   - Memory requirements
-   - Storage needs
-   - Network capabilities
-
-2. Software Components:
-   - Operating systems
-   - Development tools
-   - Support utilities
-   - Third-party tools
-
-3. Configuration Details:
-   - Tool versions
-   - Integration points
-   - Security settings
-   - Network topology
-
 
 5.2.1.2 Software engineering environment adequacy analysis reports
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Document environment analysis results:
-
-1. Capability Assessment:
-   - Tool functionality
-   - Performance metrics
-   - Scalability analysis
-   - Integration effectiveness
-
-2. Gap Analysis:
-   - Missing capabilities
-   - Performance bottlenecks
-   - Security vulnerabilities
-   - Compliance issues
-
-3. Improvement Plans:
-   - Tool upgrades
-   - Process enhancements
-   - Security hardening
-   - Performance optimization
 
 
 5.2.2 Software integration and qualification test environment
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Define test environment requirements:
-
-1. Test Infrastructure:
-   - Hardware platforms
-   - Network configuration
-   - Storage systems
-   - External interfaces
-
-2. Test Tools:
-   - Test frameworks
-   - Automation tools
-   - Monitoring systems
-   - Results analysis
-
-3. Environment Control:
-   - Configuration management
-   - Version control
-   - Data management
-   - Access control
-
 
 5.2.2.1 Software integration and qualification test environment description
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Detail test environment specifications:
-
-1. Physical Infrastructure:
-   - Hardware components
-   - Network architecture
-   - Storage systems
-   - Security measures
-
-2. Software Components:
-   - Test frameworks
-   - Automation tools
-   - Monitoring systems
-   - Support utilities
-
-3. Configuration Management:
-   - Version control
-   - Change tracking
-   - Environment replication
-   - Backup procedures
 
 5.2.2.2 Software integration and qualification test environment adequacy analysis reports
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Document test environment analysis:
-
-1. Capability Verification:
-   - Feature coverage
-   - Performance validation
-   - Security assessment
-   - Reliability testing
-
-2. Deficiency Analysis:
-   - Missing capabilities
-   - Performance issues
-   - Security gaps
-   - Integration problems
-
-3. Enhancement Planning:
-   - Capability additions
-   - Performance improvements
-   - Security updates
-   - Process optimization
 
 5.2.3 Software development library
 """"""""""""""""""""""""""""""""""
 
-Define library management approach:
-
-1. Library Structure:
-   - Component organization
-   - Version management
-   - Dependency tracking
-   - Documentation storage
-
-2. Access Control:
-   - User permissions
-   - Security policies
-   - Audit procedures
-   - Change tracking
-
-3. Maintenance Procedures:
-   - Update processes
-   - Cleanup routines
-   - Backup strategies
-   - Recovery plans
 
 5.2.4 Software development files
 """"""""""""""""""""""""""""""""
 
-Specify file management requirements:
-
-1. File Organization:
-   - Directory structure
-   - Naming conventions
-   - Version control
-   - Backup procedures
-
-2. File Types:
-   - Source code
-   - Documentation
-   - Test files
-   - Build scripts
-   - Configuration files
-
-3. Management Procedures:
-   - Access control
-   - Change tracking
-   - Review processes
-   - Archival policies
-
 
 5.2.5 Nondeliverable software
 """""""""""""""""""""""""""""
-
-Define management of support software:
-
-1. Software Categories:
-   - Development tools
-   - Test utilities
-   - Build scripts
-   - Support tools
-
-2. Management Approach:
-   - Version control
-   - Configuration management
-   - License tracking
-   - Usage policies
-
-3. Maintenance Strategy:
-   - Update procedures
-   - Compatibility checks
-   - Security updates
-   - Support requirements
 
 
 5.3 System requirements analysis
@@ -1214,99 +663,17 @@ following subparagraphs to describe the approach
 to be followed for participating in system
 requirements analysis.
 
-Define the approach for system requirements analysis:
-
-1. Analysis Framework:
-   - Requirements gathering methods
-   - Analysis techniques
-   - Validation approaches
-   - Documentation standards
-
-2. Process Requirements:
-   - Entry criteria
-   - Input artifacts
-   - Required activities
-   - Output products
-   - Exit criteria
-
-3. Quality Standards:
-   - Completeness criteria
-   - Consistency checks
-   - Traceability rules
-   - Validation methods
-
 
 5.3.1 Analysis of user input
 """"""""""""""""""""""""""""
-
-Detail user input analysis approach:
-
-1. Input Sources:
-   - User interviews
-   - Stakeholder workshops
-   - Requirements documents
-   - Legacy system analysis
-
-2. Analysis Methods:
-   - Input categorization
-   - Priority assessment
-   - Feasibility analysis
-   - Risk evaluation
-
-3. Documentation Requirements:
-   - Input recording format
-   - Analysis results
-   - Validation evidence
-   - Traceability links
 
 
 5.3.2 Operational concept
 """""""""""""""""""""""""
 
-Define operational concept development:
-
-1. Concept Elements:
-   - System purpose
-   - Operational scenarios
-   - User interactions
-   - Environmental conditions
-
-2. Documentation Requirements:
-   - Scenario descriptions
-   - Use case specifications
-   - Interface definitions
-   - Performance parameters
-
-3. Validation Approach:
-   - Stakeholder reviews
-   - Prototype demonstrations
-   - Simulation results
-   - Acceptance criteria
-
 
 5.3.3 System requirements definition
 """"""""""""""""""""""""""""""""""""
-
-Specify requirements definition process:
-
-1. Requirements Categories:
-   - Functional requirements
-   - Performance requirements
-   - Interface requirements
-   - Quality attributes
-   - Constraints
-
-2. Documentation Standards:
-   - Requirement format
-   - Unique identifiers
-   - Priority levels
-   - Verification methods
-
-3. Quality Criteria:
-   - Completeness checks
-   - Consistency validation
-   - Testability assessment
-   - Traceability verification
 
 
 5.4 System architecture and design
@@ -1320,73 +687,13 @@ be divided into the following subparagraphs to
 describe the approach to be followed for
 participating in system architectural design.
 
-Define system architecture development approach:
-
-1. Architecture Framework:
-   - Design principles
-   - Architecture patterns
-   - Quality attributes
-   - Design constraints
-
-2. Documentation Requirements:
-   - Architecture views
-   - Design decisions
-   - Trade-off analysis
-   - Interface specifications
-
-3. Validation Methods:
-   - Architecture reviews
-   - Pattern compliance
-   - Quality assessment
-   - Risk evaluation
-
 
 5.4.1 System-wide architectural design decisions
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-Detail architectural decision process:
-
-1. Decision Framework:
-   - Decision criteria
-   - Analysis methods
-   - Trade-off evaluation
-   - Impact assessment
-
-2. Documentation Requirements:
-   - Decision rationale
-   - Alternatives considered
-   - Selection criteria
-   - Implementation impact
-
-3. Quality Standards:
-   - Consistency checks
-   - Pattern compliance
-   - Performance impact
-   - Maintainability assessment
-
 
 5.4.2 System architectural design
 """""""""""""""""""""""""""""""""
-
-Specify architectural design approach:
-
-1. Design Elements:
-   - Component structure
-   - Interface definitions
-   - Data architecture
-   - Control flow
-
-2. Documentation Standards:
-   - Design notation
-   - View specifications
-   - Interface contracts
-   - Quality attributes
-
-3. Validation Methods:
-   - Design reviews
-   - Pattern compliance
-   - Performance analysis
-   - Security assessment
 
 
 5.5 Software requirements analysis
@@ -1397,27 +704,6 @@ followed for software requirements analysis. See
 Section 5.5 in the body of (SDSMCS) for the
 activities and topics to be addressed in this
 paragraph on software requirements analysis.
-
-Define software requirements analysis approach:
-
-1. Analysis Framework:
-   - Requirements sources
-   - Analysis methods
-   - Validation techniques
-   - Documentation standards
-
-2. Process Requirements:
-   - Entry criteria
-   - Input artifacts
-   - Required activities
-   - Output products
-   - Exit criteria
-
-3. Quality Standards:
-   - Completeness checks
-   - Consistency validation
-   - Testability assessment
-   - Traceability verification
 
 
 5.6 Software architecture and design
@@ -1431,193 +717,32 @@ divided into the following subparagraphs to
 describe the approach to be followed for software
 design.
 
-Detail software architecture development:
-
-1. Architecture Framework:
-   - Design principles
-   - Architecture patterns
-   - Quality attributes
-   - Design constraints
-
-2. Documentation Requirements:
-   - Architecture views
-   - Design decisions
-   - Interface specifications
-   - Quality scenarios
-
-3. Validation Methods:
-   - Architecture reviews
-   - Pattern compliance
-   - Performance analysis
-   - Security assessment
-
 
 5.6.1 Overall software architecture
 """""""""""""""""""""""""""""""""""
 
-Define overall architecture approach:
-
-1. Architecture Elements:
-   - System decomposition
-   - Component relationships
-   - Quality strategies
-   - Evolution approach
-
-2. Documentation Standards:
-   - Architecture views
-   - Design patterns
-   - Quality attributes
-   - Constraints
-
-3. Validation Methods:
-   - Architecture reviews
-   - Pattern compliance
-   - Quality assessment
-   - Risk evaluation
-
-
 5.6.2 Software item architecture
 """"""""""""""""""""""""""""""""
-
-Specify item architecture approach:
-
-1. Architecture Components:
-   - Module structure
-   - Interface definitions
-   - Data design
-   - Control flow
-
-2. Documentation Requirements:
-   - Component specifications
-   - Interface contracts
-   - Quality attributes
-   - Design constraints
-
-3. Validation Methods:
-   - Design reviews
-   - Interface analysis
-   - Performance assessment
-   - Security validation
 
 
 5.6.3 Software item detailed design
 """""""""""""""""""""""""""""""""""
 
-Detail design development approach:
-
-1. Design Elements:
-   - Module specifications
-   - Algorithm design
-   - Data structures
-   - Interface details
-
-2. Documentation Standards:
-   - Design notation
-   - Implementation guidelines
-   - Quality requirements
-   - Constraints
-
-3. Validation Methods:
-   - Design reviews
-   - Code inspection
-   - Performance analysis
-   - Security assessment
-
 
 5.6.3.1 Software unit detailed design
 """""""""""""""""""""""""""""""""""""
-
-Define unit design approach:
-
-1. Design Components:
-   - Function specifications
-   - Class definitions
-   - Data structures
-   - Algorithms
-
-2. Documentation Requirements:
-   - Design notation
-   - Implementation rules
-   - Quality attributes
-   - Constraints
-
-3. Validation Methods:
-   - Code reviews
-   - Unit tests
-   - Performance checks
-   - Security validation
 
 
 5.6.3.2 Software interface design
 """""""""""""""""""""""""""""""""
 
-Specify interface design approach:
-
-1. Interface Elements:
-   - API specifications
-   - Protocol definitions
-   - Data formats
-   - Error handling
-
-2. Documentation Standards:
-   - Interface contracts
-   - Protocol documentation
-   - Error definitions
-   - Version control
-
-3. Validation Methods:
-   - Interface testing
-   - Protocol verification
-   - Error handling
-   - Performance analysis
-
 
 5.6.3.3 Database design, as applicable
 """"""""""""""""""""""""""""""""""""""
 
-Define database design approach:
-
-1. Design Elements:
-   - Data models
-   - Schema definitions
-   - Relationships
-   - Constraints
-
-2. Documentation Requirements:
-   - Schema documentation
-   - Data dictionary
-   - Relationship maps
-   - Integrity rules
-
-3. Validation Methods:
-   - Schema review
-   - Data validation
-   - Performance testing
-   - Security assessment
-
 
 5.6.3.4 User interface design, as applicable
 """"""""""""""""""""""""""""""""""""""""""""
-
-Detail UI design approach:
-
-1. Design Elements:
-   - Layout specifications
-   - Interaction patterns
-   - Visual design
-   - Accessibility features
-
-2. Documentation Standards:
-   - Style guides
-   - Component library
-   - Interaction patterns
-   - Accessibility rules
-
-3. Validation Methods:
-   - Usability testing
-   - Accessibility checks
-   - Performance analysis
-   - User acceptance
 
 
 5.6.3.5 Other applicable software design
@@ -1637,168 +762,29 @@ shall be divided into the following subparagraphs
 to describe the approach to be followed for
 software implementation and unit testing.
 
-Define implementation and testing approach:
-
-1. Implementation Framework:
-   - Coding standards
-   - Development practices
-   - Quality metrics
-   - Testing requirements
-
-2. Process Requirements:
-   - Entry criteria
-   - Development workflow
-   - Testing procedures
-   - Exit criteria
-
-3. Quality Standards:
-   - Code reviews
-   - Unit tests
-   - Performance checks
-   - Security validation
-
 
 5.7.1 Implementing software
 """""""""""""""""""""""""""
-
-Specify implementation approach:
-
-1. Development Standards:
-   - Coding guidelines
-   - Documentation rules
-   - Quality metrics
-   - Best practices
-
-2. Process Requirements:
-   - Version control
-   - Code review
-   - Documentation
-   - Testing
-
-3. Quality Controls:
-   - Static analysis
-   - Code coverage
-   - Performance metrics
-   - Security checks
 
 
 5.7.2 Preparing for unit testing
 """"""""""""""""""""""""""""""""
 
-Detail unit test preparation:
-
-1. Test Framework:
-   - Testing tools
-   - Test environment
-   - Test data
-   - Coverage requirements
-
-2. Test Planning:
-   - Test cases
-   - Test procedures
-   - Test data
-   - Expected results
-
-3. Quality Standards:
-   - Coverage metrics
-   - Performance criteria
-   - Security requirements
-   - Documentation standards
-
 
 5.7.3 Performing unit testing
 """""""""""""""""""""""""""""
 
-Define unit testing process:
-
-1. Testing Activities:
-   - Test execution
-   - Result recording
-   - Defect tracking
-   - Coverage analysis
-
-2. Documentation Requirements:
-   - Test results
-   - Coverage reports
-   - Defect logs
-   - Performance data
-
-3. Quality Criteria:
-   - Pass/fail criteria
-   - Coverage thresholds
-   - Performance targets
-   - Security standards
 
 5.7.4 Analyzing and recording unit testing results
 """"""""""""""""""""""""""""""""""""""""""""""""""
-
-Specify test analysis approach:
-
-1. Analysis Methods:
-   - Result verification
-   - Coverage assessment
-   - Performance analysis
-   - Trend analysis
-
-2. Documentation Standards:
-   - Result format
-   - Analysis reports
-   - Metrics collection
-   - Trend reporting
-
-3. Quality Requirements:
-   - Completeness checks
-   - Accuracy validation
-   - Trend analysis
-   - Action planning
 
 
 5.7.5 Unit regression testing
 """""""""""""""""""""""""""""
 
-Define regression testing approach:
-
-1. Testing Strategy:
-   - Test selection
-   - Automation approach
-   - Execution frequency
-   - Result analysis
-
-2. Process Requirements:
-   - Test maintenance
-   - Execution triggers
-   - Result verification
-   - Issue resolution
-
-3. Quality Standards:
-   - Coverage requirements
-   - Performance criteria
-   - Reliability metrics
-   - Documentation standards
-
 
 5.7.6 Revising and retesting units
 """"""""""""""""""""""""""""""""""
-
-Detail revision and retest process:
-
-1. Revision Approach:
-   - Change assessment
-   - Impact analysis
-   - Implementation rules
-   - Quality checks
-
-2. Retest Requirements:
-   - Test selection
-   - Execution process
-   - Result verification
-   - Documentation
-
-3. Quality Criteria:
-   - Change validation
-   - Test coverage
-   - Performance checks
-   - Security validation
 
 
 5.8 Unit integration and testing
@@ -1811,26 +797,6 @@ integration and testing. This paragraph shall be
 divided into the following subparagraphs to
 describe the approach to be followed for unit
 integration and testing.
-
-Define integration testing approach:
-
-1. Integration Framework:
-   - Integration strategy
-   - Testing methods
-   - Quality criteria
-   - Documentation standards
-
-2. Process Requirements:
-   - Entry criteria
-   - Integration steps
-   - Testing procedures
-   - Exit criteria
-
-3. Quality Standards:
-   - Integration checks
-   - Interface testing
-   - Performance analysis
-   - Security validation
 
 
 5.8.1 Testing on the target computer system

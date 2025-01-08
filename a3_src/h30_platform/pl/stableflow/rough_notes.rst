@@ -1080,3 +1080,518 @@ Stableflow provides a CLI for system control:
     stableflow system pause
     stableflow system step
     stableflow system stop
+
+
+
+𝑥
+
+# XACT design description document
+
+| System of interest | XACT |
+| :---- | :---- |
+| Document name | XACT design description document |
+| Document identifier | xd0006\_xact\_design\_description\_document |
+| Revision indicator | 0 |
+| Document status | Draft \- Incomplete |
+| Date created | 20190729 |
+| Date last modified | 20200508 |
+| Security marking | N/A |
+| Contract \# | N/A |
+| Prepared for | TBD  |
+| Prepared by | TBD |
+| Distribution statement | Approved for public release; distribution is unlimited |
+
+(This page intentionally blank)
+
+# 0 \- Table of contents {#0---table-of-contents}
+
+[**0 \- Table of contents**](#0---table-of-contents)	**[3](#0---table-of-contents)**
+
+[**1 \- Scope**](#1---scope)	**[4](#1---scope)**
+
+[1.1 \- Identification](#1.1---identification)	[4](#1.1---identification)
+
+[1.2 \- System overview](#1.2---system-overview)	[4](#1.2---system-overview)
+
+[1.2.1 \- Purpose of system](#1.2.1---purpose-of-system)	[4](#1.2.1---purpose-of-system)
+
+[1.2.2 \- General nature of system](#1.2.2---general-nature-of-system)	[4](#1.2.2---general-nature-of-system)
+
+[1.2.3 \- History of system development](#1.2.3---history-of-system-development)	[5](#1.2.3---history-of-system-development)
+
+[1.2.4 \- Operation](#1.2.4---operation)	[5](#1.2.4---operation)
+
+[1.2.5 \- Maintenance](#1.2.5---maintenance)	[6](#1.2.5---maintenance)
+
+[1.2.6 \- Sponsor](#1.2.6---sponsor)	[6](#1.2.6---sponsor)
+
+[1.2.7 \- Developer](#1.2.7---developer)	[6](#1.2.7---developer)
+
+[1.2.8 \- Acquirer](#1.2.8---acquirer)	[6](#1.2.8---acquirer)
+
+[1.2.9 \- End user](#1.2.9---end-user)	[6](#1.2.9---end-user)
+
+[1.2.8 \- Support](#1.2.8---support)	[6](#1.2.8---support)
+
+[1.2.9 \- Other relevant documents.](#1.2.9---other-relevant-documents.)	[6](#1.2.9---other-relevant-documents.)
+
+[1.3 \- Document overview](#1.3---document-overview)	[6](#1.3---document-overview)
+
+[**2 \- Referenced documents**](#2---referenced-documents)	**[7](#2---referenced-documents)**
+
+[2.1 \- Engineering design documents](#2.1---engineering-design-documents)	[7](#2.1---engineering-design-documents)
+
+[2.2 \- Academic references](#2.2---academic-references)	[7](#2.2---academic-references)
+
+[2.3 \- Relevant technical standards and processes](#2.3---relevant-technical-standards-and-processes)	[7](#2.3---relevant-technical-standards-and-processes)
+
+[**3 \- System wide design decisions**](#3---system-wide-design-decisions)	**[8](#3---system-wide-design-decisions)**
+
+[3.1 \- Inputs](#heading=h.fq8cqjd4kpvj)	[8](#heading=h.fq8cqjd4kpvj)
+
+[3.1.1 \- Structure of the configuration data](#3.21---structure-of-the-configuration-data)	[8](#3.21---structure-of-the-configuration-data)
+
+[3.1.2 \- Representation of the configuration data on disk](#3.2.2---representation-of-the-configuration-data-on-disk)	[8](#3.2.2---representation-of-the-configuration-data-on-disk)
+
+[3.1.3 \- Python modules.](#3.2.3---python-modules.)	[9](#3.2.3---python-modules.)
+
+[3.1.4 \- Unix philosophy command line applications.](#3.2.4---unix-philosophy-command-line-applications.)	[9](#3.2.4---unix-philosophy-command-line-applications.)
+
+[3.1.5 \- Shared libraries.](#3.2.5---shared-libraries.)	[9](#3.2.5---shared-libraries.)
+
+[3.1.6 \- Command line interface](#3.2.6---command-line-interface)	[9](#3.2.6---command-line-interface)
+
+[3.1.7 \- Graphical user interface](#3.2.7---graphical-user-interface)	[9](#3.2.7---graphical-user-interface)
+
+[3.2 \- Outputs](#3.3---outputs)	[9](#3.3---outputs)
+
+[3.3 \- Files and file formats](#3.4---files-and-file-formats)	[9](#3.4---files-and-file-formats)
+
+[3.4 \- Response times](#3.5---response-times)	[9](#3.5---response-times)
+
+[3.5 \- Safety requirements](#3.6---safety-requirements)	[9](#3.6---safety-requirements)
+
+[3.6 \- Security requirements](#3.7---security-requirements)	[9](#3.7---security-requirements)
+
+[3.7 \- Privacy requirements](#3.8---privacy-requirements)	[10](#3.8---privacy-requirements)
+
+[3.8 \- Approach to provide flexibility](#3.9---approach-to-provide-flexibility)	[10](#3.9---approach-to-provide-flexibility)
+
+[3.9 \- Approach to provide availability](#3.10---approach-to-provide-availability)	[10](#3.10---approach-to-provide-availability)
+
+[3.10 \- Approach to provide maintainability](#3.11---approach-to-provide-maintainability)	[10](#3.11---approach-to-provide-maintainability)
+
+[3.11 \- Design conventions needed to understand the design.](#3.12---design-conventions-needed-to-understand-the-design.)	[10](#3.12---design-conventions-needed-to-understand-the-design.)
+
+[**4 \- System architectural design**](#4---system-architectural-design)	**[11](#4---system-architectural-design)**
+
+[4.1 \- System components](#4.1---system-components)	[11](#4.1---system-components)
+
+[4.1.1 \- System components identification and diagrams.](#4.1.1---system-components-identification-and-diagrams.)	[11](#4.1.1---system-components-identification-and-diagrams.)
+
+[4.1.2 \- Command line interface](#4.1.2---command-line-interface)	[12](#4.1.2---command-line-interface)
+
+[4.1.3 \- System controller](#4.1.3---system-controller)	[12](#4.1.3---system-controller)
+
+[4.1.4 \- Process host controller](#4.1.4---process-host-controller)	[12](#4.1.4---process-host-controller)
+
+[4.1.5 \- Process controller](#4.1.5---process-controller)	[12](#4.1.5---process-controller)
+
+[4.1.6 \- Node controller](#4.1.6---node-controller)	[12](#4.1.6---node-controller)
+
+[4.1.7 \- Configuration logic](#4.1.7---configuration-logic)	[12](#4.1.7---configuration-logic)
+
+[4.1.8 \- Interface logic generation](#4.1.8---interface-logic-generation)	[12](#4.1.8---interface-logic-generation)
+
+[4.1.9 \- Queue handling](#4.1.9---queue-handling)	[12](#4.1.9---queue-handling)
+
+[4.2 \- Concept of execution](#4.2---concept-of-execution)	[12](#4.2---concept-of-execution)
+
+[4.3 \- Interface design](#4.3---interface-design)	[13](#4.3---interface-design)
+
+[4.3.1 \- Interface identification and diagrams](#4.3.1---interface-identification-and-diagrams)	[13](#4.3.1---interface-identification-and-diagrams)
+
+[4.3.2 \- Configuration Interface](#4.3.2---configuration-interface)	[13](#4.3.2---configuration-interface)
+
+[4.3.3 \- Command line interface](#4.3.3---command-line-interface)	[13](#4.3.3---command-line-interface)
+
+[4.3.4 \- Runtime interface to launch remote processes.](#4.3.4---runtime-interface-to-launch-remote-processes.)	[13](#4.3.4---runtime-interface-to-launch-remote-processes.)
+
+[**5 \- Requirements traceability**](#5---requirements-traceability)	**[13](#5---requirements-traceability)**
+
+[**6 \- Notes**](#6---notes)	**[13](#6---notes)**
+
+[6.1 \- Background information](#6.1---background-information)	[13](#6.1---background-information)
+
+[6.2 \- Rationale](#6.2---rationale)	[13](#6.2---rationale)
+
+[6.3 \- Glossary of terms](#6.3---glossary-of-terms)	[13](#6.3---glossary-of-terms)
+
+[**Appendix A \- TBD**](#appendix-a---tbd)	**[13](#appendix-a---tbd)**
+
+
+
+
+# 1 \- Scope {#1---scope}
+
+## 1.1 \- Identification {#1.1---identification}
+
+This document describes the design of the xact systems engineering framework. At the time of writing, xact is at a relatively early stage of development, so many of the features described are only partially implemented. This document is more correctly thought of as a description of design intent than as documentation of the as-implemented design, although some effort has been made to distinguish between the two in the body of the text. It is intended that this document be continually updated as the xact framework is developed. The design documents for the xact framework are currently hosted on github at the following URL: [https://github.com/xplain-systems/xact/](https://github.com/xplain-systems/xact/)
+
+## 1.2 \- System overview {#1.2---system-overview}
+
+### 1.2.1 \- Purpose of system {#1.2.1---purpose-of-system}
+
+The xact framework is intended to support the development of software intensive systems using model based systems engineering techniques. It is oriented toward distributed, dataflow-oriented, compute-bound soft-real-time systems.
+
+At early stages of development, it is intended to enable technology demonstrators to be assembled rapidly from prototype components and environment simulations and then to support the independent development of each component towards design maturity. In this way, the xact framework is intended to enable engineering organizations to narrow the structural and technical gaps that so often exist between research and product development teams.
+
+The xact systems engineering framework is also intended to support automation of various aspects of the engineering process, supporting techniques such as design optimization or determining the acceptability of arguments for the safety, security or privacy case.
+
+The ultimate vision is for xact to provide a foundation for the development of explainable systems, able to make arguments about the safety of their own actions, and the safety of their design, given the environment in which they find themselves operating.
+
+### 1.2.2 \- General nature of system {#1.2.2---general-nature-of-system}
+
+Functionally, the xact framework is an implementation of a Kahn process network. A Kahn process network consists of a number of ‘processes’ connected by ‘channels’ along which 'tokens’ may be passed. If the ‘processes’ and the ‘channels’ both obey certain restrictions, then guarantees of monotonicity and determinism may be obtained. To prevent confusion with the similar but distinct notion of operating system processes, this xact system refers to a Kahn 'process’ as a ‘node’.
+
+Xact allows one or more nodes in the Kahn process network graph to be mapped to each of the available operating system processes (or an equivalent), across one or more process hosts. Each process host normally corresponds to a distinct server or embedded computer, although it is intended that a large system-on-chip may contain multiple process hosts, one for each microprocessor in the SOC. In this way, xact supports both multiprocessing and distributed computing.
+
+Conceptually, each node in the Kahn process network graph corresponds either to the implementation of a computational component in the system itself, or to a simulation of some other thing inside or outside the system boundary; perhaps a sensor or part of the physical environment within which the system operates. It is in this way that xact is intended to support model based systems engineering techniques.
+
+The xact framework is intended to support nodes that are implemented in a number of different languages, although at the time of writing only Python is supported with C being the next language planned. It is intended that eventually it should be possible to deploy collections of compute nodes to FPGAs or ASICs as well as more conventional compute hardware.
+
+For the guarantees of monotonicity and determinism to be upheld, each node must meet certain restrictions, although in certain cases (such as at the edge of the process network graph) those restrictions may be lifted to permit interfacing with external systems.
+
+Similarly, the xact framework is intended to support a range of different implementations for the channels that connect the nodes in the Kahn process network graph. At the time of writing, nodes communicating within a single process use synchronized access to shared memory areas, nodes communicating across process boundaries on the same process host use a shared memory interprocess queue implementation, and nodes communicating between process hosts use zeromq sockets. It is intended that future development work enable the support of other transports such as SPI, DDS, ROS or Kafka.
+
+The topology of the Kahn process network graph is treated as configuration data, and is provided as a data structure that is read from a set of configuration files. It is intended that this data structure could be generated automatically, either by a design optimization algorithm, or by an IDE to permit graphical drag-and-drop style rapid prototyping.
+
+At its most basic functional level,, the xact system can be seen as a configuration tool for message based middleware.
+
+### 1.2.3 \- History of system development {#1.2.3---history-of-system-development}
+
+The xact systems engineering framework is a relatively straightforward implementation of ideas which emerged starting in the early 1960s with Bell Labs’ BLODI (Block diagram compiler), and expanded upon in the mid 1970s with Gilles Kahn and David Macqueen’s work on Kahn process networks, Jack Dennis’ work on Data Flow networks, and Tony Hoare’s work on Communicating sequential processes.
+
+These ideas have been enormously influential over the last 60 years or so, and today it is commonplace to come across systems and software based on concepts that trace their intellectual foundations back to this time. Unix pipes, coroutines, message based middleware and actor models all share this academic heritage.
+
+Macqueen and Kahn’s work stands out, not only because of the denotational semantics that Kahn developed, but also because of the monotonicity and determinism guarantees provided by his formalism; guarantees which are clearly of critical importance to any model based engineering methodology.
+
+There are a very large number of commercial systems that are conceptually similar to xact \- Simulink, LabView and LUSTRE are perhaps the most well-known of these. The open source ROS framework and the automotive AUTOSAR standard both have message passing models as a subset of their functionality. The number of message passing systems in the enterprise software space are too numerous to enumerate fully, as are those which are specialized for data science or for machine learning.
+
+The intent of xact is not to compete with or replace these frameworks, but rather to provide a uniform interface for the automatic configuration and deployment of such systems, enabling a higher level of automation than is currently practicable. To this end, the structure of the process network graph in xact is not defined programmatically, but rather is specified as a data structure which can either be read from configuration or generated dynamically.
+
+Development started in late 2016 with a simple sequential model. After a hiatus, development picked up again in the summer of 2019, adding more capable data definitions, multiprocessing and then distributed computing capability.
+
+### 1.2.4 \- Operation {#1.2.4---operation}
+
+At present, the end user is required to write a set of configuration files that describe both the topology of the compute graph as well as how the nodes are to be distributed across available computing resources. The logic that is instantiated by each node is also specified in configuration. Where new logic is required, this can be done by creating a python module that conforms to a specific interface; providing a ‘step’ function and an (optional) reset function.
+
+Once the configuration files have been defined and the implementation for all nodes is available, the xact system can be launched from the command line. 
+
+When the xact system is launched, it first reads in the specified configuration files, assembling the configuration data structure and enriching it with information that is represented only implicitly in the on-disk configuration.
+
+If some nodes are to be run on remote process hosts, then xact uses ssh to launch processes on those computers. With xact processes running on all process hosts, a brief synchronization routine is run to ensure that all remote queues are ready and connected.
+
+At this point, the reset() function is called on all nodes, and then normal operation commences.
+
+Data flows between nodes, and for each node, when all inputs have data items and are ready to be read, the step() function for that node is called.
+
+In future, it is intended that it should be possible to edit the configuration files via a graphical editor, and that the network should be able to change dynamically, without the system halting. 
+
+It is also intended to support recording and replay of data passing through nodes, enabling a step-forwards and step-backwards functionality when running as a simulation.
+
+### 1.2.5 \- Maintenance {#1.2.5---maintenance}
+
+When xact changes, how will those changes be communicated to the end user?
+
+I.e. when features are obsoleted and removed, how do we coordinate with the customers who are using those features? Do we mark APIs as obsoleted and then removed? Or do we encourage customer projects to fix versions?
+
+How will the framework be versioned? What will the release cycle look like? How will that integrate with how our customers get support?
+
+How do we document what features we have implemented?
+
+When we introduce new features, how do we coordinate with training and documentation?
+
+### 1.2.6 \- Sponsor {#1.2.6---sponsor}
+
+N/A
+
+### 1.2.7 \- Developer {#1.2.7---developer}
+
+Initial development was undertaken by Mr. W. Payne (2016-2019). The intent is to contract Mr A Kumar to implement specific features.
+
+### 1.2.8 \- Acquirer {#1.2.8---acquirer}
+
+N/A
+
+### 1.2.9 \- End user {#1.2.9---end-user}
+
+This software is targeted at systems engineers and software engineers who want to be able to quickly produce prototypes, and then smoothly and easily take those prototypes into production.
+
+The vision is to enable rapid prototyping of systems with ML algorithm components in Python, then easily transforming the system piece-by-piece into C and deploy onto embedded hardware (or into VHDL and deploy on an FPGA).
+
+### 1.2.8 \- Support {#1.2.8---support}
+
+TBD. Strategic decision required. See also maintenance. 
+
+### 1.2.9 \- Other relevant documents. {#1.2.9---other-relevant-documents.}
+
+* xd0007\_xact\_requirements\_specificatio \- XACT Requirements Specification.  
+* xd0008\_xact\_user\_manual \- XACT User Manual.  
+* DI-IPSC-81432A \- Data Item Description for System / Subsystem Design Description documents.  
+* SMC-S-012 \- Air Force Space Command \- Space and Missile Systems Center Standard \- Software Development
+
+## 1.3 \- Document overview {#1.3---document-overview}
+
+This is a working document and is expected to develop and mature along with the system itself.
+
+# 2 \- Referenced documents {#2---referenced-documents}
+
+## 2.1 \- Engineering design documents {#2.1---engineering-design-documents}
+
+* xd0007\_xact\_requirements\_specificatio \- XACT Requirements Specification.  
+* xd0008\_xact\_user\_manual \- XACT User Manual.
+
+## 2.2 \- Academic references {#2.2---academic-references}
+
+* 1974 \- “The Semantics of a Simple Language for Parallel Programming” \- Gilles Kahn  
+* 1976 \-“Communicating Sequential Processes” \- Tony Hoare  
+* CyberPhysical systems book.
+
+## 2.3 \- Relevant technical standards and processes {#2.3---relevant-technical-standards-and-processes}
+
+* DI-IPSC-81432A \- Data Item Description for System / Subsystem Design Description documents.  
+* SMC-S-012 \- Air Force Space Command \- Space and Missile Systems Center Standard \- Software Development  
+* INCOSE Systems engineering handbook, 2nd edition..
+
+# 
+
+# 3 \- System wide design decisions {#3---system-wide-design-decisions}
+
+This section shall be divided into paragraphs as needed to present system wide design decisions, that is, decisions about the systems behavioral design (from the users point of view) in meeting its requirements, and other decisions affecting the selection and design of system components.
+
+Or simply refer to the requirements document.
+
+## 3.1 \- Computational model
+
+## 3.2 \- Inputs
+
+### 3.21 \- Structure of the configuration data {#3.21---structure-of-the-configuration-data}
+
+xact systems can be configured either by authoring configuration files or by generating and/or modifying configuration data programmatically. In both cases the structure of the configuration data is the same.
+
+When being handled by a Python program, the xact configuration data is a hierarchical dict that specifies the structure of the system to be run. It is divided into six sections, each corresponding to a major architectural division of the xact framework:
+
+**`‘system’`**`:         <SYSTEM-CONFIGURATION>`  
+**`‘host’`**`:`  
+    `<HOST-ID>:    <PROCESS-HOST-CONFIGURATION>`  
+**`‘process’`**`:`  
+    `<PROCESS-ID>: <PROCESS-CONFIGURATION>`  
+**`‘node’`**`:`  
+    `<NODE-ID>:    <NODE-CONFIGURATION>`  
+**`‘edge’`**`:`  
+    `- <EDGE-CONFIGURATION>`  
+**`‘data’`**`:`  
+    `<TYPE-ID>:    <TYPE-SPEC>`
+
+The **`‘system’`**, **`‘host’`**, **`‘process’`** and **`‘node’`** sections each correspond to a level in the physical decomposition hierarchy of an xact system.
+
+The **`‘system’`** section contains configuration structure which applies to the system as a whole. 
+
+The **`‘host’`**, **`‘process’`** and **`‘node’`** sections each contain a dict which maps from the component identifier to the configuration structure for that component. Thus **`cfg[‘host’]`** is a dict that maps from host id strings to host configuration, **`cfg[‘process’]`** is a dict that maps from process id strings to process configuration, and **`cfg[‘node’]`** is a dict that maps from node id strings to node configuration.
+
+The **`’edge’`** section is a little different, as edges in an xact system are anonymous. This means that Instead of mapping from an identifier to configuration data, we instead have a list (or set) of edge configuration structures.
+
+The **`‘data’`** section is laid out in a similar manner to the host, process and node sections, as a dict that maps from a type id string to the configuration structure that defines the properties of the data type.
+
+A key driving requirement for this approach is to minimize the risk of merge conflicts between different versions of the configuration files. This is achieved by structuring the configuration such that most changes are both minimal and compact.
+
+It is for this reason that the containment structure of the system (which nodes are contained within which processes, and which processes are contained within which process-hosts) is specified within the configuration of the subordinate component. For example, the configuration for each process records the host within which it resides, and changing to a new host will involve a change only to the relevant process configuration and nowhere else.
+
+Similarly, a change to the connectivity structure of the system (the Kahn process network graph) requires a change only to the relevant edge configuration and nowhere else.
+
+The intent of these design decisions is to produce minimal, readable diffs, and a minimum of merge conflicts in a branch-and-merge engineering process.
+
+### 3.2.2 \- Representation of the configuration data on disk {#3.2.2---representation-of-the-configuration-data-on-disk}
+
+To start an xact system from the command line, call **`xact-cli -p <PATH>`**. 
+
+The path parameter specifies the location where the configuration of the system to be run may be found. It can either be a file path giving the location of a single configuration file, or a directory path, giving the location of a collection of configuration files held together in a single directory.
+
+When read (and combined together, in the case of a directory path being given), the resulting configuration is expected to have the structure described in the previous section.
+
+Xact can read configuration files formatted as YAML, JSON or XML. If YAML format is used, the filename should take the form `<NAME>.cfg.yaml`. Similarly, if JSON or XML is used, the filename should take the form `<NAME>.cfg.json` or `<NAME>.cfg.xml` respectively.
+
+If the path parameter is given as a directory path, then the leading part of the filename (the part preceding the `.cfg.*` suffix) is used to determine where in the configuration structure the file content should be placed, with any dots in the filename being used as a path delimiter This means that the content of file `host.cfg.yaml` will be placed in `cfg[‘host’]`, and the content of file `host.my_host_id.cfg.yaml` goes to `cfg[‘host’][‘my_host_id’]`. 
+
+Configuration files are read in order of filename length, shortest to longest, so a file targeting a specific subset of the configuration structure is not wiped out by one targeting a broader superset of the structure.
+
+If a file named `root.cfg.*` is present in the directory, it is treated as a special case, and is always read first, it’s content placed in the root of the configuration structure.
+
+Another special case concerns XML files. If t
+
+### 3.2.3 \- Python modules. {#3.2.3---python-modules.}
+
+TBD \- Refer to some sort of interface definition (TBD) in source document repository.  
+Requirement is for a mandatory step() function and an optional reset() function.
+
+### 3.2.4 \- Unix philosophy command line applications. {#3.2.4---unix-philosophy-command-line-applications.}
+
+Describe planned wrapper for UNIX pipes
+
+### 3.2.5 \- Shared libraries. {#3.2.5---shared-libraries.}
+
+TBD \- Define an interface for .so files.
+
+### 3.2.6 \- Command line interface {#3.2.6---command-line-interface}
+
+TBD
+
+### 3.2.7 \- Graphical user interface {#3.2.7---graphical-user-interface}
+
+TBD
+
+## 3.3 \- Outputs {#3.3---outputs}
+
+TBD
+
+## 3.4 \- Files and file formats {#3.4---files-and-file-formats}
+
+TBD
+
+## 3.5 \- Response times {#3.5---response-times}
+
+TBD
+
+## 3.6 \- Safety requirements {#3.6---safety-requirements}
+
+TBD
+
+## 3.7 \- Security requirements {#3.7---security-requirements}
+
+TBD
+
+## 3.8 \- Privacy requirements {#3.8---privacy-requirements}
+
+TBD
+
+## 3.9 \- Approach to provide flexibility {#3.9---approach-to-provide-flexibility}
+
+TBD
+
+## 3.10 \- Approach to provide availability {#3.10---approach-to-provide-availability}
+
+TBD
+
+## 3.11 \- Approach to provide maintainability {#3.11---approach-to-provide-maintainability}
+
+TBD
+
+## 3.12 \- Design conventions needed to understand the design. {#3.12---design-conventions-needed-to-understand-the-design.}
+
+TBD
+
+# 
+
+# 4 \- System architectural design {#4---system-architectural-design}
+
+An xact system is composed of one or more process hosts, each of which is composed of one or more processes, each of which is in turn composed of one or more nodes in the compute graph. In this way each process (normally implemented as a linux process) may contain several nodes which operate synchronously, but we can also distribute the computational load across multiple processes and even multiple computers if required. Each node in the xact graph corresponds to the concept of a ‘process’ in a Kahn process network.
+
+This hierarchy is intended to map loosely onto the systems engineering hierarchy defined in version 2 of the INCOSE systems engineering handbook, although the exact system breakdown structure and the exact mapping used will of course vary from problem to problem.
+
+Each xact graph node can be thought of as a software component, and a system implemented using xact as a component-oriented architecture. During development, xact nodes can also be used to implement simulations of sensors, actuators, or other extra-
+
+Because xact nodes can be used for either 
+
+ it should be possible to map the xact process and process host concepts onto whatever hardware components they reside within.   
+The xact system can be used to model or implement anything from an entire cyber-physical system, down to the control system for an individual subassembly.  
+This computational model suits certain types of cyber-physical systems, namely those compute-bound soft-real time systems that map naturally onto a ‘processing pipeline’ consisting of a small number of long-lived processes.
+
+### 4.1 \- System components {#4.1---system-components}
+
+### 4.1.1 \- System components identification and diagrams. {#4.1.1---system-components-identification-and-diagrams.}
+
+The product breakdown structure for xact decomposes the framework into 8 top level system components.
+
+These 8 components work together to read in configuration data and to distribute computational work across hardware resources accordingly, managing communications between hardware resources as configured and as required, and enabling the system to be controlled by the user.
+
+1. The **cli** component provides elementary command line control over xact systems, enabling the system to be started, stopped and paused from the command line.  
+2. The **sys** component is responsible for executing commands on the level of the entire xact system, deploying logic to remote hosts; configuring and connecting inter host channels, as well starting, stopping and pausing the process hosts.  
+3. The **host** component is responsible for executing commands on the level of process hosts, configuring and connecting inter process communications channels as well as starting and stopping the processes at the next level down.  
+4. The **proc** component is responsible for executing commands on the level of individual operating system processes. This component contains the ‘main loop’ for independently running processes, or the callback for those processes that are running under the control of an integrated application. The proc component is responsible for scheduling and stepping individual graph nodes, handling interrupts and restarting when recoverable errors occur.  
+5. The **node** component provides a thin wrapper around the logic that is configured for each node. It handles reading and writing to the queue interface, stores data between calls to step(), and provides functionality for recording and replaying channel data.  
+6. The **cfg** component provides functions for reading, writing, serializing, deserializing, and ‘enriching’ configuration data.  
+7. The **gen** component responsible for generating logic for the serialization, deserialization and validation of data items based on specifications from the configuration data.  
+8. The **queue** component provides adapter classes for different queue implementations, ensuring that each node is able to use a common interface to send and receive data irrespective of the underlying implementation.
+
+### 4.1.2 \- Command line interface {#4.1.2---command-line-interface}
+
+The xact command line interface component is stored in an executable python script named ‘xact’. The click (command line interface construction kit) library is used for command line parsing, via a thin wrapper with minor customization in ‘cli.py’. The command line interface reads configuration data with the ‘config’ package, and either invokes xact at a system level with the system.py module, or invokes xact at a host level with the host.py module.
+
+### 4.1.3 \- System controller {#4.1.3---system-controller}
+
+If configuration data has been generated programmatically, the xact system is started by calling **`xact.sys.start(cfg)`**. 
+
+### 4.1.4 \- Process host controller {#4.1.4---process-host-controller}
+
+TBD
+
+### 4.1.5 \- Process controller {#4.1.5---process-controller}
+
+TBD
+
+### 4.1.6 \- Node controller {#4.1.6---node-controller}
+
+TBD
+
+### 4.1.7 \- Configuration logic {#4.1.7---configuration-logic}
+
+TBD
+
+### 4.1.8 \- Interface logic generation {#4.1.8---interface-logic-generation}
+
+TBD
+
+### 4.1.9 \- Queue handling {#4.1.9---queue-handling}
+
+TBD
+
+## 4.2 \- Concept of execution {#4.2---concept-of-execution}
+
+This paragraph shall describe the concept of execution among the system components. It shall include diagrams and descriptions showing the dynamic relationship of the components. That is, how they will interact during system assembly, storage, deployment and operation, including, as applicable, flow of execution control, data flow, dynamically controlled sequencing, state transition diagrams, priorities among components, handling of interrupts, timing/sequencing relationships, exception handling, concurrent execution, dynamic allocation/deallocation, dynamic creation/deletion of objects, processes, tasks, assembly, storage, deployment and other aspects of dynamic behavior.
+
+## 4.3 \- Interface design {#4.3---interface-design}
+
+This section describes both interfaces among the components of the system and their interfaces with external entities such as other systems, configuration items and users, referencing interface design description documents as needed.  
+TBD
+
+### 4.3.1 \- Interface identification and diagrams {#4.3.1---interface-identification-and-diagrams}
+
+This section describes the project-unique identifier assigned to each interface and identifies the interfacing entities by name, number, version and documentation references as applicable. The identification shall state which entities have fixed interface characteristics and which are being developed or modified. One or more interface diagrams shall be provided.
+
+### 4.3.2 \- Configuration Interface  {#4.3.2---configuration-interface}
+
+Configuration file format and configuration structure
+
+### 4.3.3 \- Command line interface {#4.3.3---command-line-interface}
+
+CLI overview
+
+### 4.3.4 \- Runtime interface to launch remote processes. {#4.3.4---runtime-interface-to-launch-remote-processes.}
+
+CLI overview
+
+# 5 \- Requirements traceability {#5---requirements-traceability}
+
+Traceability from each component to requirements allocated to it.
+
+# 6 \- Notes {#6---notes}
+
+## 6.1 \- Background information {#6.1---background-information}
+
+## 6.2 \- Rationale {#6.2---rationale}
+
+## 6.3 \- Glossary of terms {#6.3---glossary-of-terms}
+
+# Appendix A \- TBD {#appendix-a---tbd}
+
