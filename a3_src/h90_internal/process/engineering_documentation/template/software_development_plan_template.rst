@@ -4,7 +4,7 @@ Software development plan template
 
 This appendix is a MANDATORY part of the (SDSMCS).
 It provides the content requirements for the
-software development plan.
+software development plan (SDP).
 
 #. Referenced information cited in paragraphs 4, 
    5, 6, and 7 shall be provided as attachments to
@@ -46,35 +46,39 @@ project schedules, organization, and resources.
 References
 ^^^^^^^^^^
 
-* (CMMI) Software Engineering Institute,
-  Capability Maturity Model Integration, Version
-  1.3, CMMI for Development, Report No.
-  CMU/SEI-2010-TR-033, November 2010, Software
-  Engineering Institute, Carnegie Mellon
-  University. Capability Maturity Model ® and
-  CMMI ® are registered in the U. S. Patent and
-  Trademark Office by Carnegie Mellon University.
-* (SMS) Abelson, L. A., S. Eslinger, M. C.
-  Gechman, C. H. Ledoux, M. V. Lieu, K. Korzac,
-  Software Measurement Standard for Mission
-  Critical Systems, Aerospace Report No.
-  TOR-2009(8506)-6, 5 May, 2011, The Aerospace
-  Corporation.
-* (SDSMCS) Adams, R. J., S. Eslinger, K. L. Owens,
-  J. M. Tagami, and M. A. Zambrana, Software
-  Development Standard for Mission Critical
-  Systems (SDSMCS), Aerospace Report No.
-  TR-RS-2015-00012, March 17, 2014, The Aerospace
-  Corporation. This is the same as SMC Standard
-  SMC-S-012, Software Development Standard.
+CMMI
+  Software Engineering Institute, Capability 
+  Maturity Model Integration, Version 1.3, CMMI
+  for Development, Report No. CMU/SEI-2010-TR-033,
+  November 2010, Software Engineering Institute,
+  Carnegie Mellon University. Capability Maturity
+  Model ® and CMMI ® are registered in the U. S.
+  Patent and Trademark Office by Carnegie Mellon
+  University.
+
+SMS
+  Abelson, L. A., S. Eslinger, M. C. Gechman, 
+  C. H. Ledoux, M. V. Lieu, K. Korzac, Software
+  Measurement Standard for Mission Critical Systems,
+  Aerospace Report No. TOR-2009(8506)-6, 5 May,
+  2011, The Aerospace Corporation.
+
+SDSMCS
+  Adams, R. J., S. Eslinger, K. L. Owens, J. M.
+  Tagami, and M. A. Zambrana, Software Development
+  Standard for Mission Critical Systems (SDSMCS),
+  Aerospace Report No. TR-RS-2015-00012, March 17, 
+  2014, The Aerospace Corporation. This is the
+  same as SMC Standard SMC-S-012, Software
+  Development Standard.
 
 
 Content requirements
 ^^^^^^^^^^^^^^^^^^^^
 
-This template contains the required content of the 
-Software Development Plan (SDP). See Section 3 of
-the Software Development Standard for Mission
+This template contains the required content of
+the Software Development Plan (SDP). See Section
+3 of the Software Development Standard for Mission
 Critical Systems (SDSMCS), Aerospace Report No.
 TOR-2013-00083, for definitions of all italicized
 words or phrases.
@@ -127,18 +131,19 @@ associated with its use.
 1.4 Relationship to other plans
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This paragraph shall describe the relationship, if
-any, of the SDP to other project management plans.
+This paragraph shall describe the relationship,
+if any, of the SDP to other project management
+plans.
 
 
 2. Referenced documents
 -----------------------
 
 This section shall list the number, title,
-revision,  and date of all documents referenced in
-this plan. This section shall also identify the
-source for all documents not available through
-normal Government stocking activities.
+revision,  and date of all documents referenced
+in this plan. This section shall also identify
+the source for all documents not available
+through normal Government stocking activities.
 
 
 3. Overview of required work
@@ -146,23 +151,23 @@ normal Government stocking activities.
 
 This section shall be divided into paragraphs as 
 needed to establish the context for the planning
-described in later sections. It shall include, as
-applicable, an overview of:
+described in later sections. It shall include,
+as applicable, an overview of:
 
-#. Requirements and constraints on the system and 
-   software to be developed
+#. Requirements and constraints on the system
+   and software to be developed.
 #. Requirements and constraints on project 
-   documentation
-#. Position of the project in the system lifecycle
-#. The selected project and acquisition strategy
+   documentation.
+#. Position of the project in the system lifecycle.
+#. The selected project and acquisition strategy.
 #. Any requirements or constraints on the selected
-   project and acquisition strategy
+   project and acquisition strategy.
 #. Requirements and constraints on project
-   schedules and resources
+   schedules and resources.
 #. Other requirements and constraints, such as on
    project security, privacy, methods, standards,
    interdependencies on hardware and software
-   development
+   development.
 
 
 4. General requirements

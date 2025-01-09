@@ -29,13 +29,16 @@ serves as the basis for the detailed design.
 References
 ----------
 
-* (SDSMCS) Adams, R. J., S. Eslinger, K. L. Owens, 
-  J. M. Tagami, and M. A. Zambrana, Software 
-  Development Standard for Mission Critical Systems
-  (SDSMCS), Aerospace Report No. TR-RS-2015-00012, 
-  March 17, 2014, The Aerospace Corporation. This 
-  is the same as SMC Standard SMC-S-012, Software
-  Development Standard.
+SDSMCS
+  Adams, R. J., S. Eslinger, K. L. Owens, J. M. 
+  Tagami, and M. A. Zambrana, Software Development
+  Standard for Mission Critical Systems
+
+SDSMCS
+  Aerospace Report No. TR-RS-2015-00012, March 17, 
+  2014, The Aerospace Corporation. This is the same
+  as SMC Standard SMC-S-012, Software Development
+  Standard.
 
 
 Content Requirements
