@@ -1,0 +1,557 @@
+requirements:
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "*"
+    section_name:                   Null
+    text: |
+      If the section numbering defined in the process improvement plan
+      template is not used, then the developer [SHALL]_ provide an
+      appendix in the developer process improvement plan with a
+      traceability matrix mapping from the section numbers and titles
+      in the process improvement plan template to the section numbers 
+      and titles used in the developer process improvement plan.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "*"
+    section_name:                   Null
+    text: |
+      If there exists a traceability matrix appendix, then it [SHALL]_
+      be referenced in Section 1.3.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1"
+    section_name:                   "1. Scope"
+    text: |
+      Section 1 of document type dt010_process_improvement_plan [SHALL]_ be
+      divided into the following paragraphs:
+
+      * 1.1 Identification
+      * 1.2 System overview
+      * 1.3 Document overview
+      * 1.4 Relationship to other documents and plans
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.1"
+    section_name:                   "1.1 Identification"
+    text: |
+      Paragraph 1.1 of document type dt010_process_improvement_plan [SHALL]_
+      contain a full identification of the system and the software
+      to which this document applies, including, as applicable:
+
+      * identfication numbers
+      * titles
+      * abbreviations
+      * version numbers
+      * release numbers
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt010_process_improvement_plan 
+      [SHALL]_ briefly state the purpose of the system and the software 
+      to which this document applies.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt010_process_improvement_plan
+      [SHALL]_ describe the general nature of the system and software.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt010_process_improvement_plan
+      [SHALL]_ summarize the history of system development, operation, 
+      and maintenance.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt010_process_improvement_plan
+      [SHALL]_ identify the project sponsor, acquirer, user, developer,
+      and support organizations.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt010_process_improvement_plan
+      [SHALL]_ identify current and planned operating and user sites.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.3"
+    section_name:                   "1.3 Document overview"
+    text: |
+      Paragraph 1.3 of document type dt010_process_improvement_plan
+      [SHALL]_ summarize the purpose and contents of this document.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.3"
+    section_name:                   "1.3 Document overview"
+    text: |
+      Paragraph 1.3 of document type dt010_process_improvement_plan
+      [SHALL]_ describe any security or privacy considerations 
+      associated with its use.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "1.4"
+    section_name:                   "1.4 Relationship to other documents and plans"
+    text: |
+      Paragraph 1.4 of document type dt010_process_improvement_plan
+      [SHALL]_ describe the relationship, if any, of the PIP to the
+      software development plan, software measurement plan, and other
+      project management plans.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "2"
+    section_name:                   "2. Referenced documents"
+    text: |
+      Section 2 of document type dt010_process_improvement_plan [SHALL]_
+      list the number, title, revision, and date of all documents 
+      referenced in this plan.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "2"
+    section_name:                   "2. Referenced documents"
+    text: |
+      Section 2 of document type dt010_process_improvement_plan [SHALL]_
+      identify the source for all documents not available through normal 
+      Government stocking activities.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3"
+    section_name:                   "3. Process improvement background"
+    text: |
+      Section 3 of document type dt010_process_improvement_plan [SHALL]_
+      provide background on the project's processes and process improvement 
+      efforts.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.1"
+    section_name:                   "3.1 Process baselines"
+    text: |
+      Paragraph 3.1 of document type dt010_process_improvement_plan 
+      [SHALL]_ include the process title, process identifier, organization
+      site, and date of each process in each identified process baseline(s)
+      from which process improvements are to be made.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.1"
+    section_name:                   "3.1 Process baselines"
+    text: |
+      For each software team member (if any) that uses a different process 
+      from those defined for the project or levied by the prime contractor
+      on the other software team members, then paragraph 3.1 of document type
+      dt010_process_improvement_plan [SHALL]_ include the process title, 
+      process identifier, organization site, and date of each process in each
+      identified process baseline(s) of that software team member.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.2"
+    section_name:                   "3.2 Process appraisal results"
+    text: |
+      For each process appraisal or process audit performed on the project on
+      any member of the developer team, including the prime contractor and 
+      other software team members, paragraph 3.2 of document type
+      dt010_process_improvement_plan [SHALL]_ include results including dates,
+      detailed final findings, and whether from project self-appraisal(s),
+      acquirer appraisal(s), or combined acquirer and developer appraisal
+      team(s).
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.2"
+    section_name:                   "3.2 Process appraisal results"
+    text: |
+      For each process appraisal or process audit performed on the project on
+      any member of the developer team, including the prime contractor and
+      other software team members, paragraph 3.2 of document type
+      dt010_process_improvement_plan [SHALL]_ include the appraisal disclosure
+      statements (ADSs) and any additional clarifying materials from all
+      SCAMPIs [#SCAMPI]_, if any, performed.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.2"
+    section_name:                   "3.2 Process appraisal results"
+    text: |
+      For each process appraisal or process audit performed on the project on
+      any member of the developer team, including the prime contractor and
+      other software team members, paragraph 3.2 of document type
+      dt010_process_improvement_plan [SHALL]_ include the current resolution
+      status of the findings.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.3"
+    section_name:                   "3.3 Previous process improvements"
+    text: |
+      Paragraph 3.3 of document type dt010_process_improvement_plan [SHALL]_
+      include descriptions of previous process improvement efforts that have 
+      been performed on the project.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.3"
+    section_name:                   "3.3 Previous process improvements"
+    text: |
+      Paragraph 3.3 of document type dt010_process_improvement_plan [SHALL]_
+      include other process improvement efforts, if any, that apply to the
+      project.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.3"
+    section_name:                   "3.3 Previous process improvements"
+    text: |
+      Paragraph 3.3 of document type dt010_process_improvement_plan [SHALL]_
+      include any additional clarifying information related to process
+      improvement.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.3"
+    section_name:                   "3.3 Previous process improvements"
+    text: |
+      Paragraph 3.3 of document type dt010_process_improvement_plan [SHALL]_
+      include the project's process improvements implemented so far.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "3.3"
+    section_name:                   "3.3 Previous process improvements"
+    text: |
+      Paragraph 3.3 of document type dt010_process_improvement_plan [SHALL]_
+      include a list of process improvement artifacts.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      Section 4 of document type dt010_process_improvement_plan [SHALL]_
+      identify the goals and objectives for process improvement.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      Section 4 of document type dt010_process_improvement_plan [SHALL]_
+      describe the project's planned process improvements.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      Section 4 of document type dt010_process_improvement_plan [SHALL]_
+      define the process improvement task success criteria.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      Section 4 of document type dt010_process_improvement_plan [SHALL]_
+      define how the process improvement task success criteria are measured.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      Section 4 of document type dt010_process_improvement_plan [SHALL]_
+      identify process improvement measurements.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "4"
+    section_name:                   "4. Process improvement goals and success criteria"
+    text: |
+      For each project software team member, if any, that is part of CMMI®
+      high maturity organizations [#ARC]_, Section 4 of document type
+      dt010_process_improvement_plan [SHALL]_ identify the quantitative
+      success criteria for evaluating the results.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5"
+    section_name:                   "5. Project process improvement organization"
+    text: |
+      Section 5 of document type dt010_process_improvement_plan [SHALL]_
+      depict and describe the organizational structure to be used for process
+      improvement on the project.
+    note: |
+      Reference Section 7.1 of the SDP for the project
+      organization.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.1"
+    section_name:                   "5.1 Process improvement groups"
+    text: |
+      Paragraph 5.1 of document type dt010_process_improvement_plan [SHALL]_
+      describe the project's process improvement groups, i.e., the enduring
+      groups.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.1"
+    section_name:                   "5.1 Process improvement groups"
+    text: |
+      Paragraph 5.1 of document type dt010_process_improvement_plan [SHALL]_
+      describe the process action teams, i.e., short-duration teams for
+      developing or improving specific processes.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.1"
+    section_name:                   "5.1 Process improvement groups"
+    text: |
+      Paragraph 5.1 of document type dt010_process_improvement_plan [SHALL]_
+      provide charters that identify the focus of the activities and the 
+      responsibilities for each process improvement group and process action
+      team. 
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.2"
+    section_name:                   "5.2 Process improvement processes and procedures"
+    text: |
+      Paragraph 5.2 of document type dt010_process_improvement_plan [SHALL]_
+      include the processes and procedures to be used to manage the project's
+      process improvement activities.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.3"
+    section_name:                   "5.3 Project process architecture"
+    text: |
+      Paragraph 5.3 of document type dt010_process_improvement_plan [SHALL]_
+      identify the checklists, templates, and work instructions for performing 
+      and managing the improvement tasks and generating the resulting work
+      products.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.3"
+    section_name:                   "5.3 Project process architecture"
+    text: |
+      Paragraph 5.3 of document type dt010_process_improvement_plan [SHALL]_
+      identify the necessary management, development, and support activities
+      for process improvement.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "5.3"
+    section_name:                   "5.3 Project process architecture"
+    text: |
+      Paragraph 5.3 of document type dt010_process_improvement_plan [SHALL]_
+      identify the planned process improvement work products.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      describe the planning of the process improvement activities.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      include any other inputs, besides the findings in Paragraph 3.2,
+      to the process improvement plan (e.g., lessons learned,
+      process effectiveness measures).
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      describe the process improvement activities that address the findings.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      identify any barriers and risks to implementing this plan.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      identify the risk management strategy appropriate for each identified
+      barrier or risk.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      describe how this process improvement plan will be applied to the 
+      software team members performing software development on the project.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "6"
+    section_name:                   "6. Process improvement planning"
+    text: |
+      Section 6 of document type dt010_process_improvement_plan [SHALL]_
+      specify the effort, budget, schedule, and other resources for the 
+      process improvement activities, including the basis of estimates and
+      assumptions made.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "7"
+    section_name:                   "7. Process improvement implementation and tracking"
+    text: |
+      Section 7 of document type dt010_process_improvement_plan [SHALL]_
+      describe the steps to be followed in implementing this plan.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "7"
+    section_name:                   "7. Process improvement implementation and tracking"
+    text: |
+      Section 7 of document type dt010_process_improvement_plan [SHALL]_
+      describe the steps to be followed in tracking progress against this plan.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "7"
+    section_name:                   "7. Process improvement implementation and tracking"
+    text: |
+      Section 7 of document type dt010_process_improvement_plan [SHALL]_
+      describe the steps to be followed in measuring the effectiveness of the
+      process improvement activities, including measurements and quality 
+      assurance activities.
+
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8"
+    section_name:                   "8. Notes"
+    text: |
+      Section 8 of document type dt010_process_improvement_plan [SHALL]_ 
+      contain any general information that aids in understanding this document
+      (e.g., background information, glossary, rationale).
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8"
+    section_name:                   "8. Notes"
+    text: |
+      Section 8 of document type dt010_process_improvement_plan [SHALL]_ be
+      divided into the following paragraphs:
+
+      * 8.1 Abbreviations and acronyms
+      * 8.2 Glossary
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8.1"
+    section_name:                   "8.1 Abbreviations and acronyms"
+    text: |
+      Paragraph 8.1 of document type dt010_process_improvement_plan [SHALL]_
+      include an alphabetical listing of all acronyms, abbreviations, and their
+      meanings as used in this document.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8.2"
+    section_name:                   "8.2 Glossary"
+    text: |
+      Paragraph 8.2 of document type dt010_process_improvement_plan [SHALL]_
+      include a list of any terms and their definitions needed to understand
+      this document.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8.2"
+    section_name:                   "8.2 Glossary"
+    text: |
+      For each term often used differently between organizations (e.g.,
+      acquisition phase names, build, block, development phase names,
+      effectivity, evolution, increment, and iteration), excepting those
+      terms used exactly as defined in the Software Development Standard
+      [SDSMCS]_, paragraph 8.2 of document type dt010_process_improvement_plan
+      [SHALL]_ define that term to avoid confusion.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "8.3"
+    section_name:                   "8.3 General information"
+    text: |
+      Paragraph 8.3 of document type dt010_process_improvement_plan [SHALL]_
+      contain any other general information that aids in understanding this 
+      document (e.g., background information, rationale).
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      Appendices [MAY]_ be used to provide information published separately
+      for convenience in document maintenance (e.g., charts, classified data).
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      As applicable, each appendix [SHALL]_ be referenced in the main body of
+      the document where the data would normally have been provided. Appendices
+      may be bound as separate documents for ease in handling.
+
+  - id005_document_type:            "dt010_process_improvement_plan"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      Appendices [SHALL]_ be lettered alphabetically
+      (A, B, etc.).
+
+footnotes:
+
+  - text |
+      "
+      .. [#ARC] High-maturity organizations are appraised
+         by an Appraisal Requirements for CMMI (ARC)
+         Class A SCAMPI appraisal as practicing and
+         successfully rated by an independent CMMI
+         Institute-certified High Maturity Lead Appraiser,
+         as Maturity Level 4 or 5, including all 20 or
+         22 CMMI-DEV V1.3 process areas, respectively.
+         The Level 4 CMMI high-maturity process areas
+         are: Organizational Process Performance (OPP)
+         and Quantitative Project Management (QPM);
+         the Level 5 process areas are: Causal Analysis
+         and Resolution (CAR) and Organizational
+         Performance Management (OPM).
+
+      .. [#CMU] CMMI® and SCAMPI(SM) are a trademark and
+         service mark of Carnegie Mellon University.
+
+      .. [SHALL] The use of the word SHALL indicates
+         that the statement is intended to be a
+         contractually binding requirement, and that
+         it should be both implemented and verified
+         before the requirement is considered to be
+         met.
+
+      .. [WILL] The use of the word WILL indicates
+         that the statement is intended to describe
+         a fact or an assurance that some condition
+         may be assumed to be true. This can be used
+         to communicate obligations that have been
+         accepted by other parties or to highlight
+         relevant legeslation, standards, or current
+         system capabilities. WILL statements are
+         neither subject to verification nor to
+         validation and are not intended to be
+         contractually binding.
+
+      .. [SHOULD] The use of the word SHOULD indicates
+         that the statement is either intended to
+         communicate a provision that cannot be
+         formally verified for some reason, or a
+         design goal that is desired but not certain
+         to be fully achievable. SHOULD statements are
+         not subject to verification, and are therefore
+         not contractually binding, but they are still
+         subject to validation and user acceptance
+         testing.
+
+      .. [MAY] The use of the word MAY indicates that
+         the statement is advisory, intended to grant
+         explicit permission for some design decision
+         or to suggest a potential design decision
+         without making it mandatory. MAY statements
+         place no obligation on either party and are
+         neither subject to verification nor to
+         validation
+
+      .. [NEED] The use of the word NEED indicates
+         that the statement is intended to express
+         a high level stakeholder expectation, goal
+         or need. Such statements are not requirements,
+         although requirements may be derived from
+         them. NEED statements are neither subject to
+         verification nor to validation.
+      "

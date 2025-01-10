@@ -1,0 +1,648 @@
+requirements:
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "*"
+    section_name:                   Null
+    text: |
+      If the section numbering defined in the software measurement report
+      template is not used, then the developer shall provide an appendix
+      in the developer software measurement report with a traceability
+      matrix mapping from the section numbers and titles in the software
+      measurement report template to the section numbers and titles used
+      in the developer software measurement report.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "*"
+    section_name:                   Null
+    text: |
+      If there exists a traceability matrix appendix, then it shall be
+      referenced in Section 1.3.
+
+  - id005_document_type:            "dt009_software_measurement_report" 
+    section_number:                 "1"
+    section_name:                   "1. Scope"
+    text: |
+      Section 1 of document type dt009_software_measurement_report [SHALL]_
+      be divided into the following paragraphs:
+
+      * 1.1 Identification
+      * 1.2 System overview
+      * 1.3 Document overview
+      * 1.4 Relationship to other documents and plans
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.1"
+    section_name:                   "1.1 Identification"
+    text: |
+      Paragraph 1.1 of document type dt009_software_measurement_report [SHALL]_
+      contain a full identification of the system and the software to which
+      this document applies, including, as applicable:
+
+      * identification numbers
+      * titles
+      * abbreviations
+      * version numbers
+      * release numbers
+
+      This paragraph [SHALL]_ provide the period of reporting.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.2" 
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt009_software_measurement_report [SHALL]_
+      briefly state the purpose of the system and the software to which this
+      document applies.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.2"
+    section_name:                   "1.2 System overview"
+    text: |
+      Paragraph 1.2 of document type dt009_software_measurement_report [SHALL]_:
+
+      #. Describe the general nature of the system and software
+      #. Summarize the history of system development, operation, and maintenance
+      #. Identify the project sponsor, acquirer, user, developer, and support organizations
+      #. Identify current and planned operating and user sites
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.3"
+    section_name:                   "1.3 Document overview"
+    text: |
+      Paragraph 1.3 of document type dt009_software_measurement_report [SHALL]_
+      summarize the purpose and contents of this document.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.3"
+    section_name:                   "1.3 Document overview"
+    text: |
+      Paragraph 1.3 of document type dt009_software_measurement_report [SHALL]_
+      describe any security or privacy considerations associated with its use.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "1.4"
+    section_name:                   "1.4 Relationship to other documents and plans"
+    text: |
+      Paragraph 1.4 of document type dt009_software_measurement_report [SHALL]_
+      describe the relationship, if any, of the SMR to the Software Development
+      Plan (SDP), software measurement plan, and other project management plans.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "2"
+    section_name:                   "2. Referenced documents"
+    text: |
+      Section 2 of document type dt009_software_measurement_report [SHALL]_
+      list the number, title, revision, and date of all documents referenced
+      in this plan.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "2"
+    section_name:                   "2. Referenced documents"
+    text: |
+      Section 2 of document type dt009_software_measurement_report [SHALL]_
+      identify the source for all documents not available through normal
+      Government stocking activities.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "3"
+    section_name:                   "3. Metrics analysis summary"
+    text: |
+      Section 3 of document type dt009_software_measurement_report [SHALL]_
+      be divided into the following paragraphs:
+
+      * 3.1 Contract milestones
+      * 3.2 Measurement performance
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "3.1"
+    section_name:                   "3.1 Contract milestones"
+    text: |
+      Paragraph 3.1 of document type dt009_software_measurement_report [SHALL]_
+      identify significant project milestones for the next six months.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "3.2"
+    section_name:                   "3.2 Measurement performance"
+    text: |
+      Paragraph 3.2 of document type dt009_software_measurement_report [SHALL]_
+      summarize measurement performance highlights that are detailed in the
+      subsequent report.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "3.2"
+    section_name:                   "3.2 Measurement performance"
+    text: |
+      When a threshold identified in the Software Measurement Plan (SMP) is
+      breached, then mitigation planning [SHALL]_ be itemized in paragraph 3.2
+      of document type dt009_software_measurement_report.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4"
+    section_name:                   "4. General requirements"
+    text: |
+      Section 4 of document type dt009_software_measurement_report [SHALL]_
+      be divided into the following paragraphs:
+
+      * 4.1 Project build and software item characteristics
+      * 4.2 Identification items
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4"
+    section_name:                   "4. General requirements"
+    text: |
+      If different builds or different software on the project require different
+      planning, these differences [SHALL]_ be noted in the paragraphs of Section 4
+      of document type dt009_software_measurement_report.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.1"
+    section_name:                   "4.1 Project build and software item characteristics"
+    text: |
+      For each build and software item (SI), paragraph 4.1 of document type
+      dt009_software_measurement_report [SHALL]_ provide the following context
+      information:
+
+      #. Computer resource characterization:
+         * Computer hardware identification
+         * Computer communication identification
+         * Computer storage hardware identification
+      #. Authorizing agreement (e.g., Memorandum of Understanding (MOU), contract, amendment)
+      #. Development organization(s)
+      #. Capability Maturity Model Integration for Development (CMMI®-DEV) maturity level
+      #. Application type
+      #. Development process
+      #. Software origin
+      #. Computer language
+      #. Reusable software applications, including COTS and acquirer-furnished software
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.1.x"
+    section_name:                   "4.1.x Build x characteristics"
+    text: |
+      For each build "x", paragraph 4.1.x of document type dt009_software_measurement_report
+      [SHALL]_ provide the context information specified in paragraph 4.1.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.1.x"
+    section_name:                   "4.1.x Build x characteristics"
+    text: |
+      If any characteristics change, then paragraph 4.1.x of document type
+      dt009_software_measurement_report [SHALL]_ highlight the change(s).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.1.x.y"
+    section_name:                   "4.1.x.y Software item x.y characteristics"
+    text: |
+      For each software item (SI) "y" in the build, paragraph 4.1.x.y of document type
+      dt009_software_measurement_report [SHALL]_ provide the context information
+      specified in paragraph 4.1.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.1.x.y"
+    section_name:                   "4.1.x.y Software item x.y characteristics"
+    text: |
+      If any characteristics change, then paragraph 4.1.x.y of document type
+      dt009_software_measurement_report [SHALL]_ highlight the change(s).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.2"
+    section_name:                   "4.2 Identification items"
+    text: |
+      For each build and SI, paragraph 4.2 of document type dt009_software_measurement_report
+      [SHALL]_ provide the following identification information:
+
+      #. WBS element identifier
+      #. Control account
+      #. Integrated master schedule (IMS)
+      #. Specification tree identification number
+      #. Component identification
+      #. Acquisition phase identification
+      #. Development phase identification
+      #. System identification (version and release)
+      #. Subsystem identification (version and release)
+      #. Element identification (version and release)
+      #. Software item identification (version and release)
+      #. Build identification (Release)
+      #. Computer resource utilization (CPU):
+         * CPU identification(s) (ID(s))
+         * Computer resource utilization input/output ID
+         * Computer resource utilization memory storage device
+      #. Computer resource utilization response time
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.2.x"
+    section_name:                   "4.2.x Build x identification items"
+    text: |
+      For each build, paragraph 4.2.x of document type dt009_software_measurement_report
+      [SHALL]_ provide the context information specified in paragraph 4.2.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.2.x"
+    section_name:                   "4.2.x Build x identification items"
+    text: |
+      If any characteristics change, then paragraph 4.2.x of document type
+      dt009_software_measurement_report [SHALL]_ highlight the change(s).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.2.x.y"
+    section_name:                   "4.2.x.y Software item x.y identification items"
+    text: |
+      For each SI in the build, paragraph 4.2.x.y of document type
+      dt009_software_measurement_report [SHALL]_ provide the context information
+      specified in paragraph 4.2.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "4.2.x.y"
+    section_name:                   "4.2.x.y Software item x.y identification items"
+    text: |
+      If any characteristics change, then paragraph 4.2.x.y of document type
+      dt009_software_measurement_report [SHALL]_ highlight the change(s).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5"
+    section_name:                   "5. Measurement data human-readable reporting"
+    text: |
+      Section 5 of document type dt009_software_measurement_report [SHALL]_
+      report the data by the particular component (e.g., build, increment, or
+      evolution) to which they apply.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5"
+    section_name:                   "5. Measurement data human-readable reporting"
+    text: |
+      Section 5 of document type dt009_software_measurement_report [SHALL]_
+      report the data by the SI to which they apply.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5"
+    section_name:                   "5. Measurement data human-readable reporting"
+    text: |
+      For each measurement diagram whenever a tailored Unit of Measure (UOM) is used,
+      Section 5 of document type dt009_software_measurement_report [SHALL]_ document
+      that fact in a footnote or other appropriate notation.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5"
+    section_name:                   "5. Measurement data human-readable reporting"
+    text: |
+      For each measurement diagram, Section 5 of document type dt009_software_measurement_report
+      [SHALL]_ provide the following labeling information:
+
+      a. Scope of the data
+      b. SI or build name
+      c. Product integration level
+      d. Reporting period
+      e. Reported by
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x"
+    section_name:                   "5.x Build identifier"
+    text: |
+      Section 5.x of document type dt009_software_measurement_report [SHALL]_
+      identify the specific component (e.g., build, increment, or evolution)
+      to which each of the subsequent measurements apply.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y"
+    section_name:                   "5.x.y Software item identifier"
+    text: |
+      Section 5.x.y of document type dt009_software_measurement_report [SHALL]_
+      identify the specific software item (SI) to which each of the subsequent
+      measurements apply.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y"
+    section_name:                   "5.x.y Software item identifier"
+    text: |
+      Section 5.x.y of document type dt009_software_measurement_report [SHALL]_
+      identify applicable risks and uncertainties and the plans for dealing with them.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.1"
+    section_name:                   "5.x.y.1 Requirement progress management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.1 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of requirement progress:
+
+      a. Requirements defined
+      b. Requirements TBX closure
+      c. Requirements verified
+      d. Qualification methods
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.2"
+    section_name:                   "5.x.y.2 Development progress management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.2 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of development progress:
+
+      a. Components defined
+      b. Units defined
+      c. Units coded and unit tested
+      d. Units integrated and tested
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.3"
+    section_name:                   "5.x.y.3 Test progress management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.3 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of test progress:
+
+      a. Test cases developed
+      b. Test cases dry run
+      c. Test cases performed
+      d. Test cases passed
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.4"
+    section_name:                   "5.x.y.4 Schedule adherence management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.4 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of schedule adherence:
+
+      a. Project milestones
+      b. Scheduled activities
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.5"
+    section_name:                   "5.x.y.5 Effort profile management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.5 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of effort profile management:
+
+      a. Labor hours
+      b. Rework labor hours
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.6"
+    section_name:                   "5.x.y.6 Staff profile management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.6 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of staff profile management:
+
+      a. Staffing level
+      b. Staff by experience
+      c. Staff turnover
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.7"
+    section_name:                   "5.x.y.7 Computer resource management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.7 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of computer resource management:
+
+      a. CPU utilization
+      b. Memory utilization
+      c. Input/output utilization
+      d. Response time
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.8"
+    section_name:                   "5.x.y.8 Cost profile management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.8 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of cost profile management:
+
+      a. Earned value performance
+      b. Schedule and cost performance index
+      c. Schedule and cost variance
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.9"
+    section_name:                   "5.x.y.9 Size management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.9 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of size management:
+
+      a. Requirements size
+      b. Requirements by type
+      c. Line of code size
+      d. Line of code by origin
+      e. Line of code by type
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.10"
+    section_name:                   "5.x.y.10 Volatility management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.10 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of volatility management:
+
+      a. Requirement volatility
+      b. Line of code volatility
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.11"
+    section_name:                   "5.x.y.11 Build content management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.11 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base measures of build content management:
+
+      a. Requirements per build
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.12"
+    section_name:                   "5.x.y.12 Defect resolution management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.12 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of defect resolution management:
+
+      a. Discrepancy report status
+      b. Discrepancy report aging
+      c. Discrepancy report by type
+      d. Discrepancy report by source
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.13"
+    section_name:                   "5.x.y.13 Complexity management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.13 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base measures of complexity management:
+
+      a. Cyclomatic complexity
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.14"
+    section_name:                   "5.x.y.14 Coverage management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.14 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of coverage management:
+
+      a. Requirements to design traceability
+      b. Requirements to test traceability
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.15"
+    section_name:                   "5.x.y.15 Productivity management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.15 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of productivity management:
+
+      a. Development productivity
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.16"
+    section_name:                   "5.x.y.16 Maturity management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.16 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of maturity management:
+
+      a. Development defect density
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.17"
+    section_name:                   "5.x.y.17 Management status management indicator"
+    text: |
+      For the current reporting period, paragraph 5.x.y.17 of document type
+      dt009_software_measurement_report [SHALL]_ provide in tabular and graphic
+      form the following base and derived measures of management status:
+
+      a. Action item closure
+      b. Risk mitigation task completion status
+      c. Schedule compression
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y.18"
+    section_name:                   "5.x.y.18 Aggregated measurement report (SI level)"
+    text: |
+      For the current reporting period, paragraph 5.x.y.18 of document type
+      dt009_software_measurement_report [SHALL]_ report any aggregated measurements
+      identified for the project as specified in the project software measurement
+      plan (SMP) for the software item (SI).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "5.x.y+1"
+    section_name:                   "5.x.y+1 Aggregated measurement report (build level)"
+    text: |
+      For the current reporting period, paragraph 5.x.y+1 of document type
+      dt009_software_measurement_report [SHALL]_ report any aggregated measurements
+      identified for the project as specified in the project software measurement
+      plan (SMP) for the build.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "6"
+    section_name:                   "6. Measurement data electronic reporting"
+    text: |
+      Section 6 of document type dt009_software_measurement_report [SHALL]_
+      specify the electronic reporting of measurement data.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "6.1"
+    section_name:                   "6.1 Base measures"
+    text: |
+      In accordance with the data definitions provided in (SMS) Appendix A,
+      Base Measure Specifications, paragraph 6.1 of document type
+      dt009_software_measurement_report [SHALL]_ provide the planned base
+      measure data.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "6.1"
+    section_name:                   "6.1 Base measures"
+    text: |
+      For the current reporting period, paragraph 6.1 of document type
+      dt009_software_measurement_report [SHALL]_ provide actual base measure
+      counts in accordance with the data definition provided in (SMS) the
+      Base Measure Specifications appendix.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "6.2"
+    section_name:                   "6.2 Derived measures"
+    text: |
+      For the current reporting period, paragraph 6.2 of document type
+      dt009_software_measurement_report [SHALL]_ report the calculated derived
+      values in accordance with the data definition provided in (SMS) the
+      Derived Measure Specifications appendix.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "6.3"
+    section_name:                   "6.3 Aggregated measurement report"
+    text: |
+      For the current reporting period, paragraph 6.3 of document type
+      dt009_software_measurement_report [SHALL]_ report any aggregated
+      measurements identified for the project as specified in the project
+      software measurement plan (SMP).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "7"
+    section_name:                   "7. Notes"
+    text: |
+      Section 7 of document type dt009_software_measurement_report [SHALL]_
+      contain any general information that aids in understanding this document
+      (e.g., background information, glossary, rationale).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "7.1"
+    section_name:                   "7.1 Abbreviations and acronyms"
+    text: |
+      Paragraph 7.1 of document type dt009_software_measurement_report [SHALL]_
+      include an alphabetical listing of all acronyms, abbreviations, and
+      their meanings as used in this document.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "7.2"
+    section_name:                   "7.2 Glossary"
+    text: |
+      Paragraph 7.2 of document type dt009_software_measurement_report [SHALL]_
+      include a list of any terms and their definitions needed to understand
+      this document.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "7.2"
+    section_name:                   "7.2 Glossary"
+    text: |
+      Terms often used differently between organizations (e.g., acquisition phase
+      names, build, block, development phase names, effectivity, evolution,
+      increment, and iteration) [SHALL]_ be defined in paragraph 7.2 of document
+      type dt009_software_measurement_report to avoid confusion, unless the terms
+      are used exactly as defined in the Software Development Standard (SDSMCS)
+      and Software Measurement Standard (SMS).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "7.3"
+    section_name:                   "7.3 General information"
+    text: |
+      Paragraph 7.3 of document type dt009_software_measurement_report [SHALL]_
+      contain any other general information that aids in understanding this
+      document (e.g., background information, rationale).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      Appendices [MAY]_ be used to provide information published separately
+      for convenience in document maintenance (e.g., charts, classified data).
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      As applicable, each appendix [SHALL]_ be referenced in the main body of
+      the document where the data would normally have been provided.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      Appendices [MAY]_ be bound as separate documents for ease in handling.
+
+  - id005_document_type:            "dt009_software_measurement_report"
+    section_number:                 "A"
+    section_name:                   "A. Appendices"
+    text: |
+      Appendices [SHALL]_ be lettered alphabetically (A, B, etc.).
+
