@@ -1,0 +1,116 @@
+title:
+  "Document type register"
+
+
+introduction:
+  "This register holds a list of document types
+  with a brief description for each."
+
+
+register:
+
+  dt000_bash_script:
+    desc: |
+      An executable script written in the Bash
+      programming language.
+
+  dt001_python_script:
+    desc: |
+      An executable script written in the Python
+      programming language.
+
+  dt002_python_package:
+    desc: |
+      A package of modules written in the Python
+      programming language.
+
+  dt003_python_module:
+    desc: |
+      A module written in the Python programming
+      language.
+
+  dt004_python_stableflow_edict_component:
+    desc: |
+      An ic00_edict compliant component for the
+      cf00_stableflow framework written in the
+      Python programming language.
+
+  dt005_software_development_plan:
+    desc: |
+      The Software Development Plan (SDP)
+      describes a developer's plans for conducting
+      a software development effort. The term
+      “software development” is meant to include
+      the new development, modification, reuse,
+      reengineering, incorporation of commercial
+      item (also known as COTS) packages,
+      maintenance, and all other activities
+      resulting in software products. The SDP
+      provides the acquirer insight into, and a
+      tool for monitoring, the processes to be
+      followed for software development; the
+      methods to be used; the approach to be
+      followed for each activity; and project
+      schedules, organization, and resources.
+
+  dt006_software_architecture_description:
+    desc: |
+      The Software Architecture Description (SAD)
+      documents the software architecture,
+      including the approach, important design
+      decisions, rationale, and tradeoffs. It
+      provides diagrams and text to document the
+      various architectural views from different
+      perspectives and serves as the basis for
+      the detailed design.
+
+  dt007_software_master_build_plan:
+    desc: |
+      The Software Master Build Plan (SMBP)
+      includes plans for integrating and verifying
+      the software consistent with the software
+      development lifecycle model(s). (The SMBP
+      is sometimes known as the Master Software
+      Integration and Verification Plan.)
+
+  dt008_software_measurement_plan:
+    desc: |
+      The Software Measurement Plan (SMP) is an
+      integrated plan covering the software
+      development measurement activities for all
+      software team members throughout the system
+      development. The SMP provides the planned
+      metrics and their aggregation levels,
+      explanations of computation, expected or
+      projected values, thresholds, and any
+      planned corrective actions to be taken
+      in case thresholds are breached.
+
+  dt009_software_measurement_report:
+    desc: |
+     Each Software Measurement Report (SMR) is an
+     integrated report covering the software
+     development activities for all significant
+     software team members throughout the system
+     development. The SMR provides explanations
+     and interpretations of reported measurement
+     data, including deviations from expected or
+     projected values and breaches of thresholds
+     as well as any corrective actions being
+     undertaken. The software measurements
+     collected and reported each month are
+     expected to vary because the lifecycle
+     activities vary over time.
+
+  dt010_process_improvement_plan:
+    desc: |
+     The Process Improvement Plan (PIP) is an
+     integrated plan covering the software
+     development process improvement activities
+     for all software team members throughout the
+     system development life cycle. The PIP
+     provides the plans and activities to improve
+     the processes on the project based on
+     process assessments conducted by the
+     acquirer team or the developer team or
+     both.

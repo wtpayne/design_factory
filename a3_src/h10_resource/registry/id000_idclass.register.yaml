@@ -15,20 +15,16 @@ introduction:
 
 register:
 
-  process_area:
-    regs: "process_area.register.yaml"
-    desc: "Design process area identifier."
-    pfix: "a"
-    dgts: 1
-    note: "Different areas of the workspace are
-          given over to different stages or
-          activities of the design process.
-          This makes it easier to check that
-          the process is being followed correctly,
-          e.g. by setting appropriate read/write
-          flags."
+  id000_idclass:
+    regs: id000_idclass.register.yaml
+    desc: "Identifier class identifier."
+    pfix: "id"
+    dgts: 3
+    note: |
+      This identifier is used to uniquely
+      identify different identifier classes.
 
-  branch_group:
+  id001_branch_group:
     regs: Null
     desc: "Branch group identifier."
     pfix: "b"
@@ -45,15 +41,57 @@ register:
           can identify and manage the lifecycle
           in an appropriate manner."
 
-  capability:
+  id002_workspace:
     regs: Null
-    desc: "Capability identifier."
-    pfix: "c"
-    dgts: 3
-    note: "Capability."
+    desc: "Workspace identifier."
+    pfix: "ws"
+    dgts: 2
+    note: "We sometimes need to have more than
+          one copy of the design document set
+          available at the same time on our local
+          workstation. For example, this may be
+          to make it easier switch between
+          projects, or to carry out comparisons
+          between different versions of a design.
+          This identifier gives us a way of
+          systematically identifying and handling
+          such local working copies."
 
-  component_framework:
-    regs: component_framework.register.yaml
+  id003_process_area:
+    regs: "id003_process_area.register.yaml"
+    desc: "Design process area identifier."
+    pfix: "a"
+    dgts: 1
+    note: "Different areas of the workspace are
+          given over to different stages or
+          activities of the design process.
+          This makes it easier to check that
+          the process is being followed correctly,
+          e.g. by setting appropriate read/write
+          flags."
+
+  id004_ref_ctrl:
+    regs: "id004_ref_ctrl.register.yaml"
+    desc: "Reference control hierarchy tier identifier."
+    pfix: "h"
+    dgts: 2
+    note: "We use an explicit hierarchy to reduce
+           the formation of cyclic dependencies
+           and to encourage product line oriented
+           organisation."
+
+  id005_document_type:
+    regs: "id005_document_type.register.yaml"
+    desc: "Document type identifier."
+    pfix: "dt"
+    dgts: 3
+    note: |
+      This identifier is used to uniquely 
+      identify different types of design
+      document.
+
+  id006_component_framework:
+    regs: "id006_component_framework.register.yaml"
     desc: "Component framework identifier."
     pfix: "cf"
     dgts: 2
@@ -62,8 +100,8 @@ register:
           and software runtime frameworks.
           (Stableflow, Simulink, LabView etc...)"
 
-  counterparty:
-    regs: Null
+  id007_counterparty:
+    regs: "id007_counterparty.register.yaml"
     desc: "Counterparty identifier."
     pfix: "co"
     dgts: 3
@@ -73,7 +111,7 @@ register:
           within source documents without breaching
           expectations of confidentiality."
 
-  discipline:
+  id008_discipline:
     regs: Null
     desc: "Discipline identifier."
     pfix: "d"
@@ -82,24 +120,15 @@ register:
           coordination of work from multiple
           distinct disciplines."
 
-  demo:
+  id009_demo:
     regs: Null
     desc: "Demo identifier."
     pfix: "dm"
     dgts: 3
     note: "Demonstration codename."
 
-  document_type:
-    regs: "document_type.register.yaml"
-    desc: "Document type identifier."
-    pfix: "dt"
-    dgts: 3
-    note: "This identifier is used to uniquely
-          identify different types of design
-          document."
-
-  environment:
-    regs: "environment.register.yaml"
+  id010_environment:
+    regs: "id010_environment.register.yaml"
     desc: "Runtime, build or development environment identifier."
     pfix: "e"
     dgts: 3
@@ -110,7 +139,7 @@ register:
           virtualenv instances, docker images,
           virtual machine disk images and so on."
 
-  recording:
+  id011_recording:
     regs: Null
     desc: "Recording serial identifier."
     pfix: "g"
@@ -120,17 +149,7 @@ register:
           individual recordings within a recording
           session."
 
-  ref_ctrl:
-    regs: "ref_ctrl.register.yaml"
-    desc: "Reference control hierarchy tier identifier."
-    pfix: "h"
-    dgts: 2
-    note: "We use an explicit hierarchy to reduce
-           the formation of cyclic dependencies
-           and to encourage product line oriented
-           organisation."
-
-  item:
+  id012_item:
     regs: Null
     desc: "Item identifier."
     pfix: "i"
@@ -140,8 +159,8 @@ register:
           tracked. These are currently most heavily
           used for requirements items."
 
-  interface_convention:
-    regs: "interface_convention.register.yaml"
+  id013_interface_convention:
+    regs: "id013_interface_convention.register.yaml"
     desc: "interface convention identifier."
     pfix: "ic"
     dgts: 2
@@ -150,7 +169,7 @@ register:
           been designed to conform to specific
           interface standartds or conventions."
 
-  job:
+  id014_job:
     regs: Null
     desc: "Job or task identifier."
     pfix: "j"
@@ -159,14 +178,14 @@ register:
           because the letter t is already used as
           the team member id prefix."
 
-  protection_level:
-    regs: Null
+  id015_protection_level:
+    regs: "id015_protection_level.register.yaml"
     desc: "Protection level identifier."
     pfix: "k"
     dgts: 2
     note: "The letter k is short for klassification."
 
-  lifecycle_product_class:
+  id016_lifecycle_product_class:
     regs: Null
     desc: "Lifecycle product class identifier."
     pfix: "l"
@@ -178,7 +197,7 @@ register:
           registration, validation and tracking
           processes."
 
-  platform:
+  id017_platform:
     regs: Null
     desc: "Platform identifier."
     pfix: "m"
@@ -186,7 +205,7 @@ register:
     note: "Identifier for all test and data
           recording platforms."
 
-  stream:
+  id018_stream:
     regs: Null
     desc: "Stream identifier."
     pfix: "n"
@@ -194,22 +213,22 @@ register:
     note: "Identifier for data streams on a
           particular platform."
 
-  nonconformity:
+  id019_nonconformity:
     regs: Null
     desc: "Nonconformity type identifier."
     pfix: "nc"
     dgts: 4
     note: "Identifier for nonconformity types."
 
-  project:
-    regs: Null
+  id020_project:
+    regs: "id020_project.register.yaml"
     desc: "Project identifier."
     pfix: "p"
     dgts: 4
     note: "Projects are numbered and named in a
           global namespace."
 
-  process:
+  id021_process:
     regs: Null
     desc: "Process identifier."
     pfix: "q"
@@ -217,7 +236,7 @@ register:
     note: "Process identifiers begin with a q for
           quality."
 
-  lifecycle_product:
+  id022_lifecycle_product:
     regs: Null
     desc: "Lifecycle product identifier."
     pfix: "r"
@@ -225,7 +244,7 @@ register:
     note: "Engineering lifecycle products are
           registered here."
 
-  process_class:
+  id023_process_class:
     regs: Null
     desc: "Process class identifier."
     pfix: "s"
@@ -234,15 +253,15 @@ register:
           no reason other than the word process
           has two of them."
 
-  team_member:
-    regs: "team_member.register.yaml"
+  id024_team_member:
+    regs: "id024_team_member.register.yaml"
     desc: "Team member identifier."
     pfix: "t"
     dgts: 3
     note: "I prefer calling people team members
           rather than users."
 
-  timebox:
+  id025_timebox:
     regs: Null
     desc: "Time box identifier."
     pfix: "u"
@@ -260,7 +279,7 @@ register:
           Uniquely amongst identifiers, the
           prefix can be omitted."
 
-  validation_level:
+  id026_validation_level:
     regs: Null
     desc: "Document data validation level identifier."
     pfix: "v"
@@ -268,7 +287,7 @@ register:
     note: "Documents can declare the stringency of
           their own validation."
 
-  recording_system:
+  id027_recording_system:
     regs: Null
     desc: "Recording system identifier."
     pfix: "w"
@@ -276,23 +295,7 @@ register:
     note: "Recording system. There may be more
           than one on a platform."
 
-  workspace:
-    regs: Null
-    desc: "Workspace identifier."
-    pfix: "ws"
-    dgts: 2
-    note: "We sometimes need to have more than
-          one copy of the design document set
-          available at the same time on our local
-          workstation. For example, this may be
-          to make it easier switch between
-          projects, or to carry out comparisons
-          between different versions of a design.
-          This identifier gives us a way of
-          systematically identifying and handling
-          such local working copies."
-
-  coordinate_system:
+  id028_coordinate_system:
     regs: Null
     desc: "Coordinate system type identifier."
     pfix: "x"
@@ -307,8 +310,8 @@ register:
           The prefix x is supposed to be
           reminiscent of x-axis or aXis."
 
-  device:
-    regs: "device.register.yaml"
+  id029_device:
+    regs: "id029_device.register.yaml"
     desc: "Device identifier."
     pfix: "z"
     dgts: 4
@@ -319,3 +322,11 @@ register:
           devices controlling bench/integration
           test equipment. The prefix z is short
           for zoo."
+
+  id030_capability:
+    regs: Null
+    desc: "Capability identifier."
+    pfix: "c"
+    dgts: 3
+    note: "Capability."
+
